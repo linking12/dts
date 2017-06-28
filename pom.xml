@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.quancheng.dts</groupId>
+  <artifactId>dts</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  <modules>
+    <module>dts-client</module>
+    <module>dts-common</module>
+    <module>dts-datasource</module>
+    <module>dts-parser</module>
+    <module>dts-resourcemanager</module>
+    <module>dts-rpc</module>
+    <module>dts-server</module>
+    <module>dts-rm-rabbit</module>
+    <module>dts-rm-rocketmq</module>
+    <module>dts-jdbc</module>
+  </modules>
+</project>
