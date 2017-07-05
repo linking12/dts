@@ -106,7 +106,7 @@ public abstract class DtsMessage implements DtsMsgVistor, DtsCodec, Serializable
   @Override
   public void handleMessage(long msgId, String dbKeys, String clientIp, String clientAppName,
       DtsMessage message, ResultMessage[] results, int idx) {
-    throw new UnsupportedOperationException(this.getClass().getName());
+    // do nothing
   }
 
 
