@@ -24,12 +24,13 @@ public class BeginResultMessage extends ResultMessage {
 
   private static final long serialVersionUID = -7218509638957782773L;
 
-  /**
-   * 全局唯一的事务ID
-   */
   private String xid;
 
   private String nextServerAddr;
+
+  public BeginResultMessage() {
+    super(256);
+  }
 
   public String getXid() {
     return xid;

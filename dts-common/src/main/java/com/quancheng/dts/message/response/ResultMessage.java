@@ -29,15 +29,15 @@ public abstract class ResultMessage extends DtsMessage implements MergedMessage 
 
   private static final long serialVersionUID = 8921411043866254260L;
 
-  /**
-   * 0:失败; 1:成功;
-   */
+  protected final ByteBuffer byteBuffer;
+
   private int result;
 
   private String msg;
 
-
-  protected ByteBuffer byteBuffer = ByteBuffer.allocate(256);
+  public ResultMessage(int size) {
+    this.byteBuffer = ByteBuffer.allocate(size);
+  }
 
   public int getResult() {
     return result;
@@ -108,6 +108,14 @@ public abstract class ResultMessage extends DtsMessage implements MergedMessage 
     }
 
     return true;
+  }
+
+  /**
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return "ResultMessage [result=" + result + ", msg=" + msg + "]";
   }
 
 }
