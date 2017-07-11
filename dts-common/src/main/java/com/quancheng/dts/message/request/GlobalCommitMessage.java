@@ -13,11 +13,71 @@
  */
 package com.quancheng.dts.message.request;
 
-/** 
- * @author liushiming 
- * @version GlobalCommitMessage.java, v 0.0.1 2017年7月5日 下午5:38:15 liushiming 
+import java.nio.ByteBuffer;
+
+import com.quancheng.dts.message.DtsMessage;
+import com.quancheng.dts.message.MergedMessage;
+import com.quancheng.dts.message.response.ResultMessage;
+
+/**
+ * @author liushiming
+ * @version GlobalCommitMessage.java, v 0.0.1 2017年7月5日 下午5:38:15 liushiming
  * @since JDK 1.8
  */
-public class GlobalCommitMessage {
+public class GlobalCommitMessage extends DtsMessage implements MergedMessage {
+
+  private static final long serialVersionUID = -3751334426100691183L;
+  /**
+   * 事务ID
+   */
+  private long tranId;
+
+  /**
+   * @see com.quancheng.dts.message.DtsCodec#getTypeCode()
+   */
+  @Override
+  public short getTypeCode() {
+    return TYPE_GLOBAL_COMMIT;
+  }
+
+  /**
+   * @see com.quancheng.dts.message.DtsCodec#encode()
+   */
+  @Override
+  public byte[] encode() {
+    ByteBuffer byteBuffer = ByteBuffer.allocate(16);
+    byteBuffer.putLong(tranId);
+    byteBuffer.flip();
+    byte[] content = new byte[byteBuffer.limit()];
+    byteBuffer.get(content);
+    return content;
+  }
+
+  /**
+   * @see com.quancheng.dts.message.MergedMessage#decode(java.nio.ByteBuffer)
+   */
+  @Override
+  public void decode(ByteBuffer byteBuffer) {
+    this.tranId = byteBuffer.getLong();
+  }
+
+  /**
+   * @see com.quancheng.dts.message.DtsMessage#handleMessage(long, java.lang.String,
+   *      java.lang.String, java.lang.String, com.quancheng.dts.message.DtsMessage,
+   *      com.quancheng.dts.message.response.ResultMessage[], int)
+   */
+  @Override
+  public void handleMessage(long msgId, String dbKeys, String clientIp, String clientAppName,
+      DtsMessage message, ResultMessage[] results, int idx) {
+    super.getHandler().handleMessage(msgId, dbKeys, clientIp, clientAppName, this, results, idx);
+  }
+
+  /**
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return "GlobalCommitMessage [tranId=" + tranId + "]";
+  }
 
 }

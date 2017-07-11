@@ -55,129 +55,90 @@ public class BranchRollbackMessage extends DtsMessage {
     this.byteBuffer = ByteBuffer.allocate(size);
   }
 
-
-  /**
-   * @return the serverAddr
-   */
   public String getServerAddr() {
     return serverAddr;
   }
 
-  /**
-   * @param serverAddr the serverAddr to set
-   */
+
   public void setServerAddr(String serverAddr) {
     this.serverAddr = serverAddr;
   }
 
-  /**
-   * @return the tranId
-   */
+
   public long getTranId() {
     return tranId;
   }
 
-  /**
-   * @param tranId the tranId to set
-   */
+
   public void setTranId(long tranId) {
     this.tranId = tranId;
   }
 
-  /**
-   * @return the branchId
-   */
+
   public long getBranchId() {
     return branchId;
   }
 
-  /**
-   * @param branchId the branchId to set
-   */
+
   public void setBranchId(long branchId) {
     this.branchId = branchId;
   }
 
-  /**
-   * @return the appName
-   */
+
   public String getAppName() {
     return appName;
   }
 
-  /**
-   * @param appName the appName to set
-   */
+
   public void setAppName(String appName) {
     this.appName = appName;
   }
 
-  /**
-   * @return the dbName
-   */
+
   public String getDbName() {
     return dbName;
   }
 
-  /**
-   * @param dbName the dbName to set
-   */
+
   public void setDbName(String dbName) {
     this.dbName = dbName;
   }
 
-  /**
-   * @return the commitMode
-   */
+
   public byte getCommitMode() {
     return commitMode;
   }
 
-  /**
-   * @param commitMode the commitMode to set
-   */
+
   public void setCommitMode(byte commitMode) {
     this.commitMode = commitMode;
   }
 
-  /**
-   * @return the isDelLock
-   */
+
   public byte getIsDelLock() {
     return isDelLock;
   }
 
-  /**
-   * @param isDelLock the isDelLock to set
-   */
+
   public void setIsDelLock(byte isDelLock) {
     this.isDelLock = isDelLock;
   }
 
-  /**
-   * @return the udata
-   */
+
   public String getUdata() {
     return udata;
   }
 
-  /**
-   * @param udata the udata to set
-   */
   public void setUdata(String udata) {
     this.udata = udata;
   }
 
-  /**
-   * @return the byteBuffer
-   */
+
   public ByteBuffer getByteBuffer() {
     return byteBuffer;
   }
 
-  /**
-   * @param byteBuffer the byteBuffer to set
-   */
+  
   public void setByteBuffer(ByteBuffer byteBuffer) {
     this.byteBuffer = byteBuffer;
   }
