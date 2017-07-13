@@ -69,7 +69,7 @@ public abstract class DtsMessage implements DtsMsgVistor, DtsCodec, Serializable
 
 
 
-  public static final Map<Short, String> typeMap = new HashMap<Short, String>();
+  protected static final Map<Short, String> typeMap = new HashMap<Short, String>();
 
   static {
 
@@ -108,7 +108,5 @@ public abstract class DtsMessage implements DtsMsgVistor, DtsCodec, Serializable
       DtsMessage message, ResultMessage[] results, int idx) {
     // do nothing
   }
-
-
 
 }
