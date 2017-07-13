@@ -33,7 +33,7 @@ import io.netty.channel.ChannelHandlerContext;
  * @version DtsMergeMessage.java, v 0.0.1 2017年7月5日 下午5:40:49 liushiming
  * @since JDK 1.8
  */
-public class DtsMergeMessage extends DtsMessage {
+public class DtsMergeMessage extends DtsMessage implements MergeMessage {
 
   private static final long serialVersionUID = 4190062406263786100L;
 
@@ -129,12 +129,5 @@ public class DtsMergeMessage extends DtsMessage {
     }
   }
 
-
-  private void intToBytes(int i, byte[] bytes, int offset) {
-    bytes[offset] = (byte) ((i >> 24) & 0xFF);
-    bytes[offset + 1] = (byte) ((i >> 16) & 0xFF);
-    bytes[offset + 2] = (byte) ((i >> 8) & 0xFF);
-    bytes[offset + 3] = (byte) (i & 0xFF);
-  }
 
 }

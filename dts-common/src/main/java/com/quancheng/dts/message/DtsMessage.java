@@ -18,6 +18,26 @@ import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.quancheng.dts.message.request.BeginMessage;
+import com.quancheng.dts.message.request.BeginRetryBranchMessage;
+import com.quancheng.dts.message.request.BranchCommitMessage;
+import com.quancheng.dts.message.request.BranchRollbackMessage;
+import com.quancheng.dts.message.request.GlobalCommitMessage;
+import com.quancheng.dts.message.request.GlobalRollbackMessage;
+import com.quancheng.dts.message.request.QueryLockMessage;
+import com.quancheng.dts.message.request.RegisterMessage;
+import com.quancheng.dts.message.request.ReportStatusMessage;
+import com.quancheng.dts.message.request.ReportUdataMessage;
+import com.quancheng.dts.message.response.BeginResultMessage;
+import com.quancheng.dts.message.response.BeginRetryBranchResultMessage;
+import com.quancheng.dts.message.response.BranchCommitResultMessage;
+import com.quancheng.dts.message.response.BranchRollbackResultMessage;
+import com.quancheng.dts.message.response.GlobalCommitResultMessage;
+import com.quancheng.dts.message.response.GlobalRollbackResultMessage;
+import com.quancheng.dts.message.response.QueryLockResultMessage;
+import com.quancheng.dts.message.response.RegisterResultMessage;
+import com.quancheng.dts.message.response.ReportStatusResultMessage;
+import com.quancheng.dts.message.response.ReportUdataResultMessage;
 import com.quancheng.dts.message.response.ResultMessage;
 
 import io.netty.buffer.ByteBuf;
@@ -72,6 +92,28 @@ public abstract class DtsMessage implements DtsMsgVistor, DtsCodec, Serializable
   protected static final Map<Short, String> typeMap = new HashMap<Short, String>();
 
   static {
+    typeMap.put(TYPE_BEGIN, BeginMessage.class.getName());
+    typeMap.put(TYPE_BEGIN_RESULT, BeginResultMessage.class.getName());
+    typeMap.put(TYPE_BRANCH_COMMIT, BranchCommitMessage.class.getName());
+    typeMap.put(TYPE_BRANCH_COMMIT_RESULT, BranchCommitResultMessage.class.getName());
+    typeMap.put(TYPE_BRANCH_ROLLBACK, BranchRollbackMessage.class.getName());
+    typeMap.put(TYPE_BRANCH_ROLLBACK_RESULT, BranchRollbackResultMessage.class.getName());
+    typeMap.put(TYPE_GLOBAL_COMMIT, GlobalCommitMessage.class.getName());
+    typeMap.put(TYPE_GLOBAL_COMMIT_RESULT, GlobalCommitResultMessage.class.getName());
+    typeMap.put(TYPE_GLOBAL_ROLLBACK, GlobalRollbackMessage.class.getName());
+    typeMap.put(TYPE_GLOBAL_ROLLBACK_RESULT, GlobalRollbackResultMessage.class.getName());
+    typeMap.put(TYPE_REGIST, RegisterMessage.class.getName());
+    typeMap.put(TYPE_REGIST_RESULT, RegisterResultMessage.class.getName());
+    typeMap.put(TYPE_REPORT_STATUS, ReportStatusMessage.class.getName());
+    typeMap.put(TYPE_REPORT_STATUS_RESULT, ReportStatusResultMessage.class.getName());
+    typeMap.put(TYPE_BEGIN_RETRY_BRANCH, BeginRetryBranchMessage.class.getName());
+    typeMap.put(TYPE_BEGIN_RETRY_BRANCH_RESULT, BeginRetryBranchResultMessage.class.getName());
+    typeMap.put(TYPE_REPORT_UDATA, ReportUdataMessage.class.getName());
+    typeMap.put(TYPE_REPORT_UDATA_RESULT, ReportUdataResultMessage.class.getName());
+    typeMap.put(TYPE_DTS_MERGE, DtsMergeMessage.class.getName());
+    typeMap.put(TYPE_DTS_MERGE_RESULT, DtsMergeResultMessage.class.getName());
+    typeMap.put(TYPE_QUERY_LOCK, QueryLockMessage.class.getName());
+    typeMap.put(TYPE_QUERY_LOCK_RESULT, QueryLockResultMessage.class.getName());
 
 
   }
@@ -103,10 +145,26 @@ public abstract class DtsMessage implements DtsMsgVistor, DtsCodec, Serializable
     this.handler = handler;
   }
 
+
   @Override
   public void handleMessage(long msgId, String dbKeys, String clientIp, String clientAppName,
       DtsMessage message, ResultMessage[] results, int idx) {
     // do nothing
   }
 
+  protected void intToBytes(int i, byte[] bytes, int offset) {
+    bytes[offset] = (byte) ((i >> 24) & 0xFF);
+    bytes[offset + 1] = (byte) ((i >> 16) & 0xFF);
+    bytes[offset + 2] = (byte) ((i >> 8) & 0xFF);
+    bytes[offset + 3] = (byte) (i & 0xFF);
+  }
+
+  protected int bytesToInt(byte[] bytes, int offset) {
+    int ret = 0;
+    for (int i = 0; i < 4 && i + offset < bytes.length; i++) {
+      ret <<= 8;
+      ret |= (int) bytes[i + offset] & 0xFF;
+    }
+    return ret;
+  }
 }
