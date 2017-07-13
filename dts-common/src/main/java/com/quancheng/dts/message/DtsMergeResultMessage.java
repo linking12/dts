@@ -15,6 +15,9 @@ package com.quancheng.dts.message;
 
 import java.nio.ByteBuffer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.quancheng.dts.message.response.ResultMessage;
 
 import io.netty.buffer.ByteBuf;
@@ -28,6 +31,8 @@ import io.netty.channel.ChannelHandlerContext;
 public class DtsMergeResultMessage extends ResultMessage implements MergeMessage {
 
   private static final long serialVersionUID = 8386815271362483836L;
+
+  private static final Logger logger = LoggerFactory.getLogger(DtsMergeResultMessage.class);
 
   public ResultMessage[] msgs;
 
@@ -101,7 +106,7 @@ public class DtsMergeResultMessage extends ResultMessage implements MergeMessage
       try {
         message = (MergedMessage) Class.forName(className).newInstance();
       } catch (Exception e) {
-        e.printStackTrace();
+        logger.error(className + " not found", e);
       }
       ((ResultMessage) message).setChannelHandlerContext(ctx);
       message.decode(byteBuffer);
