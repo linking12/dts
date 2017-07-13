@@ -13,11 +13,147 @@
  */
 package com.quancheng.dts.message.request;
 
-/** 
- * @author liushiming 
- * @version ReportUdataMessage.java, v 0.0.1 2017年7月5日 下午5:39:42 liushiming 
+import java.nio.ByteBuffer;
+
+import com.quancheng.dts.message.DtsMessage;
+import com.quancheng.dts.message.MergedMessage;
+import com.quancheng.dts.message.response.ResultMessage;
+
+/**
+ * @author liushiming
+ * @version ReportUdataMessage.java, v 0.0.1 2017年7月5日 下午5:39:42 liushiming
  * @since JDK 1.8
  */
-public class ReportUdataMessage {
+public class ReportUdataMessage extends DtsMessage implements MergedMessage {
+
+  private static final long serialVersionUID = -2688139318867884117L;
+
+  /**
+   * 事务ID
+   */
+  private long tranId;
+
+  /**
+   * 分支ID
+   */
+  private long branchId;
+
+  private String key;
+
+  private String udata = null;
+
+
+  public long getTranId() {
+    return tranId;
+  }
+
+  public void setTranId(long tranId) {
+    this.tranId = tranId;
+  }
+
+  public long getBranchId() {
+    return branchId;
+  }
+
+  public void setBranchId(long branchId) {
+    this.branchId = branchId;
+  }
+
+  public String getKey() {
+    return key;
+  }
+
+  public void setKey(String key) {
+    this.key = key;
+  }
+
+  public String getUdata() {
+    return udata;
+  }
+
+  public void setUdata(String udata) {
+    this.udata = udata;
+  }
+
+  /**
+   * @see com.quancheng.dts.message.DtsCodec#getTypeCode()
+   */
+  @Override
+  public short getTypeCode() {
+    return TYPE_REPORT_UDATA;
+  }
+
+  /**
+   * @see com.quancheng.dts.message.DtsCodec#encode()
+   */
+  @Override
+  public byte[] encode() {
+    ByteBuffer byteBuffer = ByteBuffer.allocate(1024);
+    byteBuffer.putLong(this.tranId);
+    byteBuffer.putLong(this.branchId);
+
+    if (this.key != null) {
+      byte[] bs = key.getBytes(UTF8);
+      byteBuffer.putShort((short) bs.length);
+      if (bs.length > 0)
+        byteBuffer.put(bs);
+    } else
+      byteBuffer.putShort((short) 0);
+
+    if (this.udata != null) {
+      byte[] bs = udata.getBytes(UTF8);
+      byteBuffer.putShort((short) bs.length);
+      if (bs.length > 0)
+        byteBuffer.put(bs);
+    } else
+      byteBuffer.putShort((short) 0);
+
+    byteBuffer.flip();
+    byte[] content = new byte[byteBuffer.limit()];
+    byteBuffer.get(content);
+    return content;
+  }
+
+  /**
+   * @see com.quancheng.dts.message.MergedMessage#decode(java.nio.ByteBuffer)
+   */
+  @Override
+  public void decode(ByteBuffer byteBuffer) {
+    this.tranId = byteBuffer.getLong();
+    this.branchId = byteBuffer.getLong();
+    short len = byteBuffer.getShort();
+    if (len > 0) {
+      byte[] bs = new byte[len];
+      byteBuffer.get(bs);
+      this.setKey(new String(bs, UTF8));
+    }
+
+    len = byteBuffer.getShort();
+    if (len > 0) {
+      byte[] bs = new byte[len];
+      byteBuffer.get(bs);
+      this.setUdata(new String(bs, UTF8));
+    }
+  }
+
+  /**
+   * @see com.quancheng.dts.message.DtsMessage#handleMessage(long, java.lang.String,
+   *      java.lang.String, java.lang.String, com.quancheng.dts.message.DtsMessage,
+   *      com.quancheng.dts.message.response.ResultMessage[], int)
+   */
+  @Override
+  public void handleMessage(long msgId, String dbKeys, String clientIp, String clientAppName,
+      DtsMessage message, ResultMessage[] results, int idx) {
+    super.getHandler().handleMessage(msgId, dbKeys, clientIp, clientAppName, this, results, idx);
+  }
+
+  /**
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return "ReportUdataMessage [tranId=" + tranId + ", branchId=" + branchId + ", key=" + key
+        + ", udata=" + udata + "]";
+  }
 
 }
