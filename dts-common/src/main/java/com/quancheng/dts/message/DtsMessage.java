@@ -133,6 +133,29 @@ public abstract class DtsMessage implements DtsMsgVistor, DtsCodec, Serializable
     typeMap.put(TYPE_QUERY_LOCK, QueryLockMessage.class.getName());
     typeMap.put(TYPE_QUERY_LOCK_RESULT, QueryLockResultMessage.class.getName());
 
+    typeMap.put(TYPE_REG_CLT, "com.quancheng.dts.rpc.impl.RegisterClientAppNameMessage");
+    typeMap.put(TYPE_REG_CLT_RESULT,
+        "com.quancheng.dts.rpc.impl.RegisterClientAppNameResultMessage");
+    typeMap.put(TYPE_REG_RM, "com.quancheng.dts.rpc.impl.RegisterRmMessage");
+    typeMap.put(TYPE_REG_RM_RESULT, "com.quancheng.dts.rpc.impl.RegisterRmResultMessage");
+    typeMap.put(TYPE_REG_CLUSTER_NODE,
+        "com.quancheng.dts.cluster.message.RegisterClusterNodeMessage");
+    typeMap.put(TYPE_REG_CLUSTER_NODE_RESULT,
+        "com.quancheng.dts.cluster.message.RegisterClusterNodeResultMessage");
+    typeMap.put(TYPE_CLUSTER_BRANCH, "com.quancheng.dts.cluster.message.ClusterBranchMessage");
+    typeMap.put(TYPE_CLUSTER_BRANCH_RESULT,
+        "com.quancheng.dts.cluster.message.ClusterBranchResultMessage");
+    typeMap.put(TYPE_CLUSTER_GLOBAL, "com.quancheng.dts.cluster.message.ClusterGlobalMessage");
+    typeMap.put(TYPE_CLUSTER_GLOBAL_RESULT,
+        "com.quancheng.dts.cluster.message.ClusterGlobalResultMessage");
+    typeMap.put(TYPE_CLUSTER_SYNC, "com.quancheng.dts.cluster.message.ClusterSyncMessage");
+    typeMap.put(TYPE_CLUSTER_SYNC_RESULT,
+        "com.quancheng.dts.cluster.message.ClusterSyncResultMessage");
+    typeMap.put(TYPE_CLUSTER_DUMP, "com.quancheng.dts.message.ClusterDumpMessage");
+    typeMap.put(TYPE_CLUSTER_DUMP_RESULT, "com.quancheng.dts.message.ClusterDumpResultMessage");
+    typeMap.put(TYPE_CLUSTER_MERGE, "com.quancheng.dts.cluster.message.ClusterMergeMessage");
+    typeMap.put(TYPE_CLUSTER_MERGE_RESULT,
+        "com.quancheng.dts.cluster.message.ClusterMergeResultMessage");
 
   }
 
