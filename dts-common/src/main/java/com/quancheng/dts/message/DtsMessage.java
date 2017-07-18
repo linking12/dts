@@ -88,6 +88,24 @@ public abstract class DtsMessage implements DtsMsgVistor, DtsCodec, Serializable
   public static final short TYPE_QUERY_LOCK_RESULT = 22;
 
 
+  public static final short TYPE_REG_CLT = 101;
+  public static final short TYPE_REG_CLT_RESULT = 102;
+  public static final short TYPE_REG_RM = 103;
+  public static final short TYPE_REG_RM_RESULT = 104;
+
+  public static final short TYPE_REG_CLUSTER_NODE = 105;
+  public static final short TYPE_REG_CLUSTER_NODE_RESULT = 106;
+  public static final short TYPE_CLUSTER_BRANCH = 107;
+  public static final short TYPE_CLUSTER_BRANCH_RESULT = 108;
+  public static final short TYPE_CLUSTER_GLOBAL = 109;
+  public static final short TYPE_CLUSTER_GLOBAL_RESULT = 110;
+  public static final short TYPE_CLUSTER_SYNC = 111;
+  public static final short TYPE_CLUSTER_SYNC_RESULT = 112;
+  public static final short TYPE_CLUSTER_DUMP = 113;
+  public static final short TYPE_CLUSTER_DUMP_RESULT = 114;
+  public static final short TYPE_CLUSTER_MERGE = 115;
+  public static final short TYPE_CLUSTER_MERGE_RESULT = 116;
+
 
   protected static final Map<Short, String> typeMap = new HashMap<Short, String>();
 

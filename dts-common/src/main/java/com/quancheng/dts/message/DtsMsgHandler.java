@@ -31,7 +31,7 @@ import com.quancheng.dts.message.response.ResultMessage;
  * @version DtsMsgHandler.java, v 0.0.1 2017年7月5日 下午5:33:53 liushiming
  * @since JDK 1.8
  */
-public interface DtsMsgHandler {
+public interface DtsMsgHandler extends MsgHandler {
 
   /**
    * 开启一个分布式事务
