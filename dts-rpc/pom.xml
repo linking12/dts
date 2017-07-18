@@ -13,5 +13,10 @@
 	<url>http://maven.apache.org</url>
 
 	<dependencies>
+		<dependency>
+			<groupId>com.quancheng.dts</groupId>
+			<artifactId>dts-common</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 	</dependencies>
 </project>
