@@ -125,4 +125,15 @@ public class RegisterClientAppNameMessage extends DtsMessage {
 
     return true;
   }
+
+  /**
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString() {
+    return "RegisterClientAppNameMessage [clientAppName=" + clientAppName + ", version=" + version
+        + "]";
+  }
+
+
 }
