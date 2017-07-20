@@ -6,6 +6,13 @@
 	<artifactId>dts</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
+	<licenses>
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
 	<modules>
 		<module>dts-client</module>
 		<module>dts-common</module>
@@ -18,7 +25,43 @@
 		<module>dts-rm-rocketmq</module>
 		<module>dts-rm-jdbc</module>
 	</modules>
+	<properties>
+		<guava.version>20.0</guava.version>
+		<slf4j-api.version>1.7.21</slf4j-api.version>
+		<commons-lang3.version>3.4</commons-lang3.version>
+		<netty.version>4.0.43.Final</netty.version>
+	</properties>
+	<scm>
+		<url>https://github.com/linking12/saluki</url>
+		<connection>scm:git:git@github.com:linking12/saluki.git</connection>
+		<developerConnection>scm:git:ssh://git@github.com:linking12/saluki.git</developerConnection>
+		<tag>HEAD</tag>
+	</scm>
 
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>com.google.guava</groupId>
+				<artifactId>guava</artifactId>
+				<version>${guava.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-api</artifactId>
+				<version>${slf4j-api.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-lang3</artifactId>
+				<version>${commons-lang3.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.netty</groupId>
+				<artifactId>netty-all</artifactId>
+				<version>${netty.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
 	<build>
 		<plugins>
