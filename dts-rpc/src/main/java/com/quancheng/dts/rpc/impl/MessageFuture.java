@@ -24,7 +24,7 @@ import com.google.common.util.concurrent.AbstractFuture;
  * @version MessageFuture.java, v 0.0.1 2017年7月20日 下午1:47:07 liushiming
  * @since JDK 1.8
  */
-public class MessageFuture<RpcMessage> extends AbstractFuture<RpcMessage> {
+public class MessageFuture extends AbstractFuture<RpcMessage> {
 
   @Override
   protected boolean set(RpcMessage resp) {

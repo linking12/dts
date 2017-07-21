@@ -11,17 +11,18 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.quancheng.dts.cluster;
-
-import java.util.List;
+package com.quancheng.dts.rpc.cluster;
 
 /**
  * @author liushiming
- * @version AddressWatcher.java, v 0.0.1 2017年7月21日 下午3:49:27 liushiming
+ * @version AddressManager.java, v 0.0.1 2017年7月21日 下午3:48:55 liushiming
  * @since JDK 1.8
  */
-public interface AddressWatcher {
+public interface AddressManager {
 
-  public void onAddressListChanged(List<String> newAddressList);
+  public void publish(String group, String address);
 
+  public void unpublish(String group, String address);
+
+  public void getAddressList(String group, AddressWatcher watcher) throws InterruptedException;
 }
