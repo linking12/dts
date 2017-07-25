@@ -13,25 +13,34 @@
  */
 package com.quancheng.dts.rpc.impl;
 
+import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.quancheng.dts.common.DtsException;
 import com.quancheng.dts.common.ResultCode;
 import com.quancheng.dts.message.MergeMessage;
+import com.quancheng.dts.message.request.ClusterDumpMessage;
 import com.quancheng.dts.rpc.cluster.AddressManager;
 import com.quancheng.dts.rpc.cluster.ZookeeperAddressManager;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelDuplexHandler;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 
 /**
@@ -43,39 +52,156 @@ public abstract class RpcEndpoint extends ChannelDuplexHandler {
 
   private static final Logger logger = LoggerFactory.getLogger(RpcEndpoint.class);
 
-  protected final ThreadPoolExecutor messageExecutor;
-
-  protected ScheduledExecutorService timerExecutor = Executors.newScheduledThreadPool(1);
-
-  protected ConcurrentHashMap<Long, MessageFuture> futures =
-      new ConcurrentHashMap<Long, MessageFuture>();
-
   private int timeoutCheckInternal = 5000;
-
-  protected AddressManager addressManager = new ZookeeperAddressManager();
 
   private String group = "DEFAULT";
 
   private Object lock = new Object();
 
-  private Map<String, BlockingQueue<RpcMessage>> basketMap =
-      new ConcurrentHashMap<String, BlockingQueue<RpcMessage>>();
+  private Object mergeLock = new Object();
 
-  protected Map<String, BlockingQueue<RpcMessage>> rmBasketMap =
-      new ConcurrentHashMap<String, BlockingQueue<RpcMessage>>();
+  protected final ThreadPoolExecutor messageExecutor;
 
-  protected Object mergeLock = new Object();
+  protected final ScheduledExecutorService timerExecutor = Executors.newScheduledThreadPool(1);
 
-  protected Map<Long, MergeMessage> mergeMsgMap = new ConcurrentHashMap<Long, MergeMessage>();
+  protected AddressManager addressManager = new ZookeeperAddressManager();
 
   protected boolean isSending = false;
+
+  private final Map<Long, MessageFuture> futures = Maps.newConcurrentMap();
+
+  private final Map<String, BlockingQueue<RpcMessage>> basketMap = Maps.newConcurrentMap();
+
+  private final Map<String, BlockingQueue<RpcMessage>> rmBasketMap = Maps.newConcurrentMap();
+
+  private final Map<Long, MergeMessage> mergeMsgMap = Maps.newConcurrentMap();
 
   public RpcEndpoint(ThreadPoolExecutor messageExecutor) {
     this.messageExecutor = messageExecutor;
   }
 
   public void init() {
+    timerExecutor.scheduleAtFixedRate(new Runnable() {
+      @Override
+      public void run() {
+        List<MessageFuture> timeoutMessageFutures = Lists.newArrayList();
+        for (MessageFuture future : futures.values()) {
+          if (!future.isDone()) {
+            timeoutMessageFutures.add(future);
+          }
+        }
+        for (MessageFuture messageFuture : timeoutMessageFutures) {
+          futures.remove(messageFuture.getRequestMessage().getId());
+          messageFuture.set(null);
+          if (logger.isDebugEnabled()) {
+            logger.debug("timeout clear future : " + messageFuture);
+          }
+        }
+      }
+    }, timeoutCheckInternal, timeoutCheckInternal, TimeUnit.MILLISECONDS);
+  }
 
+  public void destroy() {
+    timerExecutor.shutdown();
+  }
+
+  public AddressManager getAddressManager() {
+    return addressManager;
+  }
+
+  public void setAddressManager(AddressManager addressManager) {
+    this.addressManager = addressManager;
+  }
+
+  public String getGroup() {
+    return group;
+  }
+
+  public void setGroup(String group) {
+    this.group = group;
+  }
+
+  protected Object invoke(String address, Channel channel, Object msg, long timeout)
+      throws IOException, TimeoutException {
+    return invoke(address, channel, msg, timeout, timeout >= 0 ? true : false);
+  }
+
+  protected Object invoke(String address, Channel channel, Object msg, long timeout,
+      boolean waitResponse) throws IOException, TimeoutException {
+    if (channel == null) {
+      logger.warn("invoke nothing, caused by null channel.");
+      return null;
+    } else {
+      final RpcMessage rpcMessage = new RpcMessage();
+      rpcMessage.setId(RpcMessage.getNextMessageId());
+      rpcMessage.setAsync(false);
+      rpcMessage.setHeartbeat(false);
+      rpcMessage.setRequest(true);
+      rpcMessage.setBody(msg);
+      final MessageFuture messageFuture = new MessageFuture();
+      messageFuture.set(rpcMessage);
+      futures.put(rpcMessage.getId(), messageFuture);
+      if (address != null && !(msg instanceof ClusterDumpMessage)) {
+        Map<String, BlockingQueue<RpcMessage>> map = null;
+        if (this instanceof RpcClient) {
+          map = basketMap;
+        } else {
+          map = rmBasketMap;
+        }
+        BlockingQueue<RpcMessage> basket = map.get(address);
+        if (basket == null) {
+          basket = new LinkedBlockingQueue<RpcMessage>();
+          map.put(address, basket);
+        }
+        basket.offer(rpcMessage);
+        if (!isSending) {
+          synchronized (mergeLock) {
+            mergeLock.notify();
+          }
+        }
+      } else {
+        if (logger.isDebugEnabled()) {
+          logger.debug(String.format("%s wanted to send msgid:%s body:%s future:%s", this,
+              rpcMessage.getId(), rpcMessage.getBody(), messageFuture));
+        }
+        synchronized (lock) {
+          int tryTimes = 0;
+          while (!channel.isWritable()) {
+            try {
+              tryTimes++;
+              if (tryTimes > 3000)
+                throw new DtsException("channel is not writable");
+              lock.wait(10);
+            } catch (InterruptedException e) {
+            }
+          }
+        }
+        ChannelFuture future = channel.writeAndFlush(rpcMessage);
+        future.addListener(new ChannelFutureListener() {
+          @Override
+          public void operationComplete(ChannelFuture future) throws Exception {
+            if (!future.isSuccess()) {
+              MessageFuture messageFuture = futures.remove(rpcMessage.getId());
+              if (messageFuture != null)
+                messageFuture.setException(future.cause());
+              future.channel().close();
+            }
+          }
+        });
+      }
+      if (waitResponse) {
+        try {
+          return messageFuture.get(timeout, TimeUnit.MILLISECONDS);
+        } catch (Exception e) {
+          if (logger.isDebugEnabled()) {
+            logger.debug("messageFuture : " + messageFuture);
+          }
+          throw new RuntimeException(e);
+        }
+      } else {
+        return null;
+      }
+    }
   }
 
   @Override
@@ -98,6 +224,11 @@ public abstract class RpcEndpoint extends ChannelDuplexHandler {
         this.doProcessResponseMessage(ctx, rpcMessage);
       }
     }
+  }
+
+  @Override
+  public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+    logger.error(cause.getMessage(), cause);
   }
 
 
@@ -173,6 +304,55 @@ public abstract class RpcEndpoint extends ChannelDuplexHandler {
     if (!channel.isWritable()) {
       throw new DtsException("channel is not writable");
     }
+    channel.writeAndFlush(rpcMessage);
+  }
+
+  protected void sendRequest(Channel channel, Object msg) {
+    RpcMessage rpcMessage = new RpcMessage();
+    rpcMessage.setAsync(true);
+    rpcMessage.setHeartbeat(msg instanceof HeartbeatMessage);
+    rpcMessage.setRequest(true);
+    rpcMessage.setBody(msg);
+    rpcMessage.setId(RpcMessage.getNextMessageId());
+    if (msg instanceof MergeMessage)
+      mergeMsgMap.put(rpcMessage.getId(), (MergeMessage) msg);
+
+    synchronized (lock) {
+      int tryTimes = 0;
+      while (!channel.isWritable()) {
+        try {
+          tryTimes++;
+          if (tryTimes > 3000)
+            throw new DtsException("channel is not writable");
+          lock.wait(10);
+        } catch (InterruptedException e) {
+        }
+      }
+    }
+    channel.writeAndFlush(rpcMessage);
+  }
+
+  protected void sendResponse(long msgId, Channel channel, Object msg) {
+    RpcMessage rpcMessage = new RpcMessage();
+    rpcMessage.setAsync(true);
+    rpcMessage.setHeartbeat(msg instanceof HeartbeatMessage);
+    rpcMessage.setRequest(false);
+    rpcMessage.setBody(msg);
+    rpcMessage.setId(msgId);
+    synchronized (lock) {
+      int tryTimes = 0;
+      while (!channel.isWritable()) {
+        try {
+          tryTimes++;
+          if (tryTimes > 3000)
+            throw new DtsException("channel is not writable");
+          lock.wait(10);
+        } catch (InterruptedException e) {
+        }
+      }
+    }
+    if (logger.isDebugEnabled())
+      logger.debug("send response:" + rpcMessage.getBody() + ",channel:" + channel);
     channel.writeAndFlush(rpcMessage);
   }
 

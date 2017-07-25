@@ -26,9 +26,16 @@ import com.google.common.util.concurrent.AbstractFuture;
  */
 public class MessageFuture extends AbstractFuture<RpcMessage> {
 
+  private RpcMessage requestMessage;
+
   @Override
   protected boolean set(RpcMessage resp) {
+    this.requestMessage = resp;
     return super.set(resp);
+  }
+
+  public RpcMessage getRequestMessage() {
+    return requestMessage;
   }
 
   @Override
