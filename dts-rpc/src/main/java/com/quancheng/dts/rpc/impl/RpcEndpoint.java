@@ -14,6 +14,7 @@
 package com.quancheng.dts.rpc.impl;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
@@ -28,7 +29,6 @@ import java.util.concurrent.TimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.quancheng.dts.common.DtsException;
 import com.quancheng.dts.common.ResultCode;
@@ -84,15 +84,15 @@ public abstract class RpcEndpoint extends ChannelDuplexHandler {
     timerExecutor.scheduleAtFixedRate(new Runnable() {
       @Override
       public void run() {
-        List<MessageFuture> timeoutMessageFutures = Lists.newArrayList();
+        List<MessageFuture> timeoutMessageFutures = new ArrayList<MessageFuture>(futures.size());
         for (MessageFuture future : futures.values()) {
-          if (!future.isDone()) {
+          if (future.isTimeout()) {
             timeoutMessageFutures.add(future);
           }
         }
         for (MessageFuture messageFuture : timeoutMessageFutures) {
           futures.remove(messageFuture.getRequestMessage().getId());
-          messageFuture.set(null);
+          messageFuture.setResultMessage(null);
           if (logger.isDebugEnabled()) {
             logger.debug("timeout clear future : " + messageFuture);
           }
@@ -131,76 +131,80 @@ public abstract class RpcEndpoint extends ChannelDuplexHandler {
     if (channel == null) {
       logger.warn("invoke nothing, caused by null channel.");
       return null;
+    }
+    final RpcMessage rpcMessage = new RpcMessage();
+    rpcMessage.setId(RpcMessage.getNextMessageId());
+    rpcMessage.setAsync(false);
+    rpcMessage.setHeartbeat(false);
+    rpcMessage.setRequest(true);
+    rpcMessage.setBody(msg);
+
+    final MessageFuture messageFuture = new MessageFuture();
+    messageFuture.setRequestMessage(rpcMessage);
+    messageFuture.setTimeout(waitResponse ? timeout : 30 * 1000);
+    futures.put(rpcMessage.getId(), messageFuture);
+    if (address != null && !(msg instanceof ClusterDumpMessage)) {
+      Map<String, BlockingQueue<RpcMessage>> map = null;
+      if (this instanceof RpcClient) {
+        map = basketMap;
+      } else {
+        map = rmBasketMap;
+      }
+      BlockingQueue<RpcMessage> basket = map.get(address);
+      if (basket == null) {
+        basket = new LinkedBlockingQueue<RpcMessage>();
+        map.put(address, basket);
+      }
+      basket.offer(rpcMessage);
+      if (!isSending) {
+        synchronized (mergeLock) {
+          mergeLock.notify();
+        }
+      }
     } else {
-      final RpcMessage rpcMessage = new RpcMessage();
-      rpcMessage.setId(RpcMessage.getNextMessageId());
-      rpcMessage.setAsync(false);
-      rpcMessage.setHeartbeat(false);
-      rpcMessage.setRequest(true);
-      rpcMessage.setBody(msg);
-      final MessageFuture messageFuture = new MessageFuture();
-      messageFuture.set(rpcMessage);
-      futures.put(rpcMessage.getId(), messageFuture);
-      if (address != null && !(msg instanceof ClusterDumpMessage)) {
-        Map<String, BlockingQueue<RpcMessage>> map = null;
-        if (this instanceof RpcClient) {
-          map = basketMap;
-        } else {
-          map = rmBasketMap;
-        }
-        BlockingQueue<RpcMessage> basket = map.get(address);
-        if (basket == null) {
-          basket = new LinkedBlockingQueue<RpcMessage>();
-          map.put(address, basket);
-        }
-        basket.offer(rpcMessage);
-        if (!isSending) {
-          synchronized (mergeLock) {
-            mergeLock.notify();
+      ChannelFuture future;
+      if (logger.isDebugEnabled()) {
+        logger.debug(String.format("%s wanted to send msgid:%s body:%s future:%s", this,
+            rpcMessage.getId(), rpcMessage.getBody(), messageFuture));
+      }
+
+      synchronized (lock) {
+        int tryTimes = 0;
+        while (!channel.isWritable()) {
+          try {
+            tryTimes++;
+            if (tryTimes > 3000)
+              throw new DtsException("channel is not writable");
+            lock.wait(10);
+          } catch (InterruptedException e) {
           }
         }
-      } else {
+      }
+      future = channel.writeAndFlush(rpcMessage);
+      future.addListener(new ChannelFutureListener() {
+        @Override
+        public void operationComplete(ChannelFuture future) throws Exception {
+          if (!future.isSuccess()) {
+            MessageFuture messageFuture = futures.remove(rpcMessage.getId());
+            if (messageFuture != null)
+              messageFuture.setResultMessage(future.cause());
+            future.channel().close();
+          }
+        }
+      });
+    }
+
+    if (waitResponse) {
+      try {
+        return messageFuture.get(timeout, TimeUnit.MILLISECONDS);
+      } catch (Exception e) {
         if (logger.isDebugEnabled()) {
-          logger.debug(String.format("%s wanted to send msgid:%s body:%s future:%s", this,
-              rpcMessage.getId(), rpcMessage.getBody(), messageFuture));
+          logger.debug("messageFuture : " + messageFuture);
         }
-        synchronized (lock) {
-          int tryTimes = 0;
-          while (!channel.isWritable()) {
-            try {
-              tryTimes++;
-              if (tryTimes > 3000)
-                throw new DtsException("channel is not writable");
-              lock.wait(10);
-            } catch (InterruptedException e) {
-            }
-          }
-        }
-        ChannelFuture future = channel.writeAndFlush(rpcMessage);
-        future.addListener(new ChannelFutureListener() {
-          @Override
-          public void operationComplete(ChannelFuture future) throws Exception {
-            if (!future.isSuccess()) {
-              MessageFuture messageFuture = futures.remove(rpcMessage.getId());
-              if (messageFuture != null)
-                messageFuture.setException(future.cause());
-              future.channel().close();
-            }
-          }
-        });
+        throw new RuntimeException(e);
       }
-      if (waitResponse) {
-        try {
-          return messageFuture.get(timeout, TimeUnit.MILLISECONDS);
-        } catch (Exception e) {
-          if (logger.isDebugEnabled()) {
-            logger.debug("messageFuture : " + messageFuture);
-          }
-          throw new RuntimeException(e);
-        }
-      } else {
-        return null;
-      }
+    } else {
+      return null;
     }
   }
 
@@ -240,7 +244,7 @@ public abstract class RpcEndpoint extends ChannelDuplexHandler {
           messageFuture, rpcMessage.getBody()));
     }
     if (messageFuture != null) {
-      messageFuture.set(rpcMessage);
+      messageFuture.setResultMessage(rpcMessage);
     } else {
       try {
         RpcEndpoint.this.messageExecutor.execute(new Runnable() {
