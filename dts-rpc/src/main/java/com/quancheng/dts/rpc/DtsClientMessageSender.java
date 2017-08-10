@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
 /**
+ * client同步调用server端接口
  * 
  * @author liushiming
  * @version TxcClientMessageSender.java, v 0.0.1 2017年7月18日 下午4:06:25 liushiming
