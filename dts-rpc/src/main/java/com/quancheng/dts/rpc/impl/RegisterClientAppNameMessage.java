@@ -43,6 +43,9 @@ public class RegisterClientAppNameMessage extends DtsMessage {
     this.byteBuffer = ByteBuffer.allocate(size);
   }
 
+  public RegisterClientAppNameMessage(String appName) {
+    this.clientAppName = appName;
+  }
 
   public String getClientAppName() {
     return clientAppName;

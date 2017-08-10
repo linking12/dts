@@ -29,14 +29,20 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.quancheng.dts.common.DtsErrorCode;
+import com.quancheng.dts.common.DtsConstants;
+import com.quancheng.dts.common.DtsContext;
+import com.quancheng.dts.common.DtsErrCode;
+import com.quancheng.dts.common.DtsException;
+import com.quancheng.dts.common.DtsXID;
 import com.quancheng.dts.common.ResultCode;
 import com.quancheng.dts.message.DtsMergeMessage;
+import com.quancheng.dts.message.DtsMergeResultMessage;
 import com.quancheng.dts.message.DtsMessage;
 import com.quancheng.dts.message.request.GlobalRollbackMessage;
 import com.quancheng.dts.rpc.ClientMessageListener;
 import com.quancheng.dts.rpc.DtsClientMessageSender;
 import com.quancheng.dts.rpc.cluster.AddressWatcher;
+import com.quancheng.dts.rpc.util.NetUtil;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
@@ -48,7 +54,6 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.handler.timeout.IdleStateHandler;
-import io.netty.util.NetUtil;
 
 
 /**
@@ -60,10 +65,6 @@ public class RpcClient extends RpcEndpoint implements DtsClientMessageSender {
 
   private static final Logger logger = LoggerFactory.getLogger(RpcClient.class);
 
-  public RpcClient(ThreadPoolExecutor messageExecutor) {
-    super(messageExecutor);
-  }
-
   protected AtomicLong requestSeq = new AtomicLong(0);
   protected NioEventLoopGroup eventloopGroup = new NioEventLoopGroup(1);
   protected ClientMessageListener clientMessageListener;
@@ -72,6 +73,11 @@ public class RpcClient extends RpcEndpoint implements DtsClientMessageSender {
       new ConcurrentHashMap<String, Object>();
   protected ConcurrentHashMap<String, Channel> channels = new ConcurrentHashMap<String, Channel>();
   protected String clientAppName = System.getProperty("txc.appName", "txc_client");
+
+
+  public RpcClient(ThreadPoolExecutor messageExecutor) {
+    super(messageExecutor);
+  }
 
   @Override
   public void init() {
@@ -156,7 +162,7 @@ public class RpcClient extends RpcEndpoint implements DtsClientMessageSender {
       try {
         connect(serverAddress);
       } catch (Exception e) {
-        logger.error(DtsErrorCode.NetConnect.errCode,
+        logger.error(DtsErrCode.NetConnect.errCode,
             "can not connect to " + serverAddress + " cause:" + e.getMessage());
       }
     }
@@ -179,15 +185,15 @@ public class RpcClient extends RpcEndpoint implements DtsClientMessageSender {
   @Override
   public Object invoke(Object msg, long timeout) throws IOException, TimeoutException {
     String validAddress = null;
-    String svrAddr = TxcXID.getServerAddress(TxcContext.getCurrentXid());
+    String svrAddr = DtsXID.getServerAddress(DtsContext.getCurrentXid());
     try {
       validAddress = getTargetServerAddress(svrAddr);
     } catch (Exception e) {
       logger.info("channel is not ok. " + e);
-      if (msg instanceof GlobalRollbackMessage && TxcContext.getTxcNextSvrAddr() != null) {
-        validAddress = getTargetServerAddress(TxcContext.getTxcNextSvrAddr());
+      if (msg instanceof GlobalRollbackMessage && DtsContext.getTxcNextSvrAddr() != null) {
+        validAddress = getTargetServerAddress(DtsContext.getTxcNextSvrAddr());
         ((GlobalRollbackMessage) msg).setRealSvrAddr(svrAddr);
-        logger.info("I will ask next node (" + TxcContext.getTxcNextSvrAddr()
+        logger.info("I will ask next node (" + DtsContext.getTxcNextSvrAddr()
             + ") to finish the rollback " + msg + ". real node is " + svrAddr);
       } else {
         if (e instanceof IOException)
@@ -195,7 +201,7 @@ public class RpcClient extends RpcEndpoint implements DtsClientMessageSender {
         else if (e instanceof TimeoutException)
           throw (TimeoutException) e;
         else
-          throw new TxcException(e);
+          throw new DtsException(e);
       }
     }
     return super.invoke(validAddress, connect(validAddress), msg, timeout);
@@ -210,16 +216,11 @@ public class RpcClient extends RpcEndpoint implements DtsClientMessageSender {
   }
 
   protected ChannelPackage balanceNextChannel() {
-    // 过去的算法,有问题,会造成,
-    // (1)server下线后,configserver同步延时的这段时间内,
-    // (2)如果server可连接configserver,但client连接不上server
-    // client并不认为此server下线,会不停的在负载调用的过程中,造成1/n
-    // (n为server负载台数)的请求,全部负载到无法连接的server上
     int fetchCount = 0;
     while (true) {
       List<String> tmpServerAddressList = this.serverAddressList;
       if (tmpServerAddressList.size() == 0) {
-        throw new TxcException(ResultCode.SYSTEMERROR.getValue(), "can not find txc server.");
+        throw new DtsException(ResultCode.SYSTEMERROR.getValue(), "can not find txc server.");
       }
       int index = (int) (requestSeq.getAndIncrement() % tmpServerAddressList.size());
       String address = tmpServerAddressList.get(index);
@@ -237,7 +238,7 @@ public class RpcClient extends RpcEndpoint implements DtsClientMessageSender {
 
   @Override
   public Object invoke(Object msg) throws IOException, TimeoutException {
-    return invoke(msg, TxcConstants.RPC_INVOKE_TIMEOUT);
+    return invoke(msg, DtsConstants.RPC_INVOKE_TIMEOUT);
   }
 
   @Override
@@ -256,11 +257,10 @@ public class RpcClient extends RpcEndpoint implements DtsClientMessageSender {
         }
         return;
       }
-
-      if (((RpcMessage) msg).getBody() instanceof TxcMergeResultMessage) {
-        TxcMergeResultMessage results = (TxcMergeResultMessage) ((RpcMessage) msg).getBody();
-        TxcMergeMessage mergeMessage =
-            (TxcMergeMessage) mergeMsgMap.remove(((RpcMessage) msg).getId());
+      if (((RpcMessage) msg).getBody() instanceof DtsMergeResultMessage) {
+        DtsMergeResultMessage results = (DtsMergeResultMessage) ((RpcMessage) msg).getBody();
+        DtsMergeMessage mergeMessage =
+            (DtsMergeMessage) mergeMsgMap.remove(((RpcMessage) msg).getId());
         int num = mergeMessage.msgs.size();
         for (int i = 0; i < num; i++) {
           long msgId = mergeMessage.msgIds.get(i);
@@ -351,7 +351,6 @@ public class RpcClient extends RpcEndpoint implements DtsClientMessageSender {
     if (channelToServer != null && channelToServer.isActive()) {
       return channelToServer;
     }
-
     logger.info("connect to " + serverAddress);
     InetSocketAddress address = NetUtil.toInetSocketAddress(serverAddress);
     Bootstrap b = new Bootstrap();
@@ -360,7 +359,7 @@ public class RpcClient extends RpcEndpoint implements DtsClientMessageSender {
         .option(ChannelOption.SO_REUSEADDR, true).handler(new ChannelInitializer<SocketChannel>() {
           @Override
           public void initChannel(SocketChannel ch) throws Exception {
-            ch.pipeline().addLast(new IdleStateHandler(10, 5, 0), new TxcMessageCodec(),
+            ch.pipeline().addLast(new IdleStateHandler(10, 5, 0), new DtsMessageCodec(),
                 RpcClient.this);
           }
         });
@@ -378,18 +377,18 @@ public class RpcClient extends RpcEndpoint implements DtsClientMessageSender {
           } else {
             logger.info("register client app failed. server version:"
                 + ((RegisterClientAppNameResultMessage) response).getVersion());
-            throw new TxcException(ResultCode.SYSTEMERROR.getValue(),
+            throw new DtsException(ResultCode.SYSTEMERROR.getValue(),
                 "register client app failed.");
           }
         } else {
-          throw new TxcException(ResultCode.SYSTEMERROR.getValue(), "can not register app name.");
+          throw new DtsException(ResultCode.SYSTEMERROR.getValue(), "can not register app name.");
         }
       } catch (Exception e) {
-        logger.error(TxcErrCode.NetRegAppname.errCode, "register client app failed.", e);
-        throw new TxcException(ResultCode.SYSTEMERROR.getValue(), "can not register app.");
+        logger.error(DtsErrCode.NetRegAppname.errCode, "register client app failed.", e);
+        throw new DtsException(ResultCode.SYSTEMERROR.getValue(), "can not register app.");
       }
     } catch (InterruptedException e) {
-      throw new TxcException(e, "can not connect to txc server.");
+      throw new DtsException(e, "can not connect to txc server.");
     }
 
     logger.info("register client app sucesss. server cost " + (System.currentTimeMillis() - start)
@@ -431,7 +430,7 @@ public class RpcClient extends RpcEndpoint implements DtsClientMessageSender {
 
   @Override
   public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-    logger.error(TxcErrCode.ExceptionCaught.errCode,
+    logger.error(DtsErrCode.ExceptionCaught.errCode,
         NetUtil.toStringAddress(ctx.channel().remoteAddress()) + "connect exception. "
             + cause.getMessage(),
         cause);

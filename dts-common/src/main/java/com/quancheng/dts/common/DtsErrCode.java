@@ -18,7 +18,7 @@ package com.quancheng.dts.common;
  * @version DtsErrorCode.java, v 0.0.1 2017年7月24日 下午2:54:04 liushiming
  * @since JDK 1.8
  */
-public enum DtsErrorCode {
+public enum DtsErrCode {
   /**
    * 0001 ~ 0099  与配置相关的错误
    */
@@ -82,7 +82,7 @@ public enum DtsErrorCode {
   public String errCode;
   public String errMessage;
   public String errDispose;
-  private DtsErrorCode(String errCode, String errMessage, String errDispose){
+  private DtsErrCode(String errCode, String errMessage, String errDispose){
       this.errCode = errCode;
       this.errMessage = errMessage;
       this.errDispose = errDispose;
