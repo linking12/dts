@@ -13,28 +13,435 @@
  */
 package com.quancheng.dts.rpc.impl;
 
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicLong;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.quancheng.dts.common.DtsErrorCode;
+import com.quancheng.dts.common.ResultCode;
+import com.quancheng.dts.message.DtsMergeMessage;
+import com.quancheng.dts.message.DtsMessage;
+import com.quancheng.dts.message.request.GlobalRollbackMessage;
+import com.quancheng.dts.rpc.ClientMessageListener;
+import com.quancheng.dts.rpc.DtsClientMessageSender;
+import com.quancheng.dts.rpc.cluster.AddressWatcher;
+
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.timeout.IdleStateEvent;
+import io.netty.handler.timeout.IdleStateHandler;
+import io.netty.util.NetUtil;
+
 
 /**
  * @author liushiming
  * @version RpcClient.java, v 0.0.1 2017年7月25日 下午4:02:01 liushiming
  * @since JDK 1.8
  */
-public class RpcClient extends RpcEndpoint {
+public class RpcClient extends RpcEndpoint implements DtsClientMessageSender {
+
+  private static final Logger logger = LoggerFactory.getLogger(RpcClient.class);
 
   public RpcClient(ThreadPoolExecutor messageExecutor) {
     super(messageExecutor);
   }
 
-  /**
-   * @see com.quancheng.dts.rpc.impl.RpcEndpoint#dispatch(long,
-   *      io.netty.channel.ChannelHandlerContext, java.lang.Object)
-   */
+  protected AtomicLong requestSeq = new AtomicLong(0);
+  protected NioEventLoopGroup eventloopGroup = new NioEventLoopGroup(1);
+  protected ClientMessageListener clientMessageListener;
+  protected volatile List<String> serverAddressList = new ArrayList<String>();
+  protected ConcurrentHashMap<String, Object> channelLocks =
+      new ConcurrentHashMap<String, Object>();
+  protected ConcurrentHashMap<String, Channel> channels = new ConcurrentHashMap<String, Channel>();
+  protected String clientAppName = System.getProperty("txc.appName", "txc_client");
+
+  @Override
+  public void init() {
+    init(5, 5);
+  }
+
+  public void init(long healthCheckDelay, long healthCheckPeriod) {
+    try {
+      addressManager.getAddressList(this.getGroup(), new AddressWatcher() {
+        @Override
+        public void onAddressListChanged(List<String> newAddressList) {
+          RpcClient.this.serverAddressList = newAddressList;
+          logger.info("received new server list:" + newAddressList.toString());
+          reconnect();
+        }
+      });
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e);
+    }
+
+    timerExecutor.scheduleAtFixedRate(new Runnable() {
+      @Override
+      public void run() {
+        reconnect();
+      }
+    }, healthCheckDelay, healthCheckPeriod, TimeUnit.SECONDS);
+
+    new Thread(new Runnable() {
+      @Override
+      public void run() {
+        while (true) {
+          synchronized (mergeLock) {
+            try {
+              mergeLock.wait(1);
+            } catch (InterruptedException e) {
+            }
+          }
+          isSending = true;
+          for (String address : basketMap.keySet()) {
+            BlockingQueue<RpcMessage> basket = basketMap.get(address);
+            if (basket.isEmpty())
+              continue;
+
+            DtsMergeMessage mergeMessage = new DtsMergeMessage();
+            int idx = 0;
+            while (!basket.isEmpty()) {
+              RpcMessage msg = basket.poll();
+              mergeMessage.msgs.add((DtsMergeMessage) msg.getBody());
+              mergeMessage.msgIds.add(msg.getId());
+              idx++;
+            }
+
+            if (idx > 1 && logger.isDebugEnabled()) {
+              logger.debug("msgs:" + idx);
+              for (DtsMessage cm : mergeMessage.msgs)
+                logger.debug(cm.toString());
+              StringBuffer sb = new StringBuffer();
+              for (long l : mergeMessage.msgIds)
+                sb.append("msgid:").append(l).append(";");
+              sb.append("\n");
+              for (long l : futures.keySet())
+                sb.append("futures:").append(l).append(";");
+              logger.debug(sb.toString());
+            }
+
+            try {
+              sendRequest(connect(address), mergeMessage);
+            } catch (Exception e) {
+              logger.error("", "cluster merge call failed", e);
+              e.printStackTrace();
+            }
+          }
+          isSending = false;
+        }
+      }
+    }).start();
+    super.init();
+  }
+
+  private void reconnect() {
+    for (String serverAddress : serverAddressList) {
+      try {
+        connect(serverAddress);
+      } catch (Exception e) {
+        logger.error(DtsErrorCode.NetConnect.errCode,
+            "can not connect to " + serverAddress + " cause:" + e.getMessage());
+      }
+    }
+  }
+
+  @Override
+  public void destroy() {
+    super.destroy();
+    eventloopGroup.shutdownGracefully();
+  }
+
   @Override
   public void dispatch(long msgId, ChannelHandlerContext ctx, Object msg) {
+    if (clientMessageListener != null) {
+      clientMessageListener.onMessage(msgId, NetUtil.toStringAddress(ctx.channel().remoteAddress()),
+          msg);
+    }
+  }
 
+  @Override
+  public Object invoke(Object msg, long timeout) throws IOException, TimeoutException {
+    String validAddress = null;
+    String svrAddr = TxcXID.getServerAddress(TxcContext.getCurrentXid());
+    try {
+      validAddress = getTargetServerAddress(svrAddr);
+    } catch (Exception e) {
+      logger.info("channel is not ok. " + e);
+      if (msg instanceof GlobalRollbackMessage && TxcContext.getTxcNextSvrAddr() != null) {
+        validAddress = getTargetServerAddress(TxcContext.getTxcNextSvrAddr());
+        ((GlobalRollbackMessage) msg).setRealSvrAddr(svrAddr);
+        logger.info("I will ask next node (" + TxcContext.getTxcNextSvrAddr()
+            + ") to finish the rollback " + msg + ". real node is " + svrAddr);
+      } else {
+        if (e instanceof IOException)
+          throw (IOException) e;
+        else if (e instanceof TimeoutException)
+          throw (TimeoutException) e;
+        else
+          throw new TxcException(e);
+      }
+    }
+    return super.invoke(validAddress, connect(validAddress), msg, timeout);
+  }
+
+  protected String getTargetServerAddress(String serverAddress) {
+    if (serverAddress != null) {
+      return connect(serverAddress) == null ? null : serverAddress;
+    } else {
+      return balanceNextChannel().address;
+    }
+  }
+
+  protected ChannelPackage balanceNextChannel() {
+    // 过去的算法,有问题,会造成,
+    // (1)server下线后,configserver同步延时的这段时间内,
+    // (2)如果server可连接configserver,但client连接不上server
+    // client并不认为此server下线,会不停的在负载调用的过程中,造成1/n
+    // (n为server负载台数)的请求,全部负载到无法连接的server上
+    int fetchCount = 0;
+    while (true) {
+      List<String> tmpServerAddressList = this.serverAddressList;
+      if (tmpServerAddressList.size() == 0) {
+        throw new TxcException(ResultCode.SYSTEMERROR.getValue(), "can not find txc server.");
+      }
+      int index = (int) (requestSeq.getAndIncrement() % tmpServerAddressList.size());
+      String address = tmpServerAddressList.get(index);
+      if (++fetchCount <= tmpServerAddressList.size()) {
+        Channel channel = channels.get(address);
+        if (channel != null && channel.isActive()) {
+          return new ChannelPackage(channel, address);
+        }
+      } else {
+        // 超出阈值,转入尝试连接模式
+        return new ChannelPackage(connect(address), address);
+      }
+    }
+  }
+
+  @Override
+  public Object invoke(Object msg) throws IOException, TimeoutException {
+    return invoke(msg, TxcConstants.RPC_INVOKE_TIMEOUT);
+  }
+
+  @Override
+  public Object invoke(String serverAddress, Object msg, long timeout)
+      throws IOException, TimeoutException {
+    return invoke(serverAddress, connect(serverAddress), msg, timeout);
+  }
+
+  @Override
+  public void channelRead(final ChannelHandlerContext ctx, Object msg) throws Exception {
+    if (msg instanceof RpcMessage) {
+      RpcMessage rpcMessage = (RpcMessage) msg;
+      if (rpcMessage.getBody() == HeartbeatMessage.PONG) {
+        if (logger.isDebugEnabled()) {
+          logger.debug("received PONG from " + ctx.channel().remoteAddress());
+        }
+        return;
+      }
+
+      if (((RpcMessage) msg).getBody() instanceof TxcMergeResultMessage) {
+        TxcMergeResultMessage results = (TxcMergeResultMessage) ((RpcMessage) msg).getBody();
+        TxcMergeMessage mergeMessage =
+            (TxcMergeMessage) mergeMsgMap.remove(((RpcMessage) msg).getId());
+        int num = mergeMessage.msgs.size();
+        for (int i = 0; i < num; i++) {
+          long msgId = mergeMessage.msgIds.get(i);
+          MessageFuture future = futures.remove(msgId);
+          if (future == null) {
+            logger.info("msg:" + msgId + " is not found in futures.");
+          } else {
+            future.setResultMessage(results.getMsgs()[i]);
+          }
+        }
+        return;
+      }
+    }
+    super.channelRead(ctx, msg);
+  }
+
+  @Override
+  public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+    if (evt instanceof IdleStateEvent) {
+      IdleStateEvent idleStateEvent = (IdleStateEvent) evt;
+      if (idleStateEvent == IdleStateEvent.READER_IDLE_STATE_EVENT) {
+        logger.info("close channle" + ctx.channel() + " after 10s read idle.");
+        ctx.channel().close();
+      }
+
+      if (idleStateEvent == IdleStateEvent.WRITER_IDLE_STATE_EVENT) {
+        RpcClient.this.sendRequest(ctx.channel(), HeartbeatMessage.PING);
+      }
+    }
+
+  }
+
+  protected Channel connect(String serverAddress) {
+    Channel channelToServer = channels.get(serverAddress);
+    if (channelToServer != null) {
+      if (channelToServer.isActive())
+        return channelToServer;
+      else {
+        int i = 0;
+        for (i = 0; i < 1000; i++) {
+          try {
+            Thread.sleep(10);
+          } catch (InterruptedException e) {
+          }
+          channelToServer = channels.get(serverAddress);
+          if (channelToServer == null)
+            break;
+          if (channelToServer.isActive())
+            return channelToServer;
+        }
+        if (i == 1000) { // always be not active
+          try {
+            logger.warn("channel " + channelToServer + " is not active after long wait, close it.");
+            Object connectLock = channelLocks.get(serverAddress);
+            if (connectLock == null) {
+              channelLocks.putIfAbsent(serverAddress, new Object());
+              connectLock = channelLocks.get(serverAddress);
+            }
+            synchronized (connectLock) {
+              Channel ch = channels.get(serverAddress);
+              if (ch != null && ch.compareTo(channelToServer) == 0) {
+                channels.remove(serverAddress);
+                channelToServer.disconnect();
+                channelToServer.close();
+              }
+            }
+          } catch (Exception e) {
+          } finally {
+          }
+        }
+      }
+    }
+
+    Object connectLock = channelLocks.get(serverAddress);
+    if (connectLock == null) {
+      channelLocks.putIfAbsent(serverAddress, new Object());
+      connectLock = channelLocks.get(serverAddress);
+    }
+    synchronized (connectLock) {
+      channelToServer = _connect(serverAddress);
+      channels.put(serverAddress, channelToServer);
+      return channelToServer;
+    }
+  }
+
+  protected Channel _connect(String serverAddress) {
+    Channel channelToServer = channels.get(serverAddress);
+    if (channelToServer != null && channelToServer.isActive()) {
+      return channelToServer;
+    }
+
+    logger.info("connect to " + serverAddress);
+    InetSocketAddress address = NetUtil.toInetSocketAddress(serverAddress);
+    Bootstrap b = new Bootstrap();
+    b.group(eventloopGroup).channel(NioSocketChannel.class).remoteAddress(address)
+        .option(ChannelOption.TCP_NODELAY, true).option(ChannelOption.SO_KEEPALIVE, true)
+        .option(ChannelOption.SO_REUSEADDR, true).handler(new ChannelInitializer<SocketChannel>() {
+          @Override
+          public void initChannel(SocketChannel ch) throws Exception {
+            ch.pipeline().addLast(new IdleStateHandler(10, 5, 0), new TxcMessageCodec(),
+                RpcClient.this);
+          }
+        });
+
+    long start = System.currentTimeMillis();
+    Object response = null;
+    try {
+      Channel tmpChannel = b.connect().sync().channel();
+      try {
+        response =
+            super.invoke(null, tmpChannel, new RegisterClientAppNameMessage(clientAppName), 3000);
+        if (response instanceof RegisterClientAppNameResultMessage) {
+          if (((RegisterClientAppNameResultMessage) response).isResult()) {
+            channelToServer = tmpChannel;
+          } else {
+            logger.info("register client app failed. server version:"
+                + ((RegisterClientAppNameResultMessage) response).getVersion());
+            throw new TxcException(ResultCode.SYSTEMERROR.getValue(),
+                "register client app failed.");
+          }
+        } else {
+          throw new TxcException(ResultCode.SYSTEMERROR.getValue(), "can not register app name.");
+        }
+      } catch (Exception e) {
+        logger.error(TxcErrCode.NetRegAppname.errCode, "register client app failed.", e);
+        throw new TxcException(ResultCode.SYSTEMERROR.getValue(), "can not register app.");
+      }
+    } catch (InterruptedException e) {
+      throw new TxcException(e, "can not connect to txc server.");
+    }
+
+    logger.info("register client app sucesss. server cost " + (System.currentTimeMillis() - start)
+        + " ms, version:" + ((RegisterClientAppNameResultMessage) response).getVersion());
+    return channelToServer;
+  }
+
+  public ClientMessageListener getClientMessageListener() {
+    return clientMessageListener;
+  }
+
+  public void setClientMessageListener(ClientMessageListener clientMessageListener) {
+    this.clientMessageListener = clientMessageListener;
+  }
+
+  public String getClientAppName() {
+    return clientAppName;
+  }
+
+  public void setClientAppName(String clientAppName) {
+    this.clientAppName = clientAppName;
+  }
+
+  @Override
+  public void sendResponse(long msgId, String serverAddress, Object msg) {
+    super.sendResponse(msgId, connect(serverAddress), msg);
+  }
+
+  public final static class ChannelPackage {
+    public final Channel channel;
+    public final String address;
+
+    public ChannelPackage(Channel channel, String address) {
+      super();
+      this.channel = channel;
+      this.address = address;
+    }
+  }
+
+  @Override
+  public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+    logger.error(TxcErrCode.ExceptionCaught.errCode,
+        NetUtil.toStringAddress(ctx.channel().remoteAddress()) + "connect exception. "
+            + cause.getMessage(),
+        cause);
+    Iterator<Entry<String, Channel>> it = channels.entrySet().iterator();
+    while (it.hasNext()) {
+      if (it.next().getValue().compareTo(ctx.channel()) == 0) {
+        it.remove();
+        logger.info("remove channel:" + ctx.channel());
+      }
+    }
   }
 
 }

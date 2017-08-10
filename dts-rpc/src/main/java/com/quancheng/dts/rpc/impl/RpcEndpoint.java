@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
@@ -29,7 +30,6 @@ import java.util.concurrent.TimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Maps;
 import com.quancheng.dts.common.DtsException;
 import com.quancheng.dts.common.ResultCode;
 import com.quancheng.dts.message.MergeMessage;
@@ -51,30 +51,21 @@ import io.netty.channel.ChannelHandlerContext;
 public abstract class RpcEndpoint extends ChannelDuplexHandler {
 
   private static final Logger logger = LoggerFactory.getLogger(RpcEndpoint.class);
-
-  private int timeoutCheckInternal = 5000;
-
-  private String group = "DEFAULT";
-
-  private Object lock = new Object();
-
-  private Object mergeLock = new Object();
-
   protected final ThreadPoolExecutor messageExecutor;
-
-  protected final ScheduledExecutorService timerExecutor = Executors.newScheduledThreadPool(1);
-
+  protected ScheduledExecutorService timerExecutor = Executors.newScheduledThreadPool(1);
+  protected ConcurrentHashMap<Long, MessageFuture> futures =
+      new ConcurrentHashMap<Long, MessageFuture>();
+  private int timeoutCheckInternal = 5000;
   protected AddressManager addressManager = new ZookeeperAddressManager();
-
+  private String group = "DEFAULT";
+  private Object lock = new Object();
+  Map<String, BlockingQueue<RpcMessage>> basketMap =
+      new ConcurrentHashMap<String, BlockingQueue<RpcMessage>>();
+  protected Map<String, BlockingQueue<RpcMessage>> rmBasketMap =
+      new ConcurrentHashMap<String, BlockingQueue<RpcMessage>>();
+  protected Object mergeLock = new Object();
+  protected Map<Long, MergeMessage> mergeMsgMap = new ConcurrentHashMap<Long, MergeMessage>();
   protected boolean isSending = false;
-
-  private final Map<Long, MessageFuture> futures = Maps.newConcurrentMap();
-
-  private final Map<String, BlockingQueue<RpcMessage>> basketMap = Maps.newConcurrentMap();
-
-  private final Map<String, BlockingQueue<RpcMessage>> rmBasketMap = Maps.newConcurrentMap();
-
-  private final Map<Long, MergeMessage> mergeMsgMap = Maps.newConcurrentMap();
 
   public RpcEndpoint(ThreadPoolExecutor messageExecutor) {
     this.messageExecutor = messageExecutor;
