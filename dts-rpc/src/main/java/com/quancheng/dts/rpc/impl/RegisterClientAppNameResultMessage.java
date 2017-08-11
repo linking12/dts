@@ -43,6 +43,11 @@ public class RegisterClientAppNameResultMessage extends DtsMessage {
     this.byteBuffer = ByteBuffer.allocate(size);
   }
 
+  public RegisterClientAppNameResultMessage(boolean result) {
+    this();
+    this.result = result;
+  }
+
   public String getVersion() {
     return version;
   }

@@ -114,22 +114,17 @@ public abstract class RpcEndpoint extends ChannelDuplexHandler {
 
   protected Object invoke(String address, Channel channel, Object msg, long timeout)
       throws IOException, TimeoutException {
-    return invoke(address, channel, msg, timeout, timeout >= 0 ? true : false);
-  }
-
-  protected Object invoke(String address, Channel channel, Object msg, long timeout,
-      boolean waitResponse) throws IOException, TimeoutException {
     if (channel == null) {
       logger.warn("invoke nothing, caused by null channel.");
       return null;
     }
+    boolean waitResponse = timeout >= 0 ? true : false;
     final RpcMessage rpcMessage = new RpcMessage();
     rpcMessage.setId(RpcMessage.getNextMessageId());
     rpcMessage.setAsync(false);
     rpcMessage.setHeartbeat(false);
     rpcMessage.setRequest(true);
     rpcMessage.setBody(msg);
-
     final MessageFuture messageFuture = new MessageFuture();
     messageFuture.setRequestMessage(rpcMessage);
     messageFuture.setTimeout(waitResponse ? timeout : 30 * 1000);
@@ -184,7 +179,6 @@ public abstract class RpcEndpoint extends ChannelDuplexHandler {
         }
       });
     }
-
     if (waitResponse) {
       try {
         return messageFuture.get(timeout, TimeUnit.MILLISECONDS);
@@ -198,6 +192,7 @@ public abstract class RpcEndpoint extends ChannelDuplexHandler {
       return null;
     }
   }
+
 
   @Override
   public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
