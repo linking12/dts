@@ -48,7 +48,7 @@ import io.netty.handler.timeout.IdleStateHandler;
  * @version RpcServer.java, v 0.0.1 2017年8月11日 下午2:44:04 liushiming
  * @since JDK 1.8
  */
-public class RpcServer extends RpcEndpoint implements DtsServerMessageSender {
+public abstract class RpcServer extends RpcEndpoint implements DtsServerMessageSender {
 
   /**
    * @param messageExecutor
@@ -295,7 +295,7 @@ public class RpcServer extends RpcEndpoint implements DtsServerMessageSender {
         clientChannel.disconnect();
         clientChannel.close();
       } catch (Exception e) {
-        
+
       } finally {
         ipAndClientAppNameToChannelMap.remove(clientIp + clientAppName);
         clientChannel = null;
