@@ -35,13 +35,13 @@ public class DefaultDtsTransactionManager implements DtsTransactionManager {
     final TransactionBeginMessage beginMessage = new TransactionBeginMessage();
     beginMessage.setClientAddress(NetUtil.getLocalIp());
     request.setBody(RemotingSerializable.encode(beginMessage));
-    TransactionBeginBody transactionBeginBody = dtsClient.invokeSync(request, TransactionBeginBody.class);
+    TransactionBeginBody transactionBeginBody = dtsClient.invokeSync(request, timeout, TransactionBeginBody.class);
     DtsContext.bind(transactionBeginBody.getXid(), transactionBeginBody.getNextServerAddr());
   }
 
   @Override
   public void commit() throws DtsException {
-    this.commit(3000);
+    this.commit(0);
   }
 
   @Override
@@ -50,7 +50,7 @@ public class DefaultDtsTransactionManager implements DtsTransactionManager {
     commitMessage.setTransId(DtsXID.getTransactionId(DtsContext.getCurrentXid()));
     RemotingCommand request = RemotingCommand.createRequestCommand(RequestCode.TRANSACTION_COMMIT, null);
     request.setBody(RemotingSerializable.encode(commitMessage));
-    TransactionCommitBody transactionCommitBody = dtsClient.invokeSync(request, TransactionCommitBody.class);
+    TransactionCommitBody transactionCommitBody = dtsClient.invokeSync(request,null, TransactionCommitBody.class);
     System.out.println(transactionCommitBody.getTranId());
     DtsContext.unbind();
   }

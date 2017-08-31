@@ -32,5 +32,10 @@ public @interface DtsTransactional {
    */
   String transactionManager() default "";
 
+  /**
+   * timeout for connect dts server
+   * @return
+   */
+  long timeout() default 3000l;
 
 }

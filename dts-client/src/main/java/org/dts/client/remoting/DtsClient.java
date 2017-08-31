@@ -2,6 +2,7 @@ package org.dts.client.remoting;
 
 import com.quancheng.dts.exception.DtsException;
 import com.quancheng.dts.message.response.TransactionBeginBody;
+import com.quancheng.dts.rpc.cluster.AddressManager;
 import com.quancheng.dts.rpc.remoting.protocol.RemotingCommand;
 
 /**
@@ -13,9 +14,11 @@ public interface DtsClient {
 
   void shutdown();
 
-  <T> T invokeSync(RemotingCommand request, Class<T> classOfT) throws DtsException;
+  <T> T invokeSync(RemotingCommand request, Long timeoutMillis, Class<T> classOfT) throws DtsException;
 
   <T> void invokeAsync(RemotingCommand request, Class<T> classOfT, DtsInvokeCallBack<T> dtsInvokeCallBack) throws DtsException;
 
+  void setAddressManager(AddressManager addressManager);
 
+  void setGroup(String group);
 }

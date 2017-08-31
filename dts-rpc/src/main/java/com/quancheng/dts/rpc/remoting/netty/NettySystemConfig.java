@@ -18,25 +18,25 @@
 package com.quancheng.dts.rpc.remoting.netty;
 
 public class NettySystemConfig {
-    public static final String COM_ROCKETMQ_REMOTING_NETTY_POOLED_BYTE_BUF_ALLOCATOR_ENABLE =
-        "com.rocketmq.com.quancheng.dts.rpc.remoting.nettyPooledByteBufAllocatorEnable";
-    public static final String COM_ROCKETMQ_REMOTING_SOCKET_SNDBUF_SIZE = //
-        "com.rocketmq.com.quancheng.dts.rpc.remoting.socket.sndbuf.size";
-    public static final String COM_ROCKETMQ_REMOTING_SOCKET_RCVBUF_SIZE = //
-        "com.rocketmq.com.quancheng.dts.rpc.remoting.socket.rcvbuf.size";
-    public static final String COM_ROCKETMQ_REMOTING_CLIENT_ASYNC_SEMAPHORE_VALUE = //
-        "com.rocketmq.com.quancheng.dts.rpc.remoting.clientAsyncSemaphoreValue";
-    public static final String COM_ROCKETMQ_REMOTING_CLIENT_ONEWAY_SEMAPHORE_VALUE = //
-        "com.rocketmq.com.quancheng.dts.rpc.remoting.clientOnewaySemaphoreValue";
+    public static final String COM_REMOTING_NETTY_POOLED_BYTE_BUF_ALLOCATOR_ENABLE =
+        "com.quancheng.dts.remoting.nettyPooledByteBufAllocatorEnable";
+    public static final String COM_REMOTING_SOCKET_SNDBUF_SIZE = //
+        "com.quancheng.dts.remoting.socket.sndbuf.size";
+    public static final String COM_REMOTING_SOCKET_RCVBUF_SIZE = //
+        "com.quancheng.dts.remoting.socket.rcvbuf.size";
+    public static final String COM_REMOTING_CLIENT_ASYNC_SEMAPHORE_VALUE = //
+        "com.quancheng.dts.remoting.clientAsyncSemaphoreValue";
+    public static final String COM_REMOTING_CLIENT_ONEWAY_SEMAPHORE_VALUE = //
+        "com.quancheng.dts.remoting.clientOnewaySemaphoreValue";
     public static final boolean NETTY_POOLED_BYTE_BUF_ALLOCATOR_ENABLE = //
         Boolean
-            .parseBoolean(System.getProperty(COM_ROCKETMQ_REMOTING_NETTY_POOLED_BYTE_BUF_ALLOCATOR_ENABLE, "false"));
+            .parseBoolean(System.getProperty(COM_REMOTING_NETTY_POOLED_BYTE_BUF_ALLOCATOR_ENABLE, "false"));
     public static final int CLIENT_ASYNC_SEMAPHORE_VALUE = //
-        Integer.parseInt(System.getProperty(COM_ROCKETMQ_REMOTING_CLIENT_ASYNC_SEMAPHORE_VALUE, "65535"));
+        Integer.parseInt(System.getProperty(COM_REMOTING_CLIENT_ASYNC_SEMAPHORE_VALUE, "65535"));
     public static final int CLIENT_ONEWAY_SEMAPHORE_VALUE = //
-        Integer.parseInt(System.getProperty(COM_ROCKETMQ_REMOTING_CLIENT_ONEWAY_SEMAPHORE_VALUE, "65535"));
+        Integer.parseInt(System.getProperty(COM_REMOTING_CLIENT_ONEWAY_SEMAPHORE_VALUE, "65535"));
     public static int socketSndbufSize = //
-        Integer.parseInt(System.getProperty(COM_ROCKETMQ_REMOTING_SOCKET_SNDBUF_SIZE, "65535"));
+        Integer.parseInt(System.getProperty(COM_REMOTING_SOCKET_SNDBUF_SIZE, "65535"));
     public static int socketRcvbufSize = //
-        Integer.parseInt(System.getProperty(COM_ROCKETMQ_REMOTING_SOCKET_RCVBUF_SIZE, "65535"));
+        Integer.parseInt(System.getProperty(COM_REMOTING_SOCKET_RCVBUF_SIZE, "65535"));
 }

@@ -5,6 +5,7 @@ import org.dts.client.remoting.DtsClientImpl;
 
 import com.quancheng.dts.common.DtsContext;
 import com.quancheng.dts.exception.DtsException;
+import com.quancheng.dts.rpc.cluster.ZookeeperAddressManager;
 import com.quancheng.dts.rpc.remoting.netty.NettyClientConfig;
 
 /**
@@ -17,6 +18,8 @@ public class App {
     NettyClientConfig nettyClientConfig = new NettyClientConfig();
     nettyClientConfig.setConnectTimeoutMillis(3000);
     DtsClient dtsClient = new DtsClientImpl(nettyClientConfig);
+    dtsClient.setAddressManager(new ZookeeperAddressManager("localhost:2181", "/dts"));
+    dtsClient.setGroup("Demo");
     dtsClient.start();
     DefaultDtsTransactionManager transactionManager = new DefaultDtsTransactionManager(dtsClient);
     transactionManager.begin(3000L);
