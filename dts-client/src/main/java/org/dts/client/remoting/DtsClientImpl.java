@@ -11,12 +11,14 @@ import com.quancheng.dts.message.response.TransactionBeginBody;
 import com.quancheng.dts.rpc.cluster.AddressManager;
 import com.quancheng.dts.rpc.cluster.ZookeeperAddressManager;
 import com.quancheng.dts.rpc.remoting.CommandCustomHeader;
+import com.quancheng.dts.rpc.remoting.InvokeCallback;
 import com.quancheng.dts.rpc.remoting.RemotingClient;
 import com.quancheng.dts.rpc.remoting.exception.RemotingConnectException;
 import com.quancheng.dts.rpc.remoting.exception.RemotingSendRequestException;
 import com.quancheng.dts.rpc.remoting.exception.RemotingTimeoutException;
 import com.quancheng.dts.rpc.remoting.netty.NettyClientConfig;
 import com.quancheng.dts.rpc.remoting.netty.NettyRemotingClient;
+import com.quancheng.dts.rpc.remoting.netty.ResponseFuture;
 import com.quancheng.dts.rpc.remoting.protocol.RemotingCommand;
 
 import javax.annotation.PostConstruct;
@@ -51,7 +53,6 @@ public class DtsClientImpl implements DtsClient {
   @PostConstruct
   public void start() {
     remotingClient.start();
-//    addr = new InetSocketAddress(6666).getHostString() + ":6666";
   }
 
   @Override
@@ -84,7 +85,31 @@ public class DtsClientImpl implements DtsClient {
     }
   }
 
+
   @Override
+  public <T> void invokeAsync(RemotingCommand request, Class<T> classOfT, DtsInvokeCallBack<T> dtsInvokeCallBack) throws DtsException {
+
+    try {
+      remotingClient.invokeAsync(null, request, timeoutMillis, new InvokeCallback() {
+        @Override
+        public void operationComplete(final ResponseFuture responseFuture) {
+          RemotingCommand response = responseFuture.getResponseCommand();
+          if (response != null) {
+            switch (response.getCode()) {
+              case ResponseCode.SUCCESS:
+                dtsInvokeCallBack.execute(RemotingSerializable.decode(response.getBody(), classOfT));
+              default:
+                break;
+            }
+          }
+        }
+      });
+    } catch (Exception e) {
+      log.error("invokeSync error", e);
+      throw new DtsException(e);
+    }
+  }
+
   public TransactionBeginBody begin(final long timeout) throws DtsException {
 
     final CommandCustomHeader requestHeader = null;
@@ -114,28 +139,6 @@ public class DtsClientImpl implements DtsClient {
       }
     }
     return null;
-  }
-
-
-  @Override
-  public void commit(final int retryTimes) throws DtsException {
-//    final GlobalCommitMessage commitMessage = new GlobalCommitMessage();
-//    try {
-//      clientMessageSender.invoke(commitMessage);
-//    } catch (IOException e) {
-//      e.printStackTrace();
-//    } catch (TimeoutException e) {
-//      e.printStackTrace();
-//    }
-  }
-
-
-  @Override
-  public void rollback(final int retryTimes) throws DtsException {
-
-  }
-
-  public static void main(String[] args) throws DtsException {
   }
 
   public void setAddressManager(final AddressManager addressManager) {

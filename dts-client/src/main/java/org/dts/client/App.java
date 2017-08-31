@@ -21,6 +21,8 @@ public class App {
     DefaultDtsTransactionManager transactionManager = new DefaultDtsTransactionManager(dtsClient);
     transactionManager.begin(3000L);
     System.out.println(DtsContext.getCurrentXid());
+    transactionManager.commit();
+
     dtsClient.shutdown();
 
 //    final NettyClientConfig nettyClientConfig = new NettyClientConfig();

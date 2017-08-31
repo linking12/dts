@@ -15,12 +15,7 @@ public interface DtsClient {
 
   <T> T invokeSync(RemotingCommand request, Class<T> classOfT) throws DtsException;
 
-  TransactionBeginBody begin(long timeout) throws DtsException;
+  <T> void invokeAsync(RemotingCommand request, Class<T> classOfT, DtsInvokeCallBack<T> dtsInvokeCallBack) throws DtsException;
 
-
-  void commit(int retryTimes) throws DtsException;
-
-
-  void rollback(int retryTimes) throws DtsException;
 
 }

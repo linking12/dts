@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="dts-client" />
+        <module name="dts-common" />
+        <module name="dts-datasource" />
+        <module name="dts-parser" />
+        <module name="dts-resourcemanager" />
+        <module name="dts-rm-jdbc" />
+        <module name="dts-rm-rabbit" />
+        <module name="dts-rm-rocketmq" />
+        <module name="dts-rpc" />
+        <module name="dts-server" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="dts" target="1.8" />
+      <module name="dts-client" target="1.8" />
+      <module name="dts-common" target="1.8" />
+      <module name="dts-datasource" target="1.8" />
+      <module name="dts-parser" target="1.8" />
+      <module name="dts-resourcemanager" target="1.8" />
+      <module name="dts-rm-jdbc" target="1.8" />
+      <module name="dts-rm-rabbit" target="1.8" />
+      <module name="dts-rm-rocketmq" target="1.8" />
+      <module name="dts-rpc" target="1.8" />
+      <module name="dts-server" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+</project>

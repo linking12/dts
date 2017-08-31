@@ -6,7 +6,9 @@ import com.quancheng.dts.RemotingSerializable;
 import com.quancheng.dts.RequestCode;
 import com.quancheng.dts.ResponseCode;
 import com.quancheng.dts.common.DtsXID;
+import com.quancheng.dts.message.request.TransactionCommitMessage;
 import com.quancheng.dts.message.response.TransactionBeginBody;
+import com.quancheng.dts.message.response.TransactionCommitBody;
 import com.quancheng.dts.rpc.remoting.common.RemotingHelper;
 import com.quancheng.dts.rpc.remoting.netty.NettyRequestProcessor;
 import com.quancheng.dts.rpc.remoting.protocol.RemotingCommand;
@@ -36,6 +38,8 @@ public class DefaultRequestProcessor implements NettyRequestProcessor {
     switch (request.getCode()) {
       case RequestCode.TRANSACTION_BEGIN:
         return this.createTransactionBeginCommand(ctx, request);
+      case RequestCode.TRANSACTION_COMMIT:
+        return this.createTransactionCommitCommand(ctx, request);
       default:
         break;
     }
@@ -51,6 +55,20 @@ public class DefaultRequestProcessor implements NettyRequestProcessor {
     transactionBeginBody.setXid(DtsXID.generateXID(Calendar.getInstance().getTimeInMillis()));//TODO
     transactionBeginBody.setNextServerAddr(DtsXID.getSvrAddr());
     response.setBody(RemotingSerializable.encode(transactionBeginBody));
+    response.setCode(ResponseCode.SUCCESS);
+    response.setRemark(null);
+    return response;
+  }
+
+
+  private RemotingCommand createTransactionCommitCommand(final ChannelHandlerContext ctx, final RemotingCommand request) {
+    final RemotingCommand response = RemotingCommand.createResponseCommand(null);
+    TransactionCommitMessage transactionCommitMessage = RemotingSerializable.decode(request.getBody(), TransactionCommitMessage.class);
+
+    TransactionCommitBody transactionCommitBody = new TransactionCommitBody();
+    transactionCommitBody.setTranId(transactionCommitMessage.getTransId());
+    transactionCommitBody.setNextServerAddr(DtsXID.getSvrAddr());
+    response.setBody(RemotingSerializable.encode(transactionCommitBody));
     response.setCode(ResponseCode.SUCCESS);
     response.setRemark(null);
     return response;
