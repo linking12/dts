@@ -18,6 +18,10 @@ public class DtsTransactionTemplate implements DtsTransactionOperations {
 
   private static final Logger logger = LoggerFactory.getLogger(DtsTransactionTemplate.class);
 
+  public DtsTransactionTemplate(final DtsTransactionManager transactionManager) {
+    this.transactionManager = transactionManager;
+  }
+
   @Override
   public <T> T execute(DtsTransactionCallback<T> action) throws DtsTransactionException {
 
