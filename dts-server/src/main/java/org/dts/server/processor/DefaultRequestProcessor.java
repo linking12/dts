@@ -14,6 +14,7 @@ import com.quancheng.dts.rpc.remoting.netty.NettyRequestProcessor;
 import com.quancheng.dts.rpc.remoting.protocol.RemotingCommand;
 
 import java.util.Calendar;
+import java.util.HashMap;
 
 import io.netty.channel.ChannelHandlerContext;
 
@@ -48,8 +49,10 @@ public class DefaultRequestProcessor implements NettyRequestProcessor {
 
   private RemotingCommand createTransactionBeginCommand(final ChannelHandlerContext ctx, final RemotingCommand request) {
     final RemotingCommand response = RemotingCommand.createResponseCommand(null);
-//    final PutKVConfigRequestHeader requestHeader =
-//        (PutKVConfigRequestHeader) request.decodeCommandCustomHeader(PutKVConfigRequestHeader.class);
+    HashMap<String, String> extFields = request.getExtFields();
+    System.out.println(extFields);
+    //TODO
+
 
     TransactionBeginBody transactionBeginBody = new TransactionBeginBody();
     transactionBeginBody.setXid(DtsXID.generateXID(Calendar.getInstance().getTimeInMillis()));//TODO

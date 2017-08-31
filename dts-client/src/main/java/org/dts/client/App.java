@@ -19,7 +19,8 @@ public class App {
     nettyClientConfig.setConnectTimeoutMillis(3000);
     DtsClient dtsClient = new DtsClientImpl(nettyClientConfig);
     dtsClient.setAddressManager(new ZookeeperAddressManager("localhost:2181", "/dts"));
-    dtsClient.setGroup("Demo");
+    dtsClient.setGroup("Default");
+    dtsClient.setAppName("Demo");
     dtsClient.start();
     DefaultDtsTransactionManager transactionManager = new DefaultDtsTransactionManager(dtsClient);
     transactionManager.begin(3000L);

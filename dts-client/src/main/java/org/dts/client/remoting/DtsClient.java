@@ -14,11 +14,15 @@ public interface DtsClient {
 
   void shutdown();
 
+  void setTimeoutMillis(long timeoutMillis);
+
   <T> T invokeSync(RemotingCommand request, Long timeoutMillis, Class<T> classOfT) throws DtsException;
 
-  <T> void invokeAsync(RemotingCommand request, Class<T> classOfT, DtsInvokeCallBack<T> dtsInvokeCallBack) throws DtsException;
+  <T> void invokeAsync(RemotingCommand request, Long timeoutMillis, Class<T> classOfT, DtsInvokeCallBack<T> dtsInvokeCallBack) throws DtsException;
 
   void setAddressManager(AddressManager addressManager);
 
   void setGroup(String group);
+
+  void setAppName(String appName);
 }

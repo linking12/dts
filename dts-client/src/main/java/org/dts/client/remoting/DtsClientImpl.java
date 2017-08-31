@@ -8,12 +8,16 @@ import com.quancheng.dts.ResponseCode;
 import com.quancheng.dts.exception.DtsException;
 import com.quancheng.dts.rpc.cluster.AddressManager;
 import com.quancheng.dts.rpc.cluster.ZookeeperAddressManager;
+import com.quancheng.dts.rpc.remoting.CommandCustomHeader;
 import com.quancheng.dts.rpc.remoting.InvokeCallback;
+import com.quancheng.dts.rpc.remoting.RPCHook;
 import com.quancheng.dts.rpc.remoting.RemotingClient;
+import com.quancheng.dts.rpc.remoting.exception.RemotingCommandException;
 import com.quancheng.dts.rpc.remoting.netty.NettyClientConfig;
 import com.quancheng.dts.rpc.remoting.netty.NettyRemotingClient;
 import com.quancheng.dts.rpc.remoting.netty.ResponseFuture;
 import com.quancheng.dts.rpc.remoting.protocol.RemotingCommand;
+import com.quancheng.dts.rpc.util.NetUtil;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -27,23 +31,46 @@ public class DtsClientImpl implements DtsClient {
   private RemotingClient remotingClient;
   private long timeoutMillis = 3000;
   private AddressManager addressManager;
-  private String group;
+  private String appName = "client";
+  private String group = "DEFAULT";
+  public static final String DTS_REGISTER_ROOT_PATH = "/dts";
+
 
   public DtsClientImpl(NettyClientConfig nettyClientConfig) {
 
     remotingClient = new NettyRemotingClient(nettyClientConfig);
-//    this.clientMessageSender = new RpcClient(new ThreadPoolExecutor(1, 20, 0,
-//        TimeUnit.MILLISECONDS, new LinkedBlockingDeque<>()));
-//    this.clientMessageSender.setAddressManager(new ZookeeperAddressManager("localhost:2181", "/dts"));
-//    this.clientMessageSender.init();
+    remotingClient.registerRPCHook(new RPCHook() {
+      @Override
+      public void doBeforeRequest(final String remoteAddr, final RemotingCommand request) {
+        CommandCustomHeader customHeader = request.readCustomHeader();
+        if (customHeader == null) {
+          request.writeCustomHeader(new CommandCustomHeader() {
+            @Override
+            public void checkFields() throws RemotingCommandException {
+
+            }
+          });
+        }
+        request.addExtField("appName", appName);
+        request.addExtField("serverGroup", group);
+        request.addExtField("appAddress", NetUtil.getLocalIp());
+      }
+
+      @Override
+      public void doAfterResponse(final String remoteAddr, final RemotingCommand request,
+          final RemotingCommand response) {
+
+      }
+    });
   }
 
   @Override
   @PostConstruct
   public void start() {
     if (addressManager == null) {
-      addressManager = new ZookeeperAddressManager("localhost:2181", "/dts");
+      addressManager = new ZookeeperAddressManager("localhost:2181", DTS_REGISTER_ROOT_PATH);
     }
+    remotingClient.setAddressManager(addressManager);
     remotingClient.start();
   }
 
@@ -53,6 +80,7 @@ public class DtsClientImpl implements DtsClient {
     remotingClient.shutdown();
   }
 
+  @Override
   public void setTimeoutMillis(final long timeoutMillis) {
     this.timeoutMillis = timeoutMillis;
   }
@@ -82,10 +110,10 @@ public class DtsClientImpl implements DtsClient {
   }
 
   @Override
-  public <T> void invokeAsync(RemotingCommand request, Class<T> classOfT, DtsInvokeCallBack<T> dtsInvokeCallBack) throws DtsException {
+  public <T> void invokeAsync(RemotingCommand request, Long timeoutMillis, Class<T> classOfT, DtsInvokeCallBack<T> dtsInvokeCallBack) throws DtsException {
 
     try {
-      remotingClient.invokeAsync(null, request, timeoutMillis, new InvokeCallback() {
+      remotingClient.invokeAsync(null, request, determineTimeoutMillis(timeoutMillis), new InvokeCallback() {
         @Override
         public void operationComplete(final ResponseFuture responseFuture) {
           RemotingCommand response = responseFuture.getResponseCommand();
@@ -143,5 +171,10 @@ public class DtsClientImpl implements DtsClient {
 
   public void setGroup(final String group) {
     this.group = group;
+  }
+
+  @Override
+  public void setAppName(final String appName) {
+    this.appName = appName;
   }
 }

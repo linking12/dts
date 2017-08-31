@@ -20,7 +20,6 @@ package com.quancheng.dts;
 public class RequestCode {
 
 
-
     public static final int TRANSACTION_BEGIN = 10;
 
     public static final int TRANSACTION_COMMIT = 11;

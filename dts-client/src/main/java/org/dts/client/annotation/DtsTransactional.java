@@ -1,5 +1,9 @@
 package org.dts.client.annotation;
 
+import static com.quancheng.dts.common.DtsTranModel.RB;
+
+import com.quancheng.dts.common.DtsTranModel;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
@@ -33,9 +37,11 @@ public @interface DtsTransactional {
   String transactionManager() default "";
 
   /**
-   * timeout for connect dts server
+   * millio second of timeout
    * @return
    */
   long timeout() default 3000l;
+
+  DtsTranModel type() default RB;
 
 }
