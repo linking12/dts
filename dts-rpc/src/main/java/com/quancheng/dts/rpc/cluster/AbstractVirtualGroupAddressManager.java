@@ -33,10 +33,10 @@ public abstract class AbstractVirtualGroupAddressManager implements AddressManag
 
   @Override
   public void getAddressList(String vgroup, AddressWatcher watcher) throws InterruptedException {
-
+    getAddressListFromStorage(vgroup, watcher);
   }
 
-  public abstract void getAddressListFromStorage(String rGroup) throws InterruptedException;
+  public abstract List<String> getAddressListFromStorage(String rGroup) throws InterruptedException;
 
   public abstract void getAddressListFromStorage(String rGroup, AddressWatcher watcher)
       throws InterruptedException;

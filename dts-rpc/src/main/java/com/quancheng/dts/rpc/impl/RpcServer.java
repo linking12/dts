@@ -151,6 +151,7 @@ public abstract class RpcServer extends RpcEndpoint implements DtsServerMessageS
     String serverAddress = NetUtil.getLocalIp() + ":" + port;
     try {
       bootstrap.bind(NetUtil.toInetSocketAddress(serverAddress)).sync();
+      addressManager.publish(this.getGroup(), serverAddress);
       logger.info("txc server begin to listen address:" + serverAddress);
     } catch (InterruptedException e) {
       throw new RuntimeException("txc server can not bind to local address:" + serverAddress);

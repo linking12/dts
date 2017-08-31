@@ -1,1 +1,12 @@
 /dts-common1/
+/.idea/
+/dts-client/dts-client.iml
+/dts-common/dts-common.iml
+/dts-datasource/dts-datasource.iml
+/dts-parser/dts-parser.iml
+/dts-resourcemanager/dts-resourcemanager.iml
+/dts-rm-jdbc/dts-rm-jdbc.iml
+/dts-rm-rabbit/dts-rm-rabbit.iml
+/dts-rm-rocketmq/dts-rm-rocketmq.iml
+/dts-rpc/dts-rpc.iml
+/dts-server/dts-server.iml

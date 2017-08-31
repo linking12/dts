@@ -25,4 +25,6 @@ public interface AddressManager {
   public void unpublish(String group, String address);
 
   public void getAddressList(String group, AddressWatcher watcher) throws InterruptedException;
+
+  public void destroy();
 }
