@@ -6,4 +6,16 @@
     <version>0.0.1-SNAPSHOT</version>
   </parent>
   <artifactId>dts-resourcemanager</artifactId>
+  <dependencies>
+    <dependency>
+      <groupId>com.quancheng.dts</groupId>
+      <artifactId>dts-common</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.quancheng.dts</groupId>
+      <artifactId>dts-rpc</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
 </project>

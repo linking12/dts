@@ -1,9 +1,10 @@
 package com.quancheng.dts.context;
 
 public interface IDtsContextOperate {
-	public String getUserData(String key);
 
-	public String putUserData(String key, String value);
+	public <T> T getUserData(String key);
 
-	public String removeUserData(String key);
+	public <T> T putUserData(String key, T value);
+
+	public <T> T removeUserData(String key);
 }

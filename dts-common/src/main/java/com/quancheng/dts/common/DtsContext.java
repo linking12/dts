@@ -1,7 +1,9 @@
 package com.quancheng.dts.common;
 
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.google.common.collect.Lists;
 import com.quancheng.dts.context.DtsContextOperateHelper;
 
 public class DtsContext {
@@ -21,6 +23,7 @@ public class DtsContext {
   public static final String TXC_NEXT_SVR_ADDR = "TXC_NEXT_SVR_ADDR";
 
   public static final String NEW_REDO_CONTEXT = "TXC_NEW_REDO_CONTEXT";
+  public static final String TXC_BRANCH = "TXC_BRANCH_";
 
   public static final int getBeginCount() {
     String num = (String) DtsContextOperateHelper.getUserData(BEGIN_COUNT);
@@ -51,7 +54,7 @@ public class DtsContext {
 
   public static String getCurrentXid() {
     // return (String) ThreadLocalMap.get(TXC_CONTEXT_KEY);
-    return (String) DtsContextOperateHelper.getUserData(TXC_XID_KEY);
+    return DtsContextOperateHelper.getUserData(TXC_XID_KEY);
   }
 
   public static void bind(String xid, String nextSvrAddr) throws DtsException {
@@ -62,6 +65,14 @@ public class DtsContext {
     REDO_CONTEXT_MAP.put(xid, new RedoContext());
     if (nextSvrAddr != null)
       DtsContextOperateHelper.putUserData(TXC_NEXT_SVR_ADDR, nextSvrAddr);
+  }
+
+  public static void bindBranch(String dbKey, Long branchId) {
+    DtsContextOperateHelper.addUserData(TXC_BRANCH + dbKey, branchId);
+  }
+
+  public static List<Long> getBranchIds(String dbKey) {
+    return DtsContextOperateHelper.getUserData(TXC_BRANCH + dbKey);
   }
 
   static public void check() {

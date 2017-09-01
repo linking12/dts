@@ -1,1 +1,7 @@
 /dts-common1/
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr

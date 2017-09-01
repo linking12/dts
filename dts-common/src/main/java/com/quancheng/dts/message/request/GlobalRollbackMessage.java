@@ -37,6 +37,9 @@ public class GlobalRollbackMessage extends DtsMessage implements MergedMessage {
    */
   private String realSvrAddr;
 
+
+  private int retryTimes;
+
   public long getTranId() {
     return tranId;
   }
@@ -55,6 +58,13 @@ public class GlobalRollbackMessage extends DtsMessage implements MergedMessage {
     this.realSvrAddr = realSvrAddr;
   }
 
+  public int getRetryTimes() {
+    return retryTimes;
+  }
+
+  public void setRetryTimes(final int retryTimes) {
+    this.retryTimes = retryTimes;
+  }
 
   @Override
   public short getTypeCode() {

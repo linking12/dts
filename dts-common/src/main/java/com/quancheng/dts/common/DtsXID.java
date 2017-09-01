@@ -55,13 +55,13 @@ public class DtsXID {
 		return DtsXID.svrAddr;
 	}
 
-	public static int getTransactionId(String xid) {
+	public static long getTransactionId(String xid) {
 		if (xid == null) {
 			return -1;
 		}
 
 		int idx = xid.lastIndexOf(":");
-		return Integer.parseInt(xid.substring(idx + 1));
+		return Long.parseLong(xid.substring(idx + 1));
 	}
 
 	public static String getServerAddress(String xid) {

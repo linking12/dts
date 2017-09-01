@@ -60,8 +60,9 @@ public class NetUtil {
 
     
     public static String getLocalIp() {
-        InetAddress address = getLocalAddress();
-        return address == null ? LOCALHOST : address.getHostAddress();
+//        InetAddress address = getLocalAddress();
+//        return address == null ? LOCALHOST : address.getHostAddress();
+        return LOCALHOST;
     }
     
     public static InetAddress getLocalAddress() {
