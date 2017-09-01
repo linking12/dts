@@ -1,11 +1,10 @@
 package org.dts.client;
 
-import org.dts.client.remoting.DtsClient;
-import org.dts.client.remoting.DtsClientImpl;
 
 import com.quancheng.dts.common.DtsContext;
 import com.quancheng.dts.exception.DtsException;
 import com.quancheng.dts.rpc.cluster.ZookeeperAddressManager;
+import com.quancheng.dts.rpc.remoting.netty.DtsClientImpl;
 import com.quancheng.dts.rpc.remoting.netty.NettyClientConfig;
 
 /**
@@ -17,17 +16,21 @@ public class App {
 
     NettyClientConfig nettyClientConfig = new NettyClientConfig();
     nettyClientConfig.setConnectTimeoutMillis(3000);
-    DtsClient dtsClient = new DtsClientImpl(nettyClientConfig);
-    dtsClient.setAddressManager(new ZookeeperAddressManager("localhost:2181", "/dts"));
-    dtsClient.setGroup("Default");
-    dtsClient.setAppName("Demo");
-    dtsClient.start();
-    DefaultDtsTransactionManager transactionManager = new DefaultDtsTransactionManager(dtsClient);
-    transactionManager.begin(3000L);
-    System.out.println(DtsContext.getCurrentXid());
-    transactionManager.commit();
+    DtsClientImpl dtsClient = new DtsClientImpl(nettyClientConfig);
+    try {
+      dtsClient.setAddressManager(new ZookeeperAddressManager("localhost:2181", "/dts"));
+      dtsClient.setGroup("Default");
+      dtsClient.setAppName("Demo");
+      dtsClient.start();
+      DefaultDtsTransactionManager transactionManager = new DefaultDtsTransactionManager(dtsClient);
+      transactionManager.begin(3000L);
+      System.out.println(DtsContext.getCurrentXid());
+      transactionManager.commit();
+    } finally {
+      dtsClient.shutdown();
 
-    dtsClient.shutdown();
+    }
+
 
 //    final NettyClientConfig nettyClientConfig = new NettyClientConfig();
 //    nettyClientConfig.setConnectTimeoutMillis(3000);

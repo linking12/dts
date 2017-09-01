@@ -1,4 +1,4 @@
-package org.dts.client.remoting;
+package com.quancheng.dts.rpc.remoting.netty;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,15 +9,13 @@ import com.quancheng.dts.exception.DtsException;
 import com.quancheng.dts.rpc.cluster.AddressManager;
 import com.quancheng.dts.rpc.cluster.ZookeeperAddressManager;
 import com.quancheng.dts.rpc.remoting.CommandCustomHeader;
+import com.quancheng.dts.rpc.remoting.DtsClient;
+import com.quancheng.dts.rpc.remoting.DtsInvokeCallBack;
 import com.quancheng.dts.rpc.remoting.InvokeCallback;
 import com.quancheng.dts.rpc.remoting.RPCHook;
 import com.quancheng.dts.rpc.remoting.RemotingClient;
 import com.quancheng.dts.rpc.remoting.exception.RemotingCommandException;
-import com.quancheng.dts.rpc.remoting.netty.NettyClientConfig;
-import com.quancheng.dts.rpc.remoting.netty.NettyRemotingClient;
-import com.quancheng.dts.rpc.remoting.netty.ResponseFuture;
 import com.quancheng.dts.rpc.remoting.protocol.RemotingCommand;
-import com.quancheng.dts.rpc.util.NetUtil;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -28,6 +26,7 @@ import javax.annotation.PreDestroy;
 public class DtsClientImpl implements DtsClient {
 
   private static final Logger log = LoggerFactory.getLogger(DtsClientImpl.class);
+  public static final String DEFAULT_ZK_ADDRESS = "localhost:2181";
   private RemotingClient remotingClient;
   private long timeoutMillis = 3000;
   private AddressManager addressManager;
@@ -53,7 +52,6 @@ public class DtsClientImpl implements DtsClient {
         }
         request.addExtField("appName", appName);
         request.addExtField("serverGroup", group);
-        request.addExtField("appAddress", NetUtil.getLocalIp());
       }
 
       @Override
@@ -68,8 +66,9 @@ public class DtsClientImpl implements DtsClient {
   @PostConstruct
   public void start() {
     if (addressManager == null) {
-      addressManager = new ZookeeperAddressManager("localhost:2181", DTS_REGISTER_ROOT_PATH);
+      addressManager = new ZookeeperAddressManager(DEFAULT_ZK_ADDRESS, DTS_REGISTER_ROOT_PATH);
     }
+    remotingClient.setGroup(group);
     remotingClient.setAddressManager(addressManager);
     remotingClient.start();
   }
@@ -80,7 +79,6 @@ public class DtsClientImpl implements DtsClient {
     remotingClient.shutdown();
   }
 
-  @Override
   public void setTimeoutMillis(final long timeoutMillis) {
     this.timeoutMillis = timeoutMillis;
   }
@@ -133,38 +131,6 @@ public class DtsClientImpl implements DtsClient {
     }
   }
 
-//  public TransactionBeginBody begin(final long timeout) throws DtsException {
-//
-//    final CommandCustomHeader requestHeader = null;
-//    RemotingCommand request =
-//        RemotingCommand.createRequestCommand(RequestCode.TRANSACTION_BEGIN, requestHeader);
-//    RemotingCommand response = null;
-//    try {
-//      response = remotingClient.invokeSync(new InetSocketAddress(6666).getHostString()+":6666", request, 3000);
-//    } catch (InterruptedException e) {
-//      e.printStackTrace();
-//    } catch (RemotingConnectException e) {
-//      e.printStackTrace();
-//    } catch (RemotingSendRequestException e) {
-//      e.printStackTrace();
-//    } catch (RemotingTimeoutException e) {
-//      e.printStackTrace();
-//    }
-//    if (response != null) {
-//      switch (response.getCode()) {
-//        case ResponseCode.SUCCESS: {
-//          TransactionBeginBody transactionBeginBody =
-//              TransactionBeginBody.decode(response.getBody(), TransactionBeginBody.class);
-//          System.out.println(transactionBeginBody.getXid());
-//        }
-//        default:
-//          break;
-//      }
-//    }
-//    return null;
-//  }
-
-  @Override
   public void setAddressManager(final AddressManager addressManager) {
     this.addressManager = addressManager;
   }
@@ -173,7 +139,6 @@ public class DtsClientImpl implements DtsClient {
     this.group = group;
   }
 
-  @Override
   public void setAppName(final String appName) {
     this.appName = appName;
   }

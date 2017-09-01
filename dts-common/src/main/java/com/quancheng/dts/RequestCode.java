@@ -22,6 +22,12 @@ public class RequestCode {
 
     public static final int TRANSACTION_BEGIN = 10;
 
-    public static final int TRANSACTION_COMMIT = 11;
+    public static final int TRANSACTION_COMMIT = 20;
+
+    public static final int TRANSACTION_ROLLBACK = 30;
+
+    public static final int BRANCH_REGISTER = 100;
+
+    public static final int BRANCH_COMMIT = 110;
 
 }

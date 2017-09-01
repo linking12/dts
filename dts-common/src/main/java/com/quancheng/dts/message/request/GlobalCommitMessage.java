@@ -32,6 +32,24 @@ public class GlobalCommitMessage extends DtsMessage implements MergedMessage {
    */
   private long tranId;
 
+  private int retryTimes;
+
+  public void setTranId(final long tranId) {
+    this.tranId = tranId;
+  }
+
+  public long getTranId() {
+    return tranId;
+  }
+
+  public int getRetryTimes() {
+    return retryTimes;
+  }
+
+  public void setRetryTimes(final int retryTimes) {
+    this.retryTimes = retryTimes;
+  }
+
   /**
    * @see com.quancheng.dts.message.DtsCodec#getTypeCode()
    */

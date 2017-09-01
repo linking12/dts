@@ -10,18 +10,18 @@ public class DtsContextOperateByThreadLocal implements IDtsContextOperate {
   private final static ThreadLocal<Map<Object, Object>> threadContext = new MapThreadLocal();
 
   @Override
-  public String getUserData(String key) {
-    return (String) getContextMap().get(key);
+  public <T> T getUserData(String key) {
+    return (T) getContextMap().get(key);
   }
 
   @Override
-  public String putUserData(String key, String value) {
-    return (String) getContextMap().put(key, value);
+  public <T> T putUserData(String key, T value) {
+    return (T) getContextMap().put(key, value);
   }
 
   @Override
-  public String removeUserData(String key) {
-    return (String) getContextMap().remove(key);
+  public <T> T removeUserData(String key) {
+    return (T) getContextMap().remove(key);
   }
 
   private static class MapThreadLocal extends ThreadLocal<Map<Object, Object>> {

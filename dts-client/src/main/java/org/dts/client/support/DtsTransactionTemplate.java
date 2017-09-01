@@ -14,9 +14,9 @@ import java.lang.reflect.UndeclaredThrowableException;
  */
 public class DtsTransactionTemplate implements DtsTransactionOperations {
 
-  private DtsTransactionManager transactionManager;
-
   private static final Logger logger = LoggerFactory.getLogger(DtsTransactionTemplate.class);
+
+  private DtsTransactionManager transactionManager;
 
   public DtsTransactionTemplate(final DtsTransactionManager transactionManager) {
     this.transactionManager = transactionManager;

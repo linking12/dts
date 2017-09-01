@@ -1,4 +1,4 @@
-package org.dts.client.remoting;
+package com.quancheng.dts.rpc.remoting;
 
 /**
  * Created by guoyubo on 2017/8/31.

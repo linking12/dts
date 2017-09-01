@@ -1,4 +1,4 @@
-package org.dts.server;
+package org.dts.server.service;
 
 import org.dts.server.processor.DefaultRequestProcessor;
 
@@ -7,6 +7,9 @@ import com.quancheng.dts.rpc.remoting.RemotingServer;
 import com.quancheng.dts.rpc.remoting.netty.NettyRemotingServer;
 import com.quancheng.dts.rpc.remoting.netty.NettyServerConfig;
 import com.quancheng.dts.util.ThreadFactoryImpl;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -24,23 +27,26 @@ public class DtsServer {
 
   private int port;
 
-  public DtsServer(final String group, final int port, final String clusterAddress) {
+  public DtsServer(final String group, final int port, final String zkAddress) {
     this.group = group;
     this.port = port;
     final NettyServerConfig nettyServerConfig = new NettyServerConfig();
     nettyServerConfig.setListenPort(port);
     remotingServer = new NettyRemotingServer(nettyServerConfig);
-    remotingServer.setAddressManager(new ZookeeperAddressManager(clusterAddress, DTS_REGISTER_ROOT_PATH));
+    remotingServer.setGroup(group);
+    remotingServer.setAddressManager(new ZookeeperAddressManager(zkAddress, DTS_REGISTER_ROOT_PATH));
     ExecutorService remotingExecutor =
         Executors.newFixedThreadPool(nettyServerConfig.getServerWorkerThreads(),
             new ThreadFactoryImpl("RemotingExecutorThread_"));
     remotingServer.registerDefaultProcessor(new DefaultRequestProcessor(), remotingExecutor);
   }
 
+  @PostConstruct
   public void start() {
     remotingServer.start();
   }
 
+  @PreDestroy
   public void shutdown() {
     remotingServer.shutdown();
   }
@@ -51,5 +57,11 @@ public class DtsServer {
 
   public int getPort() {
     return port;
+  }
+
+  public static void main( String[] args )
+  {
+    DtsServer dtsServer = new DtsServer("Default", 9876, "localhost:2181");
+    dtsServer.start();
   }
 }

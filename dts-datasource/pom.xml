@@ -24,6 +24,11 @@
     </dependency>
     <dependency>
       <groupId>com.quancheng.dts</groupId>
+      <artifactId>dts-common</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.quancheng.dts</groupId>
       <artifactId>dts-rpc</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -46,6 +51,11 @@
       <groupId>org.springframework</groupId>
       <artifactId>spring-tx</artifactId>
       <version>4.3.9.RELEASE</version>
+    </dependency>
+    <dependency>
+      <groupId>com.alibaba</groupId>
+      <artifactId>druid</artifactId>
+      <version>1.0.15</version>
     </dependency>
   </dependencies>
 </project>

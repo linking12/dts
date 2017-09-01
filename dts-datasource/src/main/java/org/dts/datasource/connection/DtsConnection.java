@@ -27,7 +27,7 @@ public class DtsConnection extends DtsAbstractConnection {
 
   @Override
   public Connection getInternalConnection() throws SQLException {
-    Connection connection = dtsDataSource.getDataSource().getConnection();
+    Connection connection = dtsDataSource.getConnection();
     connections.add(connection);
     return connection;
   }

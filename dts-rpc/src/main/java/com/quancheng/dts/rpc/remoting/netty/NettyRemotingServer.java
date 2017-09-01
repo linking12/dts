@@ -192,15 +192,16 @@ public class NettyRemotingServer extends NettyRemotingAbstract implements Remoti
 //            InetSocketAddress addr = (InetSocketAddress) sync.channel().localAddress();
 //            this.port = addr.getPort();
 //
-            this.port = nettyServerConfig.getListenPort();
             DtsXID.setIpAddress(NetUtil.getLocalIp());
-            DtsXID.setPort(this.port);
-            String serverAddress = NetUtil.getLocalIp() + ":" + this.port;
+            DtsXID.setPort(nettyServerConfig.getListenPort());
+            String serverAddress = NetUtil.getLocalIp() + ":" + nettyServerConfig.getListenPort();
             ChannelFuture sync = this.serverBootstrap.bind(NetUtil.toInetSocketAddress(serverAddress)).sync();
+            InetSocketAddress addr = (InetSocketAddress) sync.channel().localAddress();
+            this.port = addr.getPort();
             if (addressManager != null) {
                 addressManager.publish(this.getGroup(), serverAddress);
             }
-            sync.channel().closeFuture().sync();
+//            sync.channel().closeFuture().sync();
             log.info("txc server begin to listen address:" + serverAddress);
         } catch (InterruptedException e1) {
             throw new RuntimeException("this.serverBootstrap.bind().sync() InterruptedException", e1);
