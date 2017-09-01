@@ -36,6 +36,23 @@ public class BeginResultMessage implements CommandCustomHeader {
   @CFNotNull
   String nextSvrAddr;
 
+  public String getXid() {
+    return xid;
+  }
+
+  public void setXid(String xid) {
+    this.xid = xid;
+  }
+
+  public String getNextSvrAddr() {
+    return nextSvrAddr;
+  }
+
+  public void setNextSvrAddr(String nextSvrAddr) {
+    this.nextSvrAddr = nextSvrAddr;
+  }
+
+
   @Override
   public void checkFields() throws RemotingCommandException {
 
