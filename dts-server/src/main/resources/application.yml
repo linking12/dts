@@ -11,5 +11,6 @@ datasource:
 app:
   name: server
   group: Default
-  port: 9876
   zkAddress: localhost:2181
+  listenPort: 9876
+

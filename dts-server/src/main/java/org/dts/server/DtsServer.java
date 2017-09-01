@@ -1,4 +1,4 @@
-package org.dts.server.service;
+package org.dts.server;
 
 import org.dts.server.processor.DefaultRequestProcessor;
 
@@ -25,13 +25,11 @@ public class DtsServer {
 
   private String group;
 
-  private int port;
-
-  public DtsServer(final String group, final int port, final String zkAddress) {
+  public DtsServer(final String group, final String zkAddress, NettyServerConfig nettyServerConfig) {
     this.group = group;
-    this.port = port;
-    final NettyServerConfig nettyServerConfig = new NettyServerConfig();
-    nettyServerConfig.setListenPort(port);
+    if (nettyServerConfig == null) {
+      nettyServerConfig = new NettyServerConfig();
+    }
     remotingServer = new NettyRemotingServer(nettyServerConfig);
     remotingServer.setGroup(group);
     remotingServer.setAddressManager(new ZookeeperAddressManager(zkAddress, DTS_REGISTER_ROOT_PATH));
@@ -55,13 +53,11 @@ public class DtsServer {
     return group;
   }
 
-  public int getPort() {
-    return port;
-  }
-
   public static void main( String[] args )
   {
-    DtsServer dtsServer = new DtsServer("Default", 9876, "localhost:2181");
+    final NettyServerConfig nettyServerConfig = new NettyServerConfig();
+    nettyServerConfig.setListenPort(9876);
+    DtsServer dtsServer = new DtsServer("Default", "localhost:2181", nettyServerConfig);
     dtsServer.start();
   }
 }

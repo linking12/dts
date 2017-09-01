@@ -3,47 +3,31 @@ package org.dts.server.config;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+import com.quancheng.dts.rpc.remoting.netty.NettySystemConfig;
+
+import lombok.Data;
+
 /**
  * Created by guoyubo on 2017/9/1.
  */
 @Component
 @ConfigurationProperties("app")
+@Data
 public class AppProperties {
 
   private String name;
   private String group;
-  private int port;
   private String zkAddress;
 
-  public String getName() {
-    return name;
-  }
+  //netty server config
+  private int listenPort = 8888;
+  private int serverWorkerThreads = 8;
+  private int serverCallbackExecutorThreads = 0;
+  private int serverSelectorThreads = 3;
+  private int serverOnewaySemaphoreValue = 256;
+  private int serverAsyncSemaphoreValue = 64;
+  private int serverChannelMaxIdleTimeSeconds = 120;
 
-  public void setName(final String name) {
-    this.name = name;
-  }
-
-  public String getGroup() {
-    return group;
-  }
-
-  public void setGroup(final String group) {
-    this.group = group;
-  }
-
-  public int getPort() {
-    return port;
-  }
-
-  public void setPort(final int port) {
-    this.port = port;
-  }
-
-  public String getZkAddress() {
-    return zkAddress;
-  }
-
-  public void setZkAddress(final String zkAddress) {
-    this.zkAddress = zkAddress;
-  }
+  private int serverSocketSndBufSize = NettySystemConfig.socketSndbufSize;
+  private int serverSocketRcvBufSize = NettySystemConfig.socketRcvbufSize;
 }
