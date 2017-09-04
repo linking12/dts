@@ -23,7 +23,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.quancheng.dts</groupId>
-			<artifactId>dts-rpc</artifactId>
+			<artifactId>dts-common</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
