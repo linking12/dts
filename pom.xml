@@ -24,7 +24,6 @@
 		<module>dts-rm-rocketmq</module>
 		<module>dts-rm-jdbc</module>
 		<module>dts-remoting</module>
-    <module>dts-common1</module>
   </modules>
 	<properties>
 		<guava.version>20.0</guava.version>
