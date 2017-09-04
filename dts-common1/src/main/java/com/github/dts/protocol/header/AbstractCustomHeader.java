@@ -13,41 +13,16 @@
  */
 package com.github.dts.protocol.header;
 
-import com.github.dts.remoting.annotation.CFNotNull;
+import com.github.dts.remoting.CommandCustomHeader;
+import com.github.dts.remoting.exception.RemotingCommandException;
 
 /**
- * 开始事务的返回消息
- * 
  * @author liushiming
- * @version BeginResultMessage.java, v 0.0.1 2017年9月1日 下午6:32:09 liushiming
+ * @version AbstractCommandCustomHeader.java, v 0.0.1 2017年9月4日 下午2:13:03 liushiming
  */
-public class BeginResultMessage extends AbstractCustomHeader {
+public abstract class AbstractCustomHeader implements CommandCustomHeader {
+  @Override
+  public void checkFields() throws RemotingCommandException {
 
-  /**
-   * 全局唯一的事务ID
-   */
-  @CFNotNull
-  String xid;
-  /**
-   * Server双写配置下，next node的地址
-   */
-  @CFNotNull
-  String nextSvrAddr;
-
-  public String getXid() {
-    return xid;
   }
-
-  public void setXid(String xid) {
-    this.xid = xid;
-  }
-
-  public String getNextSvrAddr() {
-    return nextSvrAddr;
-  }
-
-  public void setNextSvrAddr(String nextSvrAddr) {
-    this.nextSvrAddr = nextSvrAddr;
-  }
-
 }

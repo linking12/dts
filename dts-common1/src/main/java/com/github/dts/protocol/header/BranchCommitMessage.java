@@ -13,10 +13,102 @@
  */
 package com.github.dts.protocol.header;
 
-/** 
- * @author liushiming 
- * @version BranchCommitMessage.java, v 0.0.1 2017年9月1日 下午5:46:22 liushiming 
+import java.util.List;
+
+/**
+ * @author liushiming
+ * @version BranchCommitMessage.java, v 0.0.1 2017年9月1日 下午5:46:22 liushiming
  */
-public class BranchCommitMessage {
+public class BranchCommitMessage extends AbstractCustomHeader {
+
+  private String serverAddr;
+
+  private List<Long> tranIds;
+
+  private List<Long> branchIds;
+
+  private String clientIp;
+
+  private String appName;
+
+  private String dbName;
+
+  private String retrySql;
+
+  private byte commitMode;
+
+  private String udata;
+
+  public String getServerAddr() {
+    return serverAddr;
+  }
+
+  public void setServerAddr(String serverAddr) {
+    this.serverAddr = serverAddr;
+  }
+
+  public List<Long> getTranIds() {
+    return tranIds;
+  }
+
+  public void setTranIds(List<Long> tranIds) {
+    this.tranIds = tranIds;
+  }
+
+  public List<Long> getBranchIds() {
+    return branchIds;
+  }
+
+  public void setBranchIds(List<Long> branchIds) {
+    this.branchIds = branchIds;
+  }
+
+  public String getClientIp() {
+    return clientIp;
+  }
+
+  public void setClientIp(String clientIp) {
+    this.clientIp = clientIp;
+  }
+
+  public String getAppName() {
+    return appName;
+  }
+
+  public void setAppName(String appName) {
+    this.appName = appName;
+  }
+
+  public String getDbName() {
+    return dbName;
+  }
+
+  public void setDbName(String dbName) {
+    this.dbName = dbName;
+  }
+
+  public String getRetrySql() {
+    return retrySql;
+  }
+
+  public void setRetrySql(String retrySql) {
+    this.retrySql = retrySql;
+  }
+
+  public byte getCommitMode() {
+    return commitMode;
+  }
+
+  public void setCommitMode(byte commitMode) {
+    this.commitMode = commitMode;
+  }
+
+  public String getUdata() {
+    return udata;
+  }
+
+  public void setUdata(String udata) {
+    this.udata = udata;
+  }
 
 }

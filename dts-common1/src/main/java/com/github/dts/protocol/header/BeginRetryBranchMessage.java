@@ -13,10 +13,61 @@
  */
 package com.github.dts.protocol.header;
 
-/** 
- * @author liushiming 
- * @version BeginRetryBranchMessage.java, v 0.0.1 2017年9月1日 下午5:46:06 liushiming 
+/**
+ * @author liushiming
+ * @version BeginRetryBranchMessage.java, v 0.0.1 2017年9月1日 下午5:46:06 liushiming
  */
-public class BeginRetryBranchMessage {
+public class BeginRetryBranchMessage extends AbstractCustomHeader {
+  /**
+   * 有效时长；超出这个时长，转为告警通知用户。 缺省半小时
+   */
+  private long effectiveTime = 30 * 60000;
+
+  /**
+   * 完整DB name串
+   */
+  private String dbName;
+
+  /**
+   * 提交模式
+   */
+  private byte commitMode;
+
+  /**
+   * 重试的SQL
+   */
+  private String sql;
+
+  public long getEffectiveTime() {
+    return effectiveTime;
+  }
+
+  public void setEffectiveTime(long effectiveTime) {
+    this.effectiveTime = effectiveTime;
+  }
+
+  public String getDbName() {
+    return dbName;
+  }
+
+  public void setDbName(String dbName) {
+    this.dbName = dbName;
+  }
+
+  public byte getCommitMode() {
+    return commitMode;
+  }
+
+  public void setCommitMode(byte commitMode) {
+    this.commitMode = commitMode;
+  }
+
+  public String getSql() {
+    return sql;
+  }
+
+  public void setSql(String sql) {
+    this.sql = sql;
+  }
 
 }

@@ -13,16 +13,13 @@
  */
 package com.github.dts.protocol.header;
 
-import com.github.dts.remoting.CommandCustomHeader;
-import com.github.dts.remoting.exception.RemotingCommandException;
-
 /**
  * 开始事务消息
  * 
  * @author liushiming
  * @version BeginMessage.java, v 0.0.1 2017年9月1日 下午5:45:54 liushiming
  */
-public class BeginMessage implements CommandCustomHeader {
+public class BeginMessage extends AbstractCustomHeader {
 
   public long timeout = 60000;
 
@@ -34,9 +31,4 @@ public class BeginMessage implements CommandCustomHeader {
     this.timeout = timeout;
   }
 
-
-  @Override
-  public void checkFields() throws RemotingCommandException {
-
-  }
 }

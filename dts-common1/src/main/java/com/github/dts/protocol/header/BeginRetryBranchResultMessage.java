@@ -13,26 +13,20 @@
  */
 package com.github.dts.protocol.header;
 
-import com.github.dts.remoting.annotation.CFNotNull;
-
 /**
- * 开始事务的返回消息
- * 
  * @author liushiming
- * @version BeginResultMessage.java, v 0.0.1 2017年9月1日 下午6:32:09 liushiming
+ * @version BeginRetryBranchResultMessage.java, v 0.0.1 2017年9月4日 下午2:11:52 liushiming
  */
-public class BeginResultMessage extends AbstractCustomHeader {
+public class BeginRetryBranchResultMessage extends AbstractCustomHeader {
+  /**
+   * 事务XID
+   */
+  private String xid;
 
   /**
-   * 全局唯一的事务ID
+   * 分支ID
    */
-  @CFNotNull
-  String xid;
-  /**
-   * Server双写配置下，next node的地址
-   */
-  @CFNotNull
-  String nextSvrAddr;
+  private long branchId;
 
   public String getXid() {
     return xid;
@@ -42,12 +36,12 @@ public class BeginResultMessage extends AbstractCustomHeader {
     this.xid = xid;
   }
 
-  public String getNextSvrAddr() {
-    return nextSvrAddr;
+  public long getBranchId() {
+    return branchId;
   }
 
-  public void setNextSvrAddr(String nextSvrAddr) {
-    this.nextSvrAddr = nextSvrAddr;
+  public void setBranchId(long branchId) {
+    this.branchId = branchId;
   }
 
 }
