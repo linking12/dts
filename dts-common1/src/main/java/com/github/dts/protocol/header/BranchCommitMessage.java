@@ -19,7 +19,7 @@ import java.util.List;
  * @author liushiming
  * @version BranchCommitMessage.java, v 0.0.1 2017年9月1日 下午5:46:22 liushiming
  */
-public class BranchCommitMessage extends AbstractCustomHeader {
+public class BranchCommitMessage extends DtsMessage {
 
   private String serverAddr;
 

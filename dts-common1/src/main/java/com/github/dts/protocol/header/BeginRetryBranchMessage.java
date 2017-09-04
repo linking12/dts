@@ -17,7 +17,7 @@ package com.github.dts.protocol.header;
  * @author liushiming
  * @version BeginRetryBranchMessage.java, v 0.0.1 2017年9月1日 下午5:46:06 liushiming
  */
-public class BeginRetryBranchMessage extends AbstractCustomHeader {
+public class BeginRetryBranchMessage extends DtsMessage {
   /**
    * 有效时长；超出这个时长，转为告警通知用户。 缺省半小时
    */

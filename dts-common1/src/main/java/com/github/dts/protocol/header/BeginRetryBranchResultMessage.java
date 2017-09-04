@@ -17,7 +17,7 @@ package com.github.dts.protocol.header;
  * @author liushiming
  * @version BeginRetryBranchResultMessage.java, v 0.0.1 2017年9月4日 下午2:11:52 liushiming
  */
-public class BeginRetryBranchResultMessage extends AbstractCustomHeader {
+public class BeginRetryBranchResultMessage extends DtsMessage {
   /**
    * 事务XID
    */

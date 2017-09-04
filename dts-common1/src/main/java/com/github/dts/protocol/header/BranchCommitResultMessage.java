@@ -19,7 +19,7 @@ import java.util.List;
  * @author liushiming
  * @version BranchCommitResultMessage.java, v 0.0.1 2017年9月4日 下午2:20:45 liushiming
  */
-public class BranchCommitResultMessage extends AbstractCustomHeader {
+public class BranchCommitResultMessage extends DtsMessage {
 
   /**
    * 事务IDs

@@ -21,7 +21,7 @@ import com.github.dts.remoting.annotation.CFNotNull;
  * @author liushiming
  * @version BeginResultMessage.java, v 0.0.1 2017年9月1日 下午6:32:09 liushiming
  */
-public class BeginResultMessage extends AbstractCustomHeader {
+public class BeginResultMessage extends DtsMessage {
 
   /**
    * 全局唯一的事务ID

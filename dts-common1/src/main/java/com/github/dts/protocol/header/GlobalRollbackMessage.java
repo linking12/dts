@@ -17,7 +17,7 @@ package com.github.dts.protocol.header;
  * @author liushiming
  * @version GlobalRollbackMessage.java, v 0.0.1 2017年9月1日 下午6:27:32 liushiming
  */
-public class GlobalRollbackMessage extends AbstractCustomHeader {
+public class GlobalRollbackMessage extends DtsMessage {
   /**
    * 事务ID
    */

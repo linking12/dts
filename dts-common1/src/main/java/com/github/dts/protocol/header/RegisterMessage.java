@@ -17,7 +17,7 @@ package com.github.dts.protocol.header;
  * @author liushiming
  * @version RegisterMessage.java, v 0.0.1 2017年9月1日 下午6:29:38 liushiming
  */
-public class RegisterMessage extends AbstractCustomHeader {
+public class RegisterMessage extends DtsMessage {
   /**
    * 事务ID
    */

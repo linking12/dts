@@ -17,7 +17,7 @@ package com.github.dts.protocol.header;
  * @author liushiming
  * @version BranchRollbackResultMessage.java, v 0.0.1 2017年9月4日 下午2:23:56 liushiming
  */
-public class BranchRollbackResultMessage extends AbstractCustomHeader {
+public class BranchRollbackResultMessage extends DtsMessage {
   /**
    * 事务ID
    */

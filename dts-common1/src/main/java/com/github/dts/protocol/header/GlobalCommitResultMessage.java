@@ -17,7 +17,7 @@ package com.github.dts.protocol.header;
  * @author liushiming
  * @version GlobalCommitResultMessage.java, v 0.0.1 2017年9月4日 下午2:34:10 liushiming
  */
-public class GlobalCommitResultMessage extends AbstractCustomHeader {
+public class GlobalCommitResultMessage extends DtsMessage {
   private long tranId;
 
   public long getTranId() {

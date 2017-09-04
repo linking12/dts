@@ -17,7 +17,7 @@ package com.github.dts.protocol.header;
  * @author liushiming
  * @version GlobalCommitMessage.java, v 0.0.1 2017年9月1日 下午6:25:26 liushiming
  */
-public class GlobalCommitMessage extends AbstractCustomHeader {
+public class GlobalCommitMessage extends DtsMessage {
   /**
    * 事务ID
    */

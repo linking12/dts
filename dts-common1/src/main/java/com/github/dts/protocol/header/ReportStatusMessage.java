@@ -17,7 +17,7 @@ package com.github.dts.protocol.header;
  * @author liushiming
  * @version ReportStatusMessage.java, v 0.0.1 2017年9月1日 下午6:26:32 liushiming
  */
-public class ReportStatusMessage extends AbstractCustomHeader {
+public class ReportStatusMessage extends DtsMessage {
   /**
    * 事务ID
    */

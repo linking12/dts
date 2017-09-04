@@ -15,34 +15,17 @@ package com.github.dts.protocol.header;
 
 /**
  * @author liushiming
- * @version RegisterResultMessage.java, v 0.0.1 2017年9月4日 下午2:43:44 liushiming
+ * @version DtsMergeResultMessage.java, v 0.0.1 2017年9月4日 下午4:31:11 liushiming
  */
-public class RegisterResultMessage extends DtsMessage {
-  /**
-   * 事务ID
-   */
-  long tranId;
+public class DtsMergeResultMessage extends DtsMessage {
+  public DtsMessage[] msgs;
 
-  /**
-   * 分支ID
-   */
-  long branchId;
-
-  public long getTranId() {
-    return tranId;
+  public DtsMessage[] getMsgs() {
+    return msgs;
   }
 
-  public void setTranId(long tranId) {
-    this.tranId = tranId;
+  public void setMsgs(DtsMessage[] msgs) {
+    this.msgs = msgs;
   }
-
-  public long getBranchId() {
-    return branchId;
-  }
-
-  public void setBranchId(long branchId) {
-    this.branchId = branchId;
-  }
-
 
 }

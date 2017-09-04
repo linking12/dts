@@ -20,7 +20,7 @@ import com.github.dts.remoting.exception.RemotingCommandException;
  * @author liushiming
  * @version AbstractCommandCustomHeader.java, v 0.0.1 2017年9月4日 下午2:13:03 liushiming
  */
-public abstract class AbstractCustomHeader implements CommandCustomHeader {
+public abstract class DtsMessage implements CommandCustomHeader {
 
   private String msg;
 

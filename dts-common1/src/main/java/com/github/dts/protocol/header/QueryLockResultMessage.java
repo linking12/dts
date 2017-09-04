@@ -17,7 +17,7 @@ package com.github.dts.protocol.header;
  * @author liushiming
  * @version QueryLockResultMessage.java, v 0.0.1 2017年9月4日 下午2:37:32 liushiming
  */
-public class QueryLockResultMessage extends AbstractCustomHeader {
+public class QueryLockResultMessage extends DtsMessage {
   /**
    * 事务ID
    */

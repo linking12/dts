@@ -13,35 +13,33 @@
  */
 package com.github.dts.protocol.header;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author liushiming
- * @version RegisterResultMessage.java, v 0.0.1 2017年9月4日 下午2:43:44 liushiming
+ * @version DtsMergeMessage.java, v 0.0.1 2017年9月4日 下午4:27:31 liushiming
  */
-public class RegisterResultMessage extends DtsMessage {
-  /**
-   * 事务ID
-   */
-  long tranId;
+public class DtsMergeMessage extends DtsMessage {
 
-  /**
-   * 分支ID
-   */
-  long branchId;
+  public List<DtsMessage> msgs = new ArrayList<DtsMessage>();
 
-  public long getTranId() {
-    return tranId;
+  public List<Long> msgIds = new ArrayList<Long>();
+
+  public List<DtsMessage> getMsgs() {
+    return msgs;
   }
 
-  public void setTranId(long tranId) {
-    this.tranId = tranId;
+  public void setMsgs(List<DtsMessage> msgs) {
+    this.msgs = msgs;
   }
 
-  public long getBranchId() {
-    return branchId;
+  public List<Long> getMsgIds() {
+    return msgIds;
   }
 
-  public void setBranchId(long branchId) {
-    this.branchId = branchId;
+  public void setMsgIds(List<Long> msgIds) {
+    this.msgIds = msgIds;
   }
 
 

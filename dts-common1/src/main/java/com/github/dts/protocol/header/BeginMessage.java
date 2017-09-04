@@ -19,7 +19,7 @@ package com.github.dts.protocol.header;
  * @author liushiming
  * @version BeginMessage.java, v 0.0.1 2017年9月1日 下午5:45:54 liushiming
  */
-public class BeginMessage extends AbstractCustomHeader {
+public class BeginMessage extends DtsMessage {
 
   public long timeout = 60000;
 

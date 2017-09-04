@@ -17,7 +17,7 @@ package com.github.dts.protocol.header;
  * @author liushiming
  * @version ClusterDumpResultMessage.java, v 0.0.1 2017年9月4日 下午2:32:17 liushiming
  */
-public class ClusterDumpResultMessage extends AbstractCustomHeader {
+public class ClusterDumpResultMessage extends DtsMessage {
 
   private boolean result;
 

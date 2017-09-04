@@ -17,6 +17,6 @@ package com.github.dts.protocol.header;
  * @author liushiming
  * @version ReportUdataResultMessage.java, v 0.0.1 2017年9月4日 下午2:45:09 liushiming
  */
-public class ReportUdataResultMessage extends AbstractCustomHeader {
+public class ReportUdataResultMessage extends DtsMessage {
 
 }
