@@ -13,10 +13,37 @@
  */
 package com.github.dts.protocol.header;
 
-/** 
- * @author liushiming 
- * @version GlobalRollbackMessage.java, v 0.0.1 2017年9月1日 下午6:27:32 liushiming 
+/**
+ * @author liushiming
+ * @version GlobalRollbackMessage.java, v 0.0.1 2017年9月1日 下午6:27:32 liushiming
  */
-public class GlobalRollbackMessage {
+public class GlobalRollbackMessage extends AbstractCustomHeader {
+  /**
+   * 事务ID
+   */
+  long tranId;
+
+  /**
+   * 当server采用cluster mode，有可能消息接收svr并不是发起事务的svr，这个属性指示发起事务的svr地址
+   */
+  String realSvrAddr;
+
+  public long getTranId() {
+    return tranId;
+  }
+
+  public void setTranId(long tranId) {
+    this.tranId = tranId;
+  }
+
+  public String getRealSvrAddr() {
+    return realSvrAddr;
+  }
+
+  public void setRealSvrAddr(String realSvrAddr) {
+    this.realSvrAddr = realSvrAddr;
+  }
+
+
 
 }

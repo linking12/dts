@@ -13,10 +13,23 @@
  */
 package com.github.dts.protocol.header;
 
-/** 
- * @author liushiming 
- * @version GlobalCommitMessage.java, v 0.0.1 2017年9月1日 下午6:25:26 liushiming 
+/**
+ * @author liushiming
+ * @version GlobalCommitMessage.java, v 0.0.1 2017年9月1日 下午6:25:26 liushiming
  */
-public class GlobalCommitMessage {
+public class GlobalCommitMessage extends AbstractCustomHeader {
+  /**
+   * 事务ID
+   */
+  long tranId;
+
+  public long getTranId() {
+    return tranId;
+  }
+
+  public void setTranId(long tranId) {
+    this.tranId = tranId;
+  }
+
 
 }

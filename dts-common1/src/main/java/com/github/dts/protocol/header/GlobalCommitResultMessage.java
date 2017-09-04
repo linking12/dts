@@ -15,18 +15,18 @@ package com.github.dts.protocol.header;
 
 /**
  * @author liushiming
- * @version ClusterDumpMessage.java, v 0.0.1 2017年9月1日 下午6:25:11 liushiming
+ * @version GlobalCommitResultMessage.java, v 0.0.1 2017年9月4日 下午2:34:10 liushiming
  */
-public class ClusterDumpMessage extends AbstractCustomHeader {
+public class GlobalCommitResultMessage extends AbstractCustomHeader {
+  private long tranId;
 
-  private boolean verbose;
-
-  public boolean isVerbose() {
-    return verbose;
+  public long getTranId() {
+    return tranId;
   }
 
-  public void setVerbose(boolean verbose) {
-    this.verbose = verbose;
+  public void setTranId(long tranId) {
+    this.tranId = tranId;
   }
+
 
 }

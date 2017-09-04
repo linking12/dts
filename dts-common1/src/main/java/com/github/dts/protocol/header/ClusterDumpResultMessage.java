@@ -15,18 +15,28 @@ package com.github.dts.protocol.header;
 
 /**
  * @author liushiming
- * @version ClusterDumpMessage.java, v 0.0.1 2017年9月1日 下午6:25:11 liushiming
+ * @version ClusterDumpResultMessage.java, v 0.0.1 2017年9月4日 下午2:32:17 liushiming
  */
-public class ClusterDumpMessage extends AbstractCustomHeader {
+public class ClusterDumpResultMessage extends AbstractCustomHeader {
 
-  private boolean verbose;
+  private boolean result;
 
-  public boolean isVerbose() {
-    return verbose;
+  private String msg;
+
+  public boolean isResult() {
+    return result;
   }
 
-  public void setVerbose(boolean verbose) {
-    this.verbose = verbose;
+  public void setResult(boolean result) {
+    this.result = result;
+  }
+
+  public String getMsg() {
+    return msg;
+  }
+
+  public void setMsg(String msg) {
+    this.msg = msg;
   }
 
 }
