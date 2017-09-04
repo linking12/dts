@@ -13,10 +13,62 @@
  */
 package com.github.dts.protocol.header;
 
-/** 
- * @author liushiming 
- * @version RegisterMessage.java, v 0.0.1 2017年9月1日 下午6:29:38 liushiming 
+/**
+ * @author liushiming
+ * @version RegisterMessage.java, v 0.0.1 2017年9月1日 下午6:29:38 liushiming
  */
-public class RegisterMessage {
+public class RegisterMessage extends AbstractCustomHeader {
+  /**
+   * 事务ID
+   */
+  long tranId;
+
+  /**
+   * 对于缺省模式（TXC Atom为数据源），这个域为dbKey；对于MT模式，这是用户自定义key
+   */
+  String key;
+
+  /**
+   * 业务主键，用于强隔离。分支上报给server，自己修改了哪些表的哪些行的主键。格式如下： "tableName1:key1,key2,key3;tableName2:key1,key2"
+   */
+  String businessKey;
+
+  /**
+   * 提交模式
+   */
+  byte commitMode;
+
+  public long getTranId() {
+    return tranId;
+  }
+
+  public void setTranId(long tranId) {
+    this.tranId = tranId;
+  }
+
+  public String getKey() {
+    return key;
+  }
+
+  public void setKey(String key) {
+    this.key = key;
+  }
+
+  public String getBusinessKey() {
+    return businessKey;
+  }
+
+  public void setBusinessKey(String businessKey) {
+    this.businessKey = businessKey;
+  }
+
+  public byte getCommitMode() {
+    return commitMode;
+  }
+
+  public void setCommitMode(byte commitMode) {
+    this.commitMode = commitMode;
+  }
+
 
 }

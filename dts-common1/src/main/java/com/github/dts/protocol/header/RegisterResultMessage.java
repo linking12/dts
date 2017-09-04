@@ -15,10 +15,9 @@ package com.github.dts.protocol.header;
 
 /**
  * @author liushiming
- * @version ReportUpdateMessage.java, v 0.0.1 2017年9月1日 下午6:26:45 liushiming
+ * @version RegisterResultMessage.java, v 0.0.1 2017年9月4日 下午2:43:44 liushiming
  */
-public class ReportUpdateMessage extends AbstractCustomHeader {
-
+public class RegisterResultMessage extends AbstractCustomHeader {
   /**
    * 事务ID
    */
@@ -28,13 +27,6 @@ public class ReportUpdateMessage extends AbstractCustomHeader {
    * 分支ID
    */
   long branchId;
-
-  String key;
-
-  /**
-   * 用户自定义信息，MT服务可以把一阶段的一些用户数据上报给Server，Server在二阶段把这个信息再传下来； 这样MT服务二阶段可以节省一次查询
-   */
-  String udata = null;
 
   public long getTranId() {
     return tranId;
@@ -50,22 +42,6 @@ public class ReportUpdateMessage extends AbstractCustomHeader {
 
   public void setBranchId(long branchId) {
     this.branchId = branchId;
-  }
-
-  public String getKey() {
-    return key;
-  }
-
-  public void setKey(String key) {
-    this.key = key;
-  }
-
-  public String getUdata() {
-    return udata;
-  }
-
-  public void setUdata(String udata) {
-    this.udata = udata;
   }
 
 

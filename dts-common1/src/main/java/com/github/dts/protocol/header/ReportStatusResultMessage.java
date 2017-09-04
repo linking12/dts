@@ -15,30 +15,10 @@ package com.github.dts.protocol.header;
 
 /**
  * @author liushiming
- * @version ReportStatusMessage.java, v 0.0.1 2017年9月1日 下午6:26:32 liushiming
+ * @version ReportStatusResultMessage.java, v 0.0.1 2017年9月4日 下午2:44:27 liushiming
  */
-public class ReportStatusMessage extends AbstractCustomHeader {
-  /**
-   * 事务ID
-   */
-  long tranId;
-
-  /**
-   * 分支ID
-   */
-  long branchId;
-
-  boolean success;
-
-  String key;
-
-  public long getTranId() {
-    return tranId;
-  }
-
-  public void setTranId(long tranId) {
-    this.tranId = tranId;
-  }
+public class ReportStatusResultMessage extends AbstractCustomHeader {
+  private long branchId;
 
   public long getBranchId() {
     return branchId;
@@ -47,23 +27,6 @@ public class ReportStatusMessage extends AbstractCustomHeader {
   public void setBranchId(long branchId) {
     this.branchId = branchId;
   }
-
-  public boolean isSuccess() {
-    return success;
-  }
-
-  public void setSuccess(boolean success) {
-    this.success = success;
-  }
-
-  public String getKey() {
-    return key;
-  }
-
-  public void setKey(String key) {
-    this.key = key;
-  }
-
 
 
 }

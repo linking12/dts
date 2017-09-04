@@ -21,6 +21,40 @@ import com.github.dts.remoting.exception.RemotingCommandException;
  * @version AbstractCommandCustomHeader.java, v 0.0.1 2017年9月4日 下午2:13:03 liushiming
  */
 public abstract class AbstractCustomHeader implements CommandCustomHeader {
+
+  /**
+   * 0:失败; 1:成功;
+   */
+  private int result;
+
+  private String msg;
+
+
+
+  public int getResult() {
+    return result;
+  }
+
+
+
+  public void setResult(int result) {
+    this.result = result;
+  }
+
+
+
+  public String getMsg() {
+    return msg;
+  }
+
+
+
+  public void setMsg(String msg) {
+    this.msg = msg;
+  }
+
+
+
   @Override
   public void checkFields() throws RemotingCommandException {
 
