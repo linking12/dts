@@ -3,8 +3,8 @@ package com.quancheng.dts.common;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.google.common.collect.Lists;
 import com.quancheng.dts.context.DtsContextOperateHelper;
+import com.quancheng.dts.exception.DtsException;
 
 public class DtsContext {
 

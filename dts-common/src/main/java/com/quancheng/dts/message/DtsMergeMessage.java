@@ -17,7 +17,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.quancheng.dts.common.DtsException;
+import com.quancheng.dts.exception.DtsException;
 import com.quancheng.dts.message.request.BeginMessage;
 import com.quancheng.dts.message.request.GlobalCommitMessage;
 import com.quancheng.dts.message.request.GlobalRollbackMessage;

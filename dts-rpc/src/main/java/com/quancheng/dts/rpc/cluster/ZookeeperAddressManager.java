@@ -25,10 +25,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
-import com.quancheng.dts.common.DtsException;
+import com.quancheng.dts.exception.DtsException;
 
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author liushiming

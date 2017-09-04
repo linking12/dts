@@ -4,8 +4,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.alibaba.druid.filter.stat.StatFilter;
+import com.alibaba.druid.proxy.jdbc.CallableStatementProxy;
+import com.alibaba.druid.proxy.jdbc.PreparedStatementProxy;
 import com.alibaba.druid.proxy.jdbc.ResultSetProxy;
 import com.alibaba.druid.proxy.jdbc.StatementProxy;
+import com.alibaba.druid.stat.JdbcDataSourceStat;
+import com.alibaba.druid.stat.JdbcSqlStat;
 
 import java.util.List;
 
@@ -13,16 +17,39 @@ import java.util.List;
 /**
  * Created by sunjian on 2017/6/16.
  */
-public class RegisterBranchFilter extends StatFilter {
+public class BranchRegisterFilter extends StatFilter {
 
-  private static final Logger log = LoggerFactory.getLogger(RegisterBranchFilter.class);
+  private static final Logger log = LoggerFactory.getLogger(BranchRegisterFilter.class);
 
   private final List<StatementExecuteListener> statementExecuteListeners;
 
-  public RegisterBranchFilter(List<StatementExecuteListener> statementExecuteListeners) {
+  public BranchRegisterFilter(List<StatementExecuteListener> statementExecuteListeners) {
     this.statementExecuteListeners = statementExecuteListeners;
   }
+  @Override
+  public void statementCreateAfter(StatementProxy statement) {
+    super.statementCreateAfter(statement);
+    statementListenerBefor(statement);
+  }
 
+  @Override
+  public void statementPrepareAfter(PreparedStatementProxy statement) {
+    super.statementPrepareAfter(statement);
+    statementListenerBefor(statement);
+
+  }
+
+  private void statementListenerBefor(final StatementProxy statement) {
+    if (statementExecuteListeners != null && !statementExecuteListeners.isEmpty()) {
+      for (StatementExecuteListener statementExecuteListener : statementExecuteListeners) {
+        try {
+          statementExecuteListener.afterStatementCreate(statement);
+        } catch (Exception e) {
+          log.error("listener error", e);
+        }
+      }
+    }
+  }
 
   @Override
   protected void statementExecuteQueryBefore(StatementProxy statement, String sql) {

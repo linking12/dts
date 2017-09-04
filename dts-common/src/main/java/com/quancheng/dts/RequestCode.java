@@ -30,4 +30,6 @@ public class RequestCode {
 
     public static final int BRANCH_COMMIT = 110;
 
+    public static final int BRANCH_RETRY = 120;
+
 }

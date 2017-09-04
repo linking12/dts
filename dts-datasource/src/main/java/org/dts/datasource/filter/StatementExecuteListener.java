@@ -10,4 +10,6 @@ public interface StatementExecuteListener {
   void beforeExecute(StatementProxy statement, String sql);
 
   void afterExecute(StatementProxy statement, String sql, Throwable error);
+
+  void afterStatementCreate(StatementProxy statement);
 }

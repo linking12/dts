@@ -1,6 +1,6 @@
 package org.dts.datasource;
 
-import org.dts.datasource.filter.RegisterBranchFilter;
+import org.dts.datasource.filter.BranchRegisterFilter;
 import org.dts.datasource.filter.StatementExecuteListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,23 +43,36 @@ public class DtsDataSource extends DruidDataSource {
   public void init() throws SQLException {
     final List<StatementExecuteListener> statementExecuteListeners = new ArrayList<>();
     statementExecuteListeners.add(new StatementExecuteListener() {
+
+      @Override
+      public void afterStatementCreate(final StatementProxy statement) {
+        String sql = statement.getSqlStat().getSql();
+        if (sql.startsWith("select") || sql.startsWith("SELECT")) {
+          return;
+        }
+        final RemotingCommand request = RemotingCommand.createRequestCommand(RequestCode.BRANCH_REGISTER, null);
+        RegisterMessage registerMessage = new RegisterMessage();
+        registerMessage.setKey(DtsDataSource.this.getName());
+        registerMessage.setTranId(DtsXID.getTransactionId(DtsContext.getCurrentXid()));
+        request.setBody(RemotingSerializable.encode(registerMessage));
+        try {
+          RegisterResultMessage registerResultMessage = dtsClient.invokeSync(request, DtsDataSource.this.getMaxWait(), RegisterResultMessage.class);
+          System.out.println(registerResultMessage);
+          DtsContext.bindBranch(DtsDataSource.this.getName(), registerResultMessage.getBranchId());
+        } catch (DtsException e) {
+          log.error("register branch error", e);
+        }
+
+      }
+
+
       @Override
       public void beforeExecute(final StatementProxy statement, final String sql) {
         if (sql.startsWith("select") || sql.startsWith("SELECT")) {
           return;
         } else {
-          final RemotingCommand request = RemotingCommand.createRequestCommand(RequestCode.BRANCH_REGISTER, null);
-          RegisterMessage registerMessage = new RegisterMessage();
-          registerMessage.setKey(DtsDataSource.this.getName());
-          registerMessage.setTranId(DtsXID.getTransactionId(DtsContext.getCurrentXid()));
-          request.setBody(RemotingSerializable.encode(registerMessage));
-          try {
-            RegisterResultMessage registerResultMessage = dtsClient.invokeSync(request, DtsDataSource.this.getMaxWait(), RegisterResultMessage.class);
-            System.out.println(registerResultMessage);
-            DtsContext.bindBranch(DtsDataSource.this.getName(), registerResultMessage.getBranchId());
-          } catch (DtsException e) {
-            log.error("register branch error", e);
-          }
+          //save undo log
+
         }
       }
 
@@ -70,7 +83,7 @@ public class DtsDataSource extends DruidDataSource {
 
 
     });
-    super.setProxyFilters(Lists.newArrayList(new RegisterBranchFilter(statementExecuteListeners)));
+    super.setProxyFilters(Lists.newArrayList(new BranchRegisterFilter(statementExecuteListeners)));
     super.init();
   }
 

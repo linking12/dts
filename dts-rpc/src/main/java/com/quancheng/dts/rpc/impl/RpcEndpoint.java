@@ -30,7 +30,7 @@ import java.util.concurrent.TimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.quancheng.dts.common.DtsException;
+import com.quancheng.dts.exception.DtsException;
 import com.quancheng.dts.common.ResultCode;
 import com.quancheng.dts.message.MergeMessage;
 import com.quancheng.dts.message.request.ClusterDumpMessage;

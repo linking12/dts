@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 import com.quancheng.dts.common.DtsConstants;
 import com.quancheng.dts.common.DtsContext;
 import com.quancheng.dts.common.DtsErrCode;
-import com.quancheng.dts.common.DtsException;
+import com.quancheng.dts.exception.DtsException;
 import com.quancheng.dts.common.DtsXID;
 import com.quancheng.dts.common.ResultCode;
 import com.quancheng.dts.message.DtsMergeMessage;
