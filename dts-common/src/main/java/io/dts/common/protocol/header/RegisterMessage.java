@@ -13,14 +13,13 @@
  */
 package io.dts.common.protocol.header;
 
-import io.dts.remoting.CommandCustomHeader;
-import io.dts.remoting.exception.RemotingCommandException;
+import io.dts.common.protocol.DtsMessage;
 
 /**
  * @author liushiming
  * @version RegisterMessage.java, v 0.0.1 2017年9月1日 下午6:29:38 liushiming
  */
-public class RegisterMessage implements CommandCustomHeader, MergedMessage {
+public class RegisterMessage extends DtsMessage  {
   /**
    * 事务ID
    */
@@ -74,10 +73,10 @@ public class RegisterMessage implements CommandCustomHeader, MergedMessage {
   }
 
   @Override
-  public void checkFields() throws RemotingCommandException {
-    // TODO Auto-generated method stub
-
+  public short getTypeCode() {
+    return TYPE_REGIST;
   }
+
 
 
 }

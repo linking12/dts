@@ -15,14 +15,13 @@ package io.dts.common.protocol.header;
 
 import java.util.List;
 
-import io.dts.remoting.CommandCustomHeader;
-import io.dts.remoting.exception.RemotingCommandException;
+import io.dts.common.protocol.DtsMessage;
 
 /**
  * @author liushiming
  * @version BranchCommitResultMessage.java, v 0.0.1 2017年9月4日 下午2:20:45 liushiming
  */
-public class BranchCommitResultMessage implements CommandCustomHeader, MergedMessage {
+public class BranchCommitResultMessage extends DtsMessage {
   /**
    * 事务IDs
    */
@@ -49,10 +48,8 @@ public class BranchCommitResultMessage implements CommandCustomHeader, MergedMes
   }
 
   @Override
-  public void checkFields() throws RemotingCommandException {
-    // TODO Auto-generated method stub
-
+  public short getTypeCode() {
+    return TYPE_BRANCH_COMMIT_RESULT;
   }
-
 
 }

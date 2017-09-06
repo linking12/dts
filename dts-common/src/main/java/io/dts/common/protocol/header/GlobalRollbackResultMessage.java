@@ -13,14 +13,13 @@
  */
 package io.dts.common.protocol.header;
 
-import io.dts.remoting.CommandCustomHeader;
-import io.dts.remoting.exception.RemotingCommandException;
+import io.dts.common.protocol.DtsMessage;
 
 /**
  * @author liushiming
  * @version GlobalRollbackResultMessage.java, v 0.0.1 2017年9月4日 下午2:35:25 liushiming
  */
-public class GlobalRollbackResultMessage implements CommandCustomHeader {
+public class GlobalRollbackResultMessage extends DtsMessage {
   private long tranId;
 
   public long getTranId() {
@@ -31,9 +30,10 @@ public class GlobalRollbackResultMessage implements CommandCustomHeader {
     this.tranId = tranId;
   }
 
-  @Override
-  public void checkFields() throws RemotingCommandException {
 
+  @Override
+  public short getTypeCode() {
+    return TYPE_GLOBAL_ROLLBACK_RESULT;
   }
 
 }

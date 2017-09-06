@@ -165,7 +165,7 @@ public class NettyRPCTest {
 }
 
 
-class TestRequestHeader implements CommandCustomHeader {
+class TestRequestHeader extends DtsMessage {
     @CFNullable
     private Integer count;
 
@@ -199,7 +199,7 @@ class TestRequestHeader implements CommandCustomHeader {
 }
 
 
-class TestResponseHeader implements CommandCustomHeader {
+class TestResponseHeader extends DtsMessage {
     @CFNullable
     private Integer count;
 

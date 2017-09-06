@@ -13,14 +13,13 @@
  */
 package io.dts.common.protocol.header;
 
-import io.dts.remoting.CommandCustomHeader;
-import io.dts.remoting.exception.RemotingCommandException;
+import io.dts.common.protocol.DtsMessage;
 
 /**
  * @author liushiming
  * @version ReportStatusResultMessage.java, v 0.0.1 2017年9月4日 下午2:44:27 liushiming
  */
-public class ReportStatusResultMessage implements CommandCustomHeader, MergedMessage {
+public class ReportStatusResultMessage extends DtsMessage  {
   private long branchId;
 
   public long getBranchId() {
@@ -32,9 +31,8 @@ public class ReportStatusResultMessage implements CommandCustomHeader, MergedMes
   }
 
   @Override
-  public void checkFields() throws RemotingCommandException {
-
+  public short getTypeCode() {
+    return TYPE_REPORT_STATUS_RESULT;
   }
-
 
 }

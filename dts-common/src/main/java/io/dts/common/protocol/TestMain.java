@@ -11,12 +11,22 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-package io.dts.common.protocol.header;
+package io.dts.common.protocol;
+
+import io.dts.common.protocol.header.BeginMessage;
+import io.dts.remoting.protocol.RemotingSerializable;
 
 /**
  * @author liushiming
- * @version MergedMessage.java, v 0.0.1 2017年9月6日 下午3:23:27 liushiming
+ * @version TestMain.java, v 0.0.1 2017年9月6日 下午4:55:13 liushiming
  */
-public interface MergedMessage {
+public class TestMain {
+
+  public static void main(String[] args) {
+    BeginMessage message = new BeginMessage();
+    byte[] bytes = RemotingSerializable.encode(message);
+    DtsMessage messageDecode = RemotingSerializable.decode(bytes, DtsMessage.class);
+    System.out.println(messageDecode.getTypeCode());
+  }
 
 }

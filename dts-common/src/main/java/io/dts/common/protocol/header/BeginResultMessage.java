@@ -13,9 +13,8 @@
  */
 package io.dts.common.protocol.header;
 
-import io.dts.remoting.CommandCustomHeader;
+import io.dts.common.protocol.DtsMessage;
 import io.dts.remoting.annotation.CFNotNull;
-import io.dts.remoting.exception.RemotingCommandException;
 
 /**
  * 开始事务的返回消息
@@ -23,7 +22,7 @@ import io.dts.remoting.exception.RemotingCommandException;
  * @author liushiming
  * @version BeginResultMessage.java, v 0.0.1 2017年9月1日 下午6:32:09 liushiming
  */
-public class BeginResultMessage implements CommandCustomHeader, MergedMessage {
+public class BeginResultMessage extends DtsMessage  {
   /**
    * 全局唯一的事务ID
    */
@@ -52,8 +51,9 @@ public class BeginResultMessage implements CommandCustomHeader, MergedMessage {
   }
 
   @Override
-  public void checkFields() throws RemotingCommandException {
-
+  public short getTypeCode() {
+    return TYPE_BEGIN_RESULT;
   }
+
 
 }

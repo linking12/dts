@@ -13,24 +13,23 @@
  */
 package io.dts.common.protocol.header;
 
-import io.dts.remoting.CommandCustomHeader;
-import io.dts.remoting.exception.RemotingCommandException;
+import io.dts.common.protocol.DtsMessage;
 
 /**
  * @author liushiming
  * @version QueryLockMessage.java, v 0.0.1 2017年9月1日 下午6:25:41 liushiming
  */
-public class QueryLockMessage implements CommandCustomHeader, MergedMessage {
+public class QueryLockMessage extends DtsMessage  {
 
   /**
    * 事务ID
    */
-  long tranId;
+  private long tranId;
 
   /**
    * 业务主键，用于强隔离。分支上报给server，自己修改了哪些表的哪些行的主键。格式如下： "tableName1:key1,key2,key3;tableName2:key1,key2"
    */
-  String businessKey;
+  private String businessKey;
 
   public long getTranId() {
     return tranId;
@@ -48,10 +47,10 @@ public class QueryLockMessage implements CommandCustomHeader, MergedMessage {
     this.businessKey = businessKey;
   }
 
-  @Override
-  public void checkFields() throws RemotingCommandException {
-    // TODO Auto-generated method stub
 
+  @Override
+  public short getTypeCode() {
+    return TYPE_QUERY_LOCK;
   }
 
 

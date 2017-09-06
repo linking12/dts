@@ -13,7 +13,7 @@
  */
 package io.dts.common.protocol.body;
 
-import io.dts.common.protocol.header.MergedMessage;
+import io.dts.common.protocol.DtsMessage;
 import io.dts.remoting.protocol.RemotingSerializable;
 
 /**
@@ -22,13 +22,13 @@ import io.dts.remoting.protocol.RemotingSerializable;
  */
 public class DtsMergeResultMessage extends RemotingSerializable {
 
-  public MergedMessage[] msgs;
+  public DtsMessage[] msgs;
 
-  public MergedMessage[] getMsgs() {
+  public DtsMessage[] getMsgs() {
     return msgs;
   }
 
-  public void setMsgs(MergedMessage[] msgs) {
+  public void setMsgs(DtsMessage[] msgs) {
     this.msgs = msgs;
   }
 

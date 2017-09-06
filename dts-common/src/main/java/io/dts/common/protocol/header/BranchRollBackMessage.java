@@ -13,14 +13,13 @@
  */
 package io.dts.common.protocol.header;
 
-import io.dts.remoting.CommandCustomHeader;
-import io.dts.remoting.exception.RemotingCommandException;
+import io.dts.common.protocol.DtsMessage;
 
 /**
  * @author liushiming
  * @version BranchRollBackMessage.java, v 0.0.1 2017年9月1日 下午5:47:51 liushiming
  */
-public class BranchRollBackMessage implements CommandCustomHeader {
+public class BranchRollBackMessage extends DtsMessage {
   /**
    * 服务端地址
    */
@@ -115,9 +114,10 @@ public class BranchRollBackMessage implements CommandCustomHeader {
   }
 
   @Override
-  public void checkFields() throws RemotingCommandException {
-
+  public short getTypeCode() {
+    return TYPE_BRANCH_ROLLBACK;
   }
+
 
 
 }

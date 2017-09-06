@@ -16,7 +16,7 @@ package io.dts.common.protocol.body;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.dts.common.protocol.header.MergedMessage;
+import io.dts.common.protocol.DtsMessage;
 import io.dts.remoting.protocol.RemotingSerializable;
 
 /**
@@ -25,15 +25,15 @@ import io.dts.remoting.protocol.RemotingSerializable;
  */
 public class MergeMessage extends RemotingSerializable {
 
-  public List<MergedMessage> msgs = new ArrayList<MergedMessage>();
+  public List<DtsMessage> msgs = new ArrayList<DtsMessage>();
 
   public List<Long> msgIds = new ArrayList<Long>();
 
-  public List<MergedMessage> getMsgs() {
+  public List<DtsMessage> getMsgs() {
     return msgs;
   }
 
-  public void setMsgs(List<MergedMessage> msgs) {
+  public void setMsgs(List<DtsMessage> msgs) {
     this.msgs = msgs;
   }
 
@@ -44,6 +44,7 @@ public class MergeMessage extends RemotingSerializable {
   public void setMsgIds(List<Long> msgIds) {
     this.msgIds = msgIds;
   }
+
 
 
 }
