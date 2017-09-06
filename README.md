@@ -1,2 +1,0 @@
-# dts
- Distributed Transaction Service
