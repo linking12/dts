@@ -14,12 +14,13 @@
 package io.dts.common.protocol.header;
 
 import io.dts.common.protocol.DtsMessage;
+import io.dts.common.protocol.ResultMessage;
 
 /**
  * @author liushiming
  * @version ReportStatusResultMessage.java, v 0.0.1 2017年9月4日 下午2:44:27 liushiming
  */
-public class ReportStatusResultMessage extends DtsMessage  {
+public class ReportStatusResultMessage extends DtsMessage implements ResultMessage {
   private long branchId;
 
   public long getBranchId() {

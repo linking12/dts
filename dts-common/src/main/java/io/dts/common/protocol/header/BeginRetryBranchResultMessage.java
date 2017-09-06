@@ -14,13 +14,14 @@
 package io.dts.common.protocol.header;
 
 import io.dts.common.protocol.DtsMessage;
+import io.dts.common.protocol.ResultMessage;
 import io.dts.remoting.annotation.CFNotNull;
 
 /**
  * @author liushiming
  * @version BeginRetryBranchResultMessage.java, v 0.0.1 2017年9月4日 下午2:11:52 liushiming
  */
-public class BeginRetryBranchResultMessage extends DtsMessage  {
+public class BeginRetryBranchResultMessage extends DtsMessage implements ResultMessage {
   /**
    * 事务XID
    */

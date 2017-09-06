@@ -23,7 +23,7 @@ import io.dts.remoting.protocol.RemotingSerializable;
  * @author liushiming
  * @version DtsMergeMessage.java, v 0.0.1 2017年9月4日 下午4:27:31 liushiming
  */
-public class MergeMessage extends RemotingSerializable {
+public class DtsMergeMessage extends RemotingSerializable {
 
   public List<DtsMessage> msgs = new ArrayList<DtsMessage>();
 

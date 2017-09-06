@@ -17,9 +17,9 @@ import io.dts.common.protocol.DtsMessage;
 
 /**
  * @author liushiming
- * @version ReportUpdateMessage.java, v 0.0.1 2017年9月1日 下午6:26:45 liushiming
+ * @version ReportUdataMessage.java, v 0.0.1 2017年9月1日 下午6:26:45 liushiming
  */
-public class ReportUpdateMessage extends DtsMessage  {
+public class ReportUdataMessage extends DtsMessage {
 
   /**
    * 事务ID

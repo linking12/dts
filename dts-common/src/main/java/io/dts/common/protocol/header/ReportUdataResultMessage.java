@@ -14,12 +14,13 @@
 package io.dts.common.protocol.header;
 
 import io.dts.common.protocol.DtsMessage;
+import io.dts.common.protocol.ResultMessage;
 
 /**
  * @author liushiming
  * @version ReportUdataResultMessage.java, v 0.0.1 2017年9月4日 下午2:45:09 liushiming
  */
-public class ReportUdataResultMessage extends DtsMessage  {
+public class ReportUdataResultMessage extends DtsMessage implements ResultMessage {
 
   @Override
   public short getTypeCode() {

@@ -11,31 +11,12 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-package io.dts.common.protocol.header;
-
-import io.dts.common.protocol.DtsMessage;
-import io.dts.common.protocol.ResultMessage;
+package io.dts.common.protocol;
 
 /**
  * @author liushiming
- * @version GlobalCommitResultMessage.java, v 0.0.1 2017年9月4日 下午2:34:10 liushiming
+ * @version ResultMessage.java, v 0.0.1 2017年9月6日 下午5:53:06 liushiming
  */
-public class GlobalCommitResultMessage extends DtsMessage implements ResultMessage {
-  private long tranId;
-
-  public long getTranId() {
-    return tranId;
-  }
-
-  public void setTranId(long tranId) {
-    this.tranId = tranId;
-  }
-
-  @Override
-  public short getTypeCode() {
-    return TYPE_GLOBAL_COMMIT_RESULT;
-  }
-
-
+public interface ResultMessage {
 
 }

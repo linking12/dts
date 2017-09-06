@@ -14,12 +14,13 @@
 package io.dts.common.protocol.header;
 
 import io.dts.common.protocol.DtsMessage;
+import io.dts.common.protocol.ResultMessage;
 
 /**
  * @author liushiming
  * @version ClusterDumpResultMessage.java, v 0.0.1 2017年9月4日 下午2:32:17 liushiming
  */
-public class ClusterDumpResultMessage extends DtsMessage {
+public class ClusterDumpResultMessage extends DtsMessage implements ResultMessage {
 
   private boolean result;
 

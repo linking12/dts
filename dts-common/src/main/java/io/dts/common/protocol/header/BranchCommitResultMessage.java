@@ -16,12 +16,13 @@ package io.dts.common.protocol.header;
 import java.util.List;
 
 import io.dts.common.protocol.DtsMessage;
+import io.dts.common.protocol.ResultMessage;
 
 /**
  * @author liushiming
  * @version BranchCommitResultMessage.java, v 0.0.1 2017年9月4日 下午2:20:45 liushiming
  */
-public class BranchCommitResultMessage extends DtsMessage {
+public class BranchCommitResultMessage extends DtsMessage implements ResultMessage {
   /**
    * 事务IDs
    */

@@ -14,12 +14,13 @@
 package io.dts.common.protocol.header;
 
 import io.dts.common.protocol.DtsMessage;
+import io.dts.common.protocol.ResultMessage;
 
 /**
  * @author liushiming
  * @version GlobalRollbackResultMessage.java, v 0.0.1 2017年9月4日 下午2:35:25 liushiming
  */
-public class GlobalRollbackResultMessage extends DtsMessage {
+public class GlobalRollbackResultMessage extends DtsMessage implements ResultMessage {
   private long tranId;
 
   public long getTranId() {

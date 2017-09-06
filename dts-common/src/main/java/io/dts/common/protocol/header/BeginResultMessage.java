@@ -14,6 +14,7 @@
 package io.dts.common.protocol.header;
 
 import io.dts.common.protocol.DtsMessage;
+import io.dts.common.protocol.ResultMessage;
 import io.dts.remoting.annotation.CFNotNull;
 
 /**
@@ -22,7 +23,7 @@ import io.dts.remoting.annotation.CFNotNull;
  * @author liushiming
  * @version BeginResultMessage.java, v 0.0.1 2017年9月1日 下午6:32:09 liushiming
  */
-public class BeginResultMessage extends DtsMessage  {
+public class BeginResultMessage extends DtsMessage implements ResultMessage {
   /**
    * 全局唯一的事务ID
    */

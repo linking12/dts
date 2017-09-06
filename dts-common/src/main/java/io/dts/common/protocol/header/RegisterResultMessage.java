@@ -14,12 +14,13 @@
 package io.dts.common.protocol.header;
 
 import io.dts.common.protocol.DtsMessage;
+import io.dts.common.protocol.ResultMessage;
 
 /**
  * @author liushiming
  * @version RegisterResultMessage.java, v 0.0.1 2017年9月4日 下午2:43:44 liushiming
  */
-public class RegisterResultMessage extends DtsMessage  {
+public class RegisterResultMessage extends DtsMessage implements ResultMessage {
   /**
    * 事务ID
    */
