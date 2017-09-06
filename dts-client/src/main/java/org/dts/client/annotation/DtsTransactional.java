@@ -2,6 +2,8 @@ package org.dts.client.annotation;
 
 import static com.quancheng.dts.common.DtsTranModel.RB;
 
+import org.springframework.core.annotation.AliasFor;
+
 import com.quancheng.dts.common.DtsTranModel;
 
 import java.lang.annotation.Documented;
@@ -21,27 +23,36 @@ import java.lang.annotation.Target;
 public @interface DtsTransactional {
 
   /**
-   * The name of transactional
-   * @return
+   * Alias for {@link #transactionManager}.
+   * @see #transactionManager
    */
-  String name() default "";
+  @AliasFor("transactionManager")
+  String value() default "";
 
   /**
    * A <em>qualifier</em> value for the specified transaction.
    * <p>May be used to determine the target transaction manager,
    * matching the qualifier value (or the bean name) of a specific
-   * {@link org.dts.client.DtsTransactionManager}
+   * {@link org.springframework.transaction.PlatformTransactionManager}
    * bean definition.
    * @since 4.2
+   * @see #value
    */
+  @AliasFor("value")
   String transactionManager() default "";
 
   /**
    * millio second of timeout
    * @return
    */
-  long timeout() default 3000l;
+  int timeout() default 3000;
 
-  DtsTranModel type() default RB;
+  /**
+   * millio second of effectiveTime
+   * @return
+   */
+  int effectiveTime() default 3000;
+
+  DtsTranModel tranModel() default RB;
 
 }

@@ -78,7 +78,8 @@ public class DtsDataSource extends DruidDataSource {
 
       @Override
       public void afterExecute(final StatementProxy statement, String sql, final Throwable error) {
-
+          if (error != null && DtsContext.inRetryContext()) {
+          }
       }
 
 

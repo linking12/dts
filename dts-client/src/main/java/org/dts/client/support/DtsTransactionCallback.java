@@ -5,5 +5,5 @@ package org.dts.client.support;
  */
 public interface DtsTransactionCallback<T> {
 
-  T doInTransaction();
+  T doInTransaction() throws Throwable;
 }

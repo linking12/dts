@@ -18,9 +18,11 @@ package org.dts.client.support;
 
 import org.dts.client.exception.DtsTransactionException;
 
+
 public interface DtsTransactionOperations {
 
 
 	<T> T execute(DtsTransactionCallback<T> action) throws DtsTransactionException;
 
+	<T> T executeRT(DtsTransactionCallback<T> callback, long effectiveTime) throws DtsTransactionException;
 }
