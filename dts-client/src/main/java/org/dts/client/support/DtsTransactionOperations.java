@@ -22,7 +22,6 @@ import org.dts.client.exception.DtsTransactionException;
 public interface DtsTransactionOperations {
 
 
-	<T> T execute(DtsTransactionCallback<T> action) throws DtsTransactionException;
+	<T> T execute(DtsTransactionCallback<T> action, long effectiveTime) throws DtsTransactionException;
 
-	<T> T executeRT(DtsTransactionCallback<T> callback, long effectiveTime) throws DtsTransactionException;
 }

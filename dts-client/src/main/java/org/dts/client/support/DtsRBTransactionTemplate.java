@@ -13,22 +13,22 @@ import java.lang.reflect.UndeclaredThrowableException;
 /**
  * Created by guoyubo on 2017/8/28.
  */
-public class DtsTransactionTemplate implements DtsTransactionOperations {
+public class DtsRBTransactionTemplate implements DtsTransactionOperations {
 
-  private static final Logger logger = LoggerFactory.getLogger(DtsTransactionTemplate.class);
+  private static final Logger logger = LoggerFactory.getLogger(DtsRBTransactionTemplate.class);
 
   private DtsTransactionManager transactionManager;
 
-  public DtsTransactionTemplate(final DtsTransactionManager transactionManager) {
+  public DtsRBTransactionTemplate(final DtsTransactionManager transactionManager) {
     this.transactionManager = transactionManager;
   }
 
   @Override
-  public <T> T execute(DtsTransactionCallback<T> action) throws DtsTransactionException {
+  public <T> T execute(DtsTransactionCallback<T> action, long effectiveTime) throws DtsTransactionException {
 
     T result = null;
     try {
-      this.transactionManager.begin(3000L);
+      this.transactionManager.begin(effectiveTime);
       result = action.doInTransaction();
       this.transactionManager.commit();
     } catch (RuntimeException ex) {
@@ -46,28 +46,6 @@ public class DtsTransactionTemplate implements DtsTransactionOperations {
     return result;
   }
 
-  /**
-   *
-   * @param callback
-   *            回调函数，在事务开启后，将回调此方法
-   * @param effectiveTime
-   *            RT模式下，Dts将在此时间内，保证重试callback中失败的sql语句
-   * @return
-   * @throws DtsException
-   *             当sql语句执行异常或TXC client无法连接到Dts server时，抛出此异常
-   * @since 1.1.0
-   */
-  @Override
-  public <T> T executeRT(DtsTransactionCallback<T> callback, long effectiveTime) throws DtsTransactionException {
-    try {
-      DtsContext.startRetryBranch(effectiveTime);
-      return callback.doInTransaction();
-    } catch (Throwable e) {
-      throw new DtsTransactionException("Application executeRT exception", e);
-    } finally {
-      DtsContext.endRetryBranch();
-    }
-  }
 
   private void rollbackOnException(Throwable ex) throws DtsTransactionException {
     logger.debug("Initiating transaction rollback on application exception", ex);

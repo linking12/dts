@@ -3,8 +3,10 @@ package org.dts.client.interceptor;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.dts.client.DtsTransactionManager;
+import org.dts.client.support.DtsRTTransactionTemplate;
 import org.dts.client.support.DtsTransactionCallback;
-import org.dts.client.support.DtsTransactionTemplate;
+import org.dts.client.support.DtsRBTransactionTemplate;
+import org.dts.client.support.DtsTransactionOperations;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
@@ -67,22 +69,18 @@ public class DtsTransactionInterceptor implements BeanFactoryAware, MethodInterc
     DtsTransactionAttribute transactionAttribute =
         (DtsTransactionAttribute) transactionAttributeSource.getTransactionAttribute(methodInvocation.getMethod(), methodInvocation.getClass());
     final DtsTransactionManager tx = determineTransactionManager(transactionAttribute);
+    DtsTransactionOperations transactionOperations = null;
     if (transactionAttribute.getTranModel().equals(DtsTranModel.RT.name())) {
-      return new DtsTransactionTemplate(tx).executeRT(new DtsTransactionCallback<Object>() {
-        @Override
-        public Object doInTransaction() throws Throwable {
-          return methodInvocation.proceed();
-        }
-      }, transactionAttribute.getEffectiveTime());
+      transactionOperations =  new DtsRTTransactionTemplate(tx);
     } else {
-
-      return new DtsTransactionTemplate(tx).execute(new DtsTransactionCallback<Object>() {
-        @Override
-        public Object doInTransaction() throws Throwable {
-          return methodInvocation.proceed();
-        }
-      });
+      transactionOperations =  new DtsRBTransactionTemplate(tx);
     }
+    return transactionOperations.execute(new DtsTransactionCallback<Object>() {
+      @Override
+      public Object doInTransaction() throws Throwable {
+        return methodInvocation.proceed();
+      }
+    }, transactionAttribute.getEffectiveTime());
   }
 
   /**
