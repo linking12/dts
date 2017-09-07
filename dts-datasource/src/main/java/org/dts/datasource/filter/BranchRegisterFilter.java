@@ -29,17 +29,16 @@ public class BranchRegisterFilter extends StatFilter {
   @Override
   public void statementCreateAfter(StatementProxy statement) {
     super.statementCreateAfter(statement);
-    statementListenerBefor(statement);
+    statementListenerBefore(statement);
   }
 
   @Override
   public void statementPrepareAfter(PreparedStatementProxy statement) {
     super.statementPrepareAfter(statement);
-    statementListenerBefor(statement);
-
+    statementListenerBefore(statement);
   }
 
-  private void statementListenerBefor(final StatementProxy statement) {
+  private void statementListenerBefore(final StatementProxy statement) {
     if (statementExecuteListeners != null && !statementExecuteListeners.isEmpty()) {
       for (StatementExecuteListener statementExecuteListener : statementExecuteListeners) {
         try {

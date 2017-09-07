@@ -8,19 +8,15 @@ import org.slf4j.LoggerFactory;
 import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.proxy.jdbc.StatementProxy;
 import com.google.common.collect.Lists;
-import com.quancheng.dts.RemotingSerializable;
-import com.quancheng.dts.RequestCode;
+import com.quancheng.dts.common.CommitMode;
 import com.quancheng.dts.common.DtsContext;
-import com.quancheng.dts.common.DtsXID;
-import com.quancheng.dts.exception.DtsException;
-import com.quancheng.dts.message.request.RegisterMessage;
-import com.quancheng.dts.message.response.RegisterResultMessage;
-import com.quancheng.dts.rpc.remoting.DtsClient;
-import com.quancheng.dts.rpc.remoting.protocol.RemotingCommand;
+import com.quansheng.dts.resourcemanager.DtsResourceManager;
 
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by guoyubo on 2017/8/22.
@@ -29,7 +25,9 @@ public class DtsDataSource extends DruidDataSource {
 
   private static final Logger log = LoggerFactory.getLogger(DtsDataSource.class);
 
-  private DtsClient dtsClient;
+  private ThreadLocal<ConcurrentHashMap<Statement, Long>> statementHolder = new ThreadLocal<>();
+
+  private DtsResourceManager resourceManager;
 
   public DtsDataSource() {
     super();
@@ -50,36 +48,31 @@ public class DtsDataSource extends DruidDataSource {
         if (sql.startsWith("select") || sql.startsWith("SELECT")) {
           return;
         }
-        final RemotingCommand request = RemotingCommand.createRequestCommand(RequestCode.BRANCH_REGISTER, null);
-        RegisterMessage registerMessage = new RegisterMessage();
-        registerMessage.setKey(DtsDataSource.this.getName());
-        registerMessage.setTranId(DtsXID.getTransactionId(DtsContext.getCurrentXid()));
-        request.setBody(RemotingSerializable.encode(registerMessage));
-        try {
-          RegisterResultMessage registerResultMessage = dtsClient.invokeSync(request, DtsDataSource.this.getMaxWait(), RegisterResultMessage.class);
-          System.out.println(registerResultMessage);
-          DtsContext.bindBranch(DtsDataSource.this.getName(), registerResultMessage.getBranchId());
-        } catch (DtsException e) {
-          log.error("register branch error", e);
+        if (DtsContext.inTxcTransaction()) {
+          long branchId = resourceManager.register(DtsDataSource.this.getName(), CommitMode.COMMIT_IN_PHASE1);
+          DtsDataSource.this.bindBranchId(statement, branchId);
         }
-
       }
 
 
       @Override
       public void beforeExecute(final StatementProxy statement, final String sql) {
-        if (sql.startsWith("select") || sql.startsWith("SELECT")) {
-          return;
-        } else {
-          //save undo log
-
+        if (DtsContext.inTxcTransaction()) {
         }
       }
 
       @Override
       public void afterExecute(final StatementProxy statement, String sql, final Throwable error) {
-          if (error != null && DtsContext.inRetryContext()) {
+        if (DtsContext.inRetryContext()) {
+          if (error != null) {
           }
+        } else {
+          if (error != null) {
+            resourceManager.reportStatus(DtsDataSource.this.getBindBranchId(statement), false, DtsDataSource.this.getName(), null);
+          } else {
+            resourceManager.reportStatus(DtsDataSource.this.getBindBranchId(statement), true, DtsDataSource.this.getName(), null);
+          }
+        }
       }
 
 
@@ -88,7 +81,21 @@ public class DtsDataSource extends DruidDataSource {
     super.init();
   }
 
-  public void setDtsClient(final DtsClient dtsClient) {
-    this.dtsClient = dtsClient;
+  private void bindBranchId(final StatementProxy statement, final long branchId) {
+    if (statementHolder.get() == null) {
+      ConcurrentHashMap<Statement, Long> concurrentHashMap = new ConcurrentHashMap();
+      concurrentHashMap.put(statement, branchId);
+      statementHolder.set(concurrentHashMap);
+    } else {
+      ConcurrentHashMap<Statement, Long> concurrentHashMap = statementHolder.get();
+      concurrentHashMap.put(statement, branchId);
+    }
   }
+
+
+  private Long getBindBranchId(final StatementProxy statement) {
+    Long branchId = statementHolder.get().get(statement);
+    return branchId;
+  }
+
 }
