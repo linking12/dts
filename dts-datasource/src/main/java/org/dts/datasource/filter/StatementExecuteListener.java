@@ -1,5 +1,6 @@
 package org.dts.datasource.filter;
 
+import com.alibaba.druid.proxy.jdbc.ConnectionProxy;
 import com.alibaba.druid.proxy.jdbc.StatementProxy;
 
 /**
@@ -12,4 +13,6 @@ public interface StatementExecuteListener {
   void afterExecute(StatementProxy statement, String sql, Throwable error);
 
   void afterStatementCreate(StatementProxy statement);
+
+  void afterSetAutoCommit(ConnectionProxy connection, final boolean autoCommit);
 }

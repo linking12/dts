@@ -3,14 +3,14 @@ package org.dts.datasource.filter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.alibaba.druid.filter.FilterChain;
 import com.alibaba.druid.filter.stat.StatFilter;
-import com.alibaba.druid.proxy.jdbc.CallableStatementProxy;
+import com.alibaba.druid.proxy.jdbc.ConnectionProxy;
 import com.alibaba.druid.proxy.jdbc.PreparedStatementProxy;
 import com.alibaba.druid.proxy.jdbc.ResultSetProxy;
 import com.alibaba.druid.proxy.jdbc.StatementProxy;
-import com.alibaba.druid.stat.JdbcDataSourceStat;
-import com.alibaba.druid.stat.JdbcSqlStat;
 
+import java.sql.SQLException;
 import java.util.List;
 
 
@@ -26,6 +26,25 @@ public class BranchRegisterFilter extends StatFilter {
   public BranchRegisterFilter(List<StatementExecuteListener> statementExecuteListeners) {
     this.statementExecuteListeners = statementExecuteListeners;
   }
+
+  @Override
+  public void connection_setAutoCommit(final FilterChain chain, final ConnectionProxy connection,
+      final boolean autoCommit)
+      throws SQLException {
+    super.connection_setAutoCommit(chain, connection, autoCommit);
+    if (!autoCommit) {
+      if (statementExecuteListeners != null && !statementExecuteListeners.isEmpty()) {
+        for (StatementExecuteListener statementExecuteListener : statementExecuteListeners) {
+          try {
+            statementExecuteListener.afterSetAutoCommit(connection, autoCommit);
+          } catch (Exception e) {
+            log.error("listener error", e);
+          }
+        }
+      }
+    }
+  }
+
   @Override
   public void statementCreateAfter(StatementProxy statement) {
     super.statementCreateAfter(statement);

@@ -11,6 +11,7 @@ import com.quancheng.dts.message.request.GlobalRollbackMessage;
 import com.quancheng.dts.message.response.BeginResultMessage;
 import com.quancheng.dts.message.response.GlobalCommitResultMessage;
 import com.quancheng.dts.message.response.GlobalRollbackResultMessage;
+import com.quancheng.dts.rpc.cluster.ZookeeperAddressManager;
 import com.quancheng.dts.rpc.remoting.CommandCustomHeader;
 import com.quancheng.dts.rpc.remoting.DtsClient;
 import com.quancheng.dts.rpc.remoting.netty.DtsClientImpl;
@@ -77,7 +78,10 @@ public class DefaultDtsTransactionManager implements DtsTransactionManager {
   public static void main(String[] args) throws DtsException {
     NettyClientConfig nettyClientConfig = new NettyClientConfig();
     nettyClientConfig.setConnectTimeoutMillis(3000);
-    DtsClient dtsClient = new DtsClientImpl(nettyClientConfig);
+    DtsClientImpl dtsClient = new DtsClientImpl(nettyClientConfig);
+    dtsClient.setAddressManager(new ZookeeperAddressManager("localhost:2181", "/dts"));
+    dtsClient.setGroup("Default");
+    dtsClient.setAppName("Demo");
     dtsClient.start();
     DefaultDtsTransactionManager transactionManager = new DefaultDtsTransactionManager(dtsClient);
     transactionManager.begin(3000L);

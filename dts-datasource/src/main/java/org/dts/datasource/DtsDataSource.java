@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.alibaba.druid.pool.DruidDataSource;
+import com.alibaba.druid.proxy.jdbc.ConnectionProxy;
 import com.alibaba.druid.proxy.jdbc.StatementProxy;
 import com.google.common.collect.Lists;
 import com.quancheng.dts.common.CommitMode;
@@ -13,7 +14,6 @@ import com.quancheng.dts.common.DtsContext;
 import com.quansheng.dts.resourcemanager.DtsResourceManager;
 
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -25,7 +25,7 @@ public class DtsDataSource extends DruidDataSource {
 
   private static final Logger log = LoggerFactory.getLogger(DtsDataSource.class);
 
-  private ThreadLocal<ConcurrentHashMap<Statement, Long>> statementHolder = new ThreadLocal<>();
+  private ThreadLocal<ConcurrentHashMap<ConnectionProxy, Long>> statementHolder = new ThreadLocal<>();
 
   private DtsResourceManager resourceManager;
 
@@ -44,16 +44,17 @@ public class DtsDataSource extends DruidDataSource {
 
       @Override
       public void afterStatementCreate(final StatementProxy statement) {
-        String sql = statement.getSqlStat().getSql();
-        if (sql.startsWith("select") || sql.startsWith("SELECT")) {
-          return;
-        }
-        if (DtsContext.inTxcTransaction()) {
-          long branchId = resourceManager.register(DtsDataSource.this.getName(), CommitMode.COMMIT_IN_PHASE1);
-          DtsDataSource.this.bindBranchId(statement, branchId);
-        }
+
+
       }
 
+      @Override
+      public void afterSetAutoCommit(final ConnectionProxy connection, final boolean autoCommit) {
+        if (DtsContext.inTxcTransaction() && !autoCommit) {
+          long branchId = resourceManager.register(DtsDataSource.this.getName(), CommitMode.COMMIT_IN_PHASE1);
+          DtsDataSource.this.bindBranchId(connection, branchId);
+        }
+      }
 
       @Override
       public void beforeExecute(final StatementProxy statement, final String sql) {
@@ -81,20 +82,20 @@ public class DtsDataSource extends DruidDataSource {
     super.init();
   }
 
-  private void bindBranchId(final StatementProxy statement, final long branchId) {
+  private void bindBranchId(final ConnectionProxy connectionProxy, final long branchId) {
     if (statementHolder.get() == null) {
-      ConcurrentHashMap<Statement, Long> concurrentHashMap = new ConcurrentHashMap();
-      concurrentHashMap.put(statement, branchId);
+      ConcurrentHashMap<ConnectionProxy, Long> concurrentHashMap = new ConcurrentHashMap();
+      concurrentHashMap.put(connectionProxy, branchId);
       statementHolder.set(concurrentHashMap);
     } else {
-      ConcurrentHashMap<Statement, Long> concurrentHashMap = statementHolder.get();
-      concurrentHashMap.put(statement, branchId);
+      ConcurrentHashMap<ConnectionProxy, Long> concurrentHashMap = statementHolder.get();
+      concurrentHashMap.put(connectionProxy, branchId);
     }
   }
 
 
   private Long getBindBranchId(final StatementProxy statement) {
-    Long branchId = statementHolder.get().get(statement);
+    Long branchId = statementHolder.get().get(statement.getConnectionProxy());
     return branchId;
   }
 
