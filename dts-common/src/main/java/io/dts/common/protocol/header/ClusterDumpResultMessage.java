@@ -13,8 +13,7 @@
  */
 package io.dts.common.protocol.header;
 
-import io.dts.common.protocol.DtsMessage;
-import io.dts.common.protocol.ResultMessage;
+import io.dts.common.protocol.ResponseMessage;
 import io.dts.remoting.CommandCustomHeader;
 import io.dts.remoting.exception.RemotingCommandException;
 
@@ -22,7 +21,7 @@ import io.dts.remoting.exception.RemotingCommandException;
  * @author liushiming
  * @version ClusterDumpResultMessage.java, v 0.0.1 2017年9月4日 下午2:32:17 liushiming
  */
-public class ClusterDumpResultMessage implements CommandCustomHeader, DtsMessage, ResultMessage {
+public class ClusterDumpResultMessage implements CommandCustomHeader, ResponseMessage {
 
   private boolean result;
 
@@ -52,7 +51,7 @@ public class ClusterDumpResultMessage implements CommandCustomHeader, DtsMessage
   @Override
   public void checkFields() throws RemotingCommandException {
     // TODO Auto-generated method stub
-    
+
   }
 
 

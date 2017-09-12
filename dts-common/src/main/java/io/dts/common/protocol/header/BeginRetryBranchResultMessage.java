@@ -13,8 +13,7 @@
  */
 package io.dts.common.protocol.header;
 
-import io.dts.common.protocol.DtsMessage;
-import io.dts.common.protocol.ResultMessage;
+import io.dts.common.protocol.ResponseMessage;
 import io.dts.remoting.CommandCustomHeader;
 import io.dts.remoting.annotation.CFNotNull;
 import io.dts.remoting.exception.RemotingCommandException;
@@ -23,8 +22,7 @@ import io.dts.remoting.exception.RemotingCommandException;
  * @author liushiming
  * @version BeginRetryBranchResultMessage.java, v 0.0.1 2017年9月4日 下午2:11:52 liushiming
  */
-public class BeginRetryBranchResultMessage
-    implements CommandCustomHeader, DtsMessage, ResultMessage {
+public class BeginRetryBranchResultMessage implements CommandCustomHeader, ResponseMessage {
   /**
    * 事务XID
    */
@@ -60,7 +58,7 @@ public class BeginRetryBranchResultMessage
   @Override
   public void checkFields() throws RemotingCommandException {
     // TODO Auto-generated method stub
-    
+
   }
 
 

@@ -17,6 +17,6 @@ package io.dts.common.protocol;
  * @author liushiming
  * @version ResultMessage.java, v 0.0.1 2017年9月6日 下午5:53:06 liushiming
  */
-public interface ResultMessage {
+public interface ResponseMessage extends DtsMessage {
 
 }

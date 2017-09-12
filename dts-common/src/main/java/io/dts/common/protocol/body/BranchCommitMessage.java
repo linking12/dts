@@ -11,19 +11,18 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-package io.dts.common.protocol.header;
+package io.dts.common.protocol.body;
 
 import java.util.List;
 
 import io.dts.common.protocol.DtsMessage;
-import io.dts.remoting.CommandCustomHeader;
-import io.dts.remoting.exception.RemotingCommandException;
+import io.dts.remoting.protocol.RemotingSerializable;
 
 /**
  * @author liushiming
  * @version BranchCommitMessage.java, v 0.0.1 2017年9月1日 下午5:46:22 liushiming
  */
-public class BranchCommitMessage implements CommandCustomHeader, DtsMessage {
+public class BranchCommitMessage extends RemotingSerializable implements DtsMessage {
 
   private String serverAddr;
 
@@ -120,10 +119,5 @@ public class BranchCommitMessage implements CommandCustomHeader, DtsMessage {
     return TYPE_BRANCH_COMMIT;
   }
 
-  @Override
-  public void checkFields() throws RemotingCommandException {
-    // TODO Auto-generated method stub
-
-  }
 
 }

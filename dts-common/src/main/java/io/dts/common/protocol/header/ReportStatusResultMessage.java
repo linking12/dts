@@ -13,8 +13,7 @@
  */
 package io.dts.common.protocol.header;
 
-import io.dts.common.protocol.DtsMessage;
-import io.dts.common.protocol.ResultMessage;
+import io.dts.common.protocol.ResponseMessage;
 import io.dts.remoting.CommandCustomHeader;
 import io.dts.remoting.exception.RemotingCommandException;
 
@@ -22,7 +21,7 @@ import io.dts.remoting.exception.RemotingCommandException;
  * @author liushiming
  * @version ReportStatusResultMessage.java, v 0.0.1 2017年9月4日 下午2:44:27 liushiming
  */
-public class ReportStatusResultMessage implements CommandCustomHeader, DtsMessage, ResultMessage {
+public class ReportStatusResultMessage implements CommandCustomHeader, ResponseMessage {
   private long branchId;
 
   public long getBranchId() {
@@ -41,7 +40,7 @@ public class ReportStatusResultMessage implements CommandCustomHeader, DtsMessag
   @Override
   public void checkFields() throws RemotingCommandException {
     // TODO Auto-generated method stub
-    
+
   }
 
 }

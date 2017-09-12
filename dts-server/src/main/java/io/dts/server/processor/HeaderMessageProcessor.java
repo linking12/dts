@@ -12,6 +12,7 @@ import com.google.common.collect.Queues;
 import io.dts.common.ThreadFactoryImpl;
 import io.dts.common.protocol.DtsMessage;
 import io.dts.common.protocol.RequestCode;
+import io.dts.common.protocol.RequestHeader;
 import io.dts.common.protocol.ResponseCode;
 import io.dts.common.protocol.header.BeginMessage;
 import io.dts.common.protocol.header.BeginResultMessage;
@@ -36,9 +37,9 @@ import io.netty.channel.ChannelHandlerContext;
  * @version AddProcessor.java, v 0.0.1 2017年9月6日 上午11:36:12 liushiming
  */
 @SuppressWarnings("unused")
-public class SingleMessageProcessor implements NettyRequestProcessor {
+public class HeaderMessageProcessor implements NettyRequestProcessor {
 
-  private static final Logger logger = LoggerFactory.getLogger(SingleMessageProcessor.class);
+  private static final Logger logger = LoggerFactory.getLogger(HeaderMessageProcessor.class);
 
   private final ExecutorService addProcessorExecutor;
 
@@ -46,7 +47,7 @@ public class SingleMessageProcessor implements NettyRequestProcessor {
 
   private final DtsServerMessageHandler messageHandler;
 
-  public SingleMessageProcessor(TcpServerController serverController,
+  public HeaderMessageProcessor(TcpServerController serverController,
       TcpServerProperties properties) {
     this.serverController = serverController;
     this.addProcessorExecutor = new ThreadPoolExecutor(//
@@ -68,9 +69,9 @@ public class SingleMessageProcessor implements NettyRequestProcessor {
       throws Exception {
     final String clientIp = NetUtil.toStringAddress(ctx.channel().remoteAddress());
     switch (request.getCode()) {
-      case RequestCode.REQUEST_CODE:
-        final DtsMessage dtsMessage =
-            (DtsMessage) request.decodeCommandCustomHeader(DtsMessage.class);
+      case RequestCode.HEADER_REQUEST:
+        final RequestHeader dtsMessage =
+            (RequestHeader) request.decodeCommandCustomHeader(RequestHeader.class);
         return processDtsMessage(clientIp, dtsMessage);
       default:
         break;
@@ -81,7 +82,7 @@ public class SingleMessageProcessor implements NettyRequestProcessor {
   }
 
 
-  private RemotingCommand processDtsMessage(String clientIp, DtsMessage dtsMessage) {
+  private RemotingCommand processDtsMessage(String clientIp, RequestHeader dtsMessage) {
     short typeCode = dtsMessage.getTypeCode();
     RemotingCommand response;
     CommandCustomHeader responseHeader;

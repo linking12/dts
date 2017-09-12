@@ -70,7 +70,5 @@ public interface DtsMessage {
   public static final short TYPE_CLUSTER_MERGE = 115;
   public static final short TYPE_CLUSTER_MERGE_RESULT = 116;
 
-
-  public abstract short getTypeCode();
-
+  public short getTypeCode();
 }

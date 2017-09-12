@@ -13,8 +13,7 @@
  */
 package io.dts.common.protocol.header;
 
-import io.dts.common.protocol.DtsMessage;
-import io.dts.common.protocol.ResultMessage;
+import io.dts.common.protocol.ResponseMessage;
 import io.dts.remoting.CommandCustomHeader;
 import io.dts.remoting.exception.RemotingCommandException;
 
@@ -22,7 +21,7 @@ import io.dts.remoting.exception.RemotingCommandException;
  * @author liushiming
  * @version BranchRollbackResultMessage.java, v 0.0.1 2017年9月4日 下午2:23:56 liushiming
  */
-public class BranchRollbackResultMessage implements CommandCustomHeader, DtsMessage, ResultMessage {
+public class BranchRollbackResultMessage implements CommandCustomHeader, ResponseMessage {
   /**
    * 事务ID
    */
@@ -57,7 +56,7 @@ public class BranchRollbackResultMessage implements CommandCustomHeader, DtsMess
   @Override
   public void checkFields() throws RemotingCommandException {
     // TODO Auto-generated method stub
-    
+
   }
 
 

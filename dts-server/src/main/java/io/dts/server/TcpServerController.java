@@ -29,8 +29,8 @@ import io.dts.remoting.netty.NettyServerConfig;
 import io.dts.server.channel.ChannelHeatBeatProcessor;
 import io.dts.server.channel.ChannelRepository;
 import io.dts.server.channel.ChannelkeepingListener;
-import io.dts.server.processor.SingleMessageProcessor;
-import io.dts.server.processor.MultipleMessageProcessor;
+import io.dts.server.processor.HeaderMessageProcessor;
+import io.dts.server.processor.BodyMessageProcessor;
 
 /**
  * @author liushiming
@@ -62,12 +62,12 @@ public class TcpServerController {
   }
 
   private void registerProcessor() {
-    SingleMessageProcessor addProcessor = new SingleMessageProcessor(this, tcpServerProperties);
-    MultipleMessageProcessor getProcessor = new MultipleMessageProcessor(this, tcpServerProperties);
+    HeaderMessageProcessor addProcessor = new HeaderMessageProcessor(this, tcpServerProperties);
+    BodyMessageProcessor getProcessor = new BodyMessageProcessor(this, tcpServerProperties);
     ChannelHeatBeatProcessor clientManageProcessor =
         new ChannelHeatBeatProcessor(this, tcpServerProperties);
-    registerProcessor(1, addProcessor, addProcessor.getThreadPool());
-    registerProcessor(2, getProcessor, getProcessor.getThreadPool());
+    registerProcessor(RequestCode.HEADER_REQUEST, addProcessor, addProcessor.getThreadPool());
+    registerProcessor(RequestCode.BODY_REQUEST, getProcessor, getProcessor.getThreadPool());
     registerProcessor(RequestCode.HEART_BEAT, clientManageProcessor,
         clientManageProcessor.getThreadPool());
   }

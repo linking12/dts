@@ -11,37 +11,14 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-package io.dts.common.protocol.header;
+package io.dts.common.protocol;
 
-import io.dts.common.protocol.ResponseMessage;
 import io.dts.remoting.CommandCustomHeader;
-import io.dts.remoting.exception.RemotingCommandException;
 
 /**
  * @author liushiming
- * @version GlobalRollbackResultMessage.java, v 0.0.1 2017年9月4日 下午2:35:25 liushiming
+ * @version RequestMessage.java, v 0.0.1 2017年9月12日 下午3:53:43 liushiming
  */
-public class GlobalRollbackResultMessage implements CommandCustomHeader, ResponseMessage {
-  private long tranId;
-
-  public long getTranId() {
-    return tranId;
-  }
-
-  public void setTranId(long tranId) {
-    this.tranId = tranId;
-  }
-
-
-  @Override
-  public short getTypeCode() {
-    return TYPE_GLOBAL_ROLLBACK_RESULT;
-  }
-
-  @Override
-  public void checkFields() throws RemotingCommandException {
-    // TODO Auto-generated method stub
-
-  }
+public interface RequestHeader extends CommandCustomHeader, DtsMessage {
 
 }

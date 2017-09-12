@@ -23,14 +23,14 @@ import io.netty.channel.ChannelHandlerContext;
  * @version GetProcessor.java, v 0.0.1 2017年9月6日 下午12:11:38 liushiming
  */
 @SuppressWarnings("unused")
-public class MultipleMessageProcessor implements NettyRequestProcessor {
+public class BodyMessageProcessor implements NettyRequestProcessor {
   private static final Logger logger = LoggerFactory.getLogger("HybridServer");
 
   private TcpServerController serverController;
 
   private final ExecutorService getProcessorExecutor;
 
-  public MultipleMessageProcessor(TcpServerController serverController,
+  public BodyMessageProcessor(TcpServerController serverController,
       TcpServerProperties properties) {
     this.serverController = serverController;
     BlockingQueue<Runnable> workerThreadPoolQueue =
