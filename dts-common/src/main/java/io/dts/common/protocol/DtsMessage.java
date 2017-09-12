@@ -13,14 +13,11 @@
  */
 package io.dts.common.protocol;
 
-import io.dts.remoting.CommandCustomHeader;
-import io.dts.remoting.exception.RemotingCommandException;
-
 /**
  * @author liushiming
  * @version DtsMessage.java, v 0.0.1 2017年9月6日 下午4:11:04 liushiming
  */
-public abstract class DtsMessage implements CommandCustomHeader {
+public interface DtsMessage {
   public static final short TYPE_BEGIN = 1;
   public static final short TYPE_BEGIN_RESULT = 2;
 
@@ -76,8 +73,4 @@ public abstract class DtsMessage implements CommandCustomHeader {
 
   public abstract short getTypeCode();
 
-  @Override
-  public void checkFields() throws RemotingCommandException {
-    // for dts ,do not check fields
-  }
 }

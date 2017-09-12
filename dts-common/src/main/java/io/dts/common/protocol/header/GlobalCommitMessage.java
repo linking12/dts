@@ -14,12 +14,14 @@
 package io.dts.common.protocol.header;
 
 import io.dts.common.protocol.DtsMessage;
+import io.dts.remoting.CommandCustomHeader;
+import io.dts.remoting.exception.RemotingCommandException;
 
 /**
  * @author liushiming
  * @version GlobalCommitMessage.java, v 0.0.1 2017年9月1日 下午6:25:26 liushiming
  */
-public class GlobalCommitMessage extends DtsMessage  {
+public class GlobalCommitMessage implements CommandCustomHeader, DtsMessage {
   /**
    * 事务ID
    */
@@ -36,5 +38,11 @@ public class GlobalCommitMessage extends DtsMessage  {
   @Override
   public short getTypeCode() {
     return TYPE_GLOBAL_COMMIT;
+  }
+
+  @Override
+  public void checkFields() throws RemotingCommandException {
+    // TODO Auto-generated method stub
+    
   }
 }

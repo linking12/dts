@@ -13,19 +13,25 @@
  */
 package io.dts.server.service;
 
-import io.dts.common.protocol.ResultMessage;
-import io.dts.common.protocol.body.DtsMergeMessage;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import io.dts.common.protocol.body.BranchCommitResultMessage;
 import io.dts.common.protocol.handler.DtsMsgHandler;
 import io.dts.common.protocol.header.BeginMessage;
-import io.dts.common.protocol.header.BeginRetryBranchMessage;
-import io.dts.common.protocol.header.BranchCommitResultMessage;
+import io.dts.common.protocol.header.BeginResultMessage;
 import io.dts.common.protocol.header.BranchRollbackResultMessage;
 import io.dts.common.protocol.header.GlobalCommitMessage;
+import io.dts.common.protocol.header.GlobalCommitResultMessage;
 import io.dts.common.protocol.header.GlobalRollbackMessage;
-import io.dts.common.protocol.header.QueryLockMessage;
 import io.dts.common.protocol.header.RegisterMessage;
+import io.dts.common.protocol.header.RegisterResultMessage;
 import io.dts.common.protocol.header.ReportStatusMessage;
-import io.dts.common.protocol.header.ReportUdataMessage;
+import io.dts.server.model.BranchLog;
+import io.dts.server.model.GlobalLog;
 
 /**
  * @author liushiming
@@ -33,75 +39,74 @@ import io.dts.common.protocol.header.ReportUdataMessage;
  */
 public class DtsServerMessageHandler implements DtsMsgHandler {
 
+  /**
+   * 当前活动的所有事务
+   */
+  private static Map<Long, GlobalLog> activeTranMap = new ConcurrentHashMap<Long, GlobalLog>();
+
+  /**
+   * 当前活动的所有事务分支
+   */
+  private static Map<Long, BranchLog> activeTranBranchMap =
+      new ConcurrentHashMap<Long, BranchLog>();
+
+  /**
+   * 保存已经发送BranchCommitMessage消息，但是还没收到响应或者失败的分支
+   */
+  private static Map<Long, Integer> committingMap = new ConcurrentHashMap<Long, Integer>();
+
+  /**
+   * 保存已经发送BranchRollbackMessage消息，但是还没收到响应或者失败的分支
+   */
+  private static Map<Long, Integer> rollbackingMap = new ConcurrentHashMap<Long, Integer>();
+
+  /**
+   * 超时的事务列表
+   */
+  private static List<Long> timeoutTranList = Collections.synchronizedList(new ArrayList<Long>());
+
   @Override
-  public void handleMessage(long msgId, String dbKeys, String clientIp, String clientAppName,
-      BeginMessage message, ResultMessage[] results, int idx) {
-
-  }
-
-  @Override
-  public void handleMessage(long msgId, String dbKeys, String clientIp, String clientAppName,
-      BranchCommitResultMessage message, ResultMessage[] results, int idx) {
-
-  }
-
-  @Override
-  public void handleMessage(long msgId, String dbKeys, String clientIp, String clientAppName,
-      BranchRollbackResultMessage message, ResultMessage[] results, int idx) {
-
-  }
-
-  @Override
-  public void handleMessage(long msgId, String dbKeys, String clientIp, String clientAppName,
-      GlobalCommitMessage message, ResultMessage[] results, int idx) {
-
-  }
-
-  @Override
-  public void handleMessage(long msgId, String dbKeys, String clientIp, String clientAppName,
-      GlobalRollbackMessage message, ResultMessage[] results, int idx) {
+  public void handleMessage(String clientIp, BeginMessage message,
+      BeginResultMessage resultMessage) {
     // TODO Auto-generated method stub
 
   }
 
   @Override
-  public void handleMessage(long msgId, String dbKeys, String clientIp, String clientAppName,
-      RegisterMessage message, ResultMessage[] results, int idx) {
+  public void handleMessage(String clientIp, RegisterMessage message,
+      RegisterResultMessage resultMessage) {
     // TODO Auto-generated method stub
 
   }
 
   @Override
-  public void handleMessage(long msgId, String dbKeys, String clientIp, String clientAppName,
-      ReportStatusMessage message, ResultMessage[] results, int idx) {
+  public void handleMessage(String clientIp, GlobalCommitMessage message,
+      GlobalCommitResultMessage resultMessage) {
     // TODO Auto-generated method stub
 
   }
 
   @Override
-  public void handleMessage(long msgId, String dbKeys, String clientIp, String clientAppName,
-      BeginRetryBranchMessage message, ResultMessage[] results, int idx) {
+  public void handleMessage(String clientIp, GlobalRollbackMessage message,
+      BranchRollbackResultMessage resultMessage) {
     // TODO Auto-generated method stub
 
   }
 
   @Override
-  public void handleMessage(long msgId, String dbKeys, String clientIp, String clientAppName,
-      ReportUdataMessage message, ResultMessage[] results, int idx) {
+  public void handleMessage(String clientIp, BranchCommitResultMessage message) {
     // TODO Auto-generated method stub
 
   }
 
   @Override
-  public void handleMessage(long msgId, String dbKeys, String clientIp, String clientAppName,
-      DtsMergeMessage message, ResultMessage[] results, int idx) {
+  public void handleMessage(String clientIp, BranchRollbackResultMessage message) {
     // TODO Auto-generated method stub
 
   }
 
   @Override
-  public void handleMessage(long msgId, String dbKeys, String clientIp, String clientAppName,
-      QueryLockMessage message, ResultMessage[] results, int idx) {
+  public void handleMessage(String clientIp, ReportStatusMessage message) {
     // TODO Auto-generated method stub
 
   }

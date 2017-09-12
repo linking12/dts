@@ -14,12 +14,14 @@
 package io.dts.common.protocol.header;
 
 import io.dts.common.protocol.DtsMessage;
+import io.dts.remoting.CommandCustomHeader;
+import io.dts.remoting.exception.RemotingCommandException;
 
 /**
  * @author liushiming
  * @version ReportUdataMessage.java, v 0.0.1 2017年9月1日 下午6:26:45 liushiming
  */
-public class ReportUdataMessage extends DtsMessage {
+public class ReportUdataMessage implements CommandCustomHeader, DtsMessage {
 
   /**
    * 事务ID
@@ -73,6 +75,12 @@ public class ReportUdataMessage extends DtsMessage {
   @Override
   public short getTypeCode() {
     return TYPE_REPORT_UDATA_RESULT;
+  }
+
+  @Override
+  public void checkFields() throws RemotingCommandException {
+    // TODO Auto-generated method stub
+    
   }
 
 

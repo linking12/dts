@@ -16,13 +16,14 @@ package io.dts.common.protocol.header;
 import java.util.List;
 
 import io.dts.common.protocol.DtsMessage;
+import io.dts.remoting.CommandCustomHeader;
 import io.dts.remoting.exception.RemotingCommandException;
 
 /**
  * @author liushiming
  * @version BranchCommitMessage.java, v 0.0.1 2017年9月1日 下午5:46:22 liushiming
  */
-public class BranchCommitMessage extends DtsMessage {
+public class BranchCommitMessage implements CommandCustomHeader, DtsMessage {
 
   private String serverAddr;
 

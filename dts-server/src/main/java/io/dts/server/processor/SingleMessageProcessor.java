@@ -13,13 +13,22 @@ import io.dts.common.ThreadFactoryImpl;
 import io.dts.common.protocol.DtsMessage;
 import io.dts.common.protocol.RequestCode;
 import io.dts.common.protocol.ResponseCode;
+import io.dts.common.protocol.header.BeginMessage;
+import io.dts.common.protocol.header.BeginResultMessage;
+import io.dts.common.protocol.header.BranchRollbackResultMessage;
+import io.dts.common.protocol.header.GlobalCommitMessage;
+import io.dts.common.protocol.header.GlobalCommitResultMessage;
+import io.dts.common.protocol.header.GlobalRollbackMessage;
+import io.dts.common.protocol.header.RegisterMessage;
+import io.dts.common.protocol.header.RegisterResultMessage;
+import io.dts.remoting.CommandCustomHeader;
 import io.dts.remoting.netty.NettyRequestProcessor;
 import io.dts.remoting.protocol.RemotingCommand;
 import io.dts.server.TcpServerController;
 import io.dts.server.TcpServerProperties;
 import io.dts.server.service.DtsServerMessageHandler;
+import io.dts.util.NetUtil;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.util.NetUtil;
 
 /**
  * 
@@ -57,14 +66,12 @@ public class SingleMessageProcessor implements NettyRequestProcessor {
   @Override
   public RemotingCommand processRequest(ChannelHandlerContext ctx, RemotingCommand request)
       throws Exception {
+    final String clientIp = NetUtil.toStringAddress(ctx.channel().remoteAddress());
     switch (request.getCode()) {
       case RequestCode.REQUEST_CODE:
         final DtsMessage dtsMessage =
             (DtsMessage) request.decodeCommandCustomHeader(DtsMessage.class);
-        final String ipAndPort = NetUtil.toStringAddress(ctx.channel().remoteAddress());
-        final String clientAppName = ipAndPortToClientAppName.get(ipAndPort);
-        final String dbKeys = ipAndPortToDbKey.get(ipAndPort);
-        return processDtsMessage(dtsMessage);
+        return processDtsMessage(clientIp, dtsMessage);
       default:
         break;
     }
@@ -74,16 +81,44 @@ public class SingleMessageProcessor implements NettyRequestProcessor {
   }
 
 
-  private RemotingCommand processDtsMessage(DtsMessage dtsMessage) {
+  private RemotingCommand processDtsMessage(String clientIp, DtsMessage dtsMessage) {
     short typeCode = dtsMessage.getTypeCode();
+    RemotingCommand response;
+    CommandCustomHeader responseHeader;
     switch (typeCode) {
       case DtsMessage.TYPE_BEGIN:
-        messageHandler.handleMessage(msgId, dbKeys, clientIp, clientAppName, message, results, idx);
-        break;
+        response = RemotingCommand.createResponseCommand(BeginResultMessage.class);
+        responseHeader = response.readCustomHeader();
+        messageHandler.handleMessage(clientIp, (BeginMessage) dtsMessage,
+            (BeginResultMessage) responseHeader);
+        return response;
+      case DtsMessage.TYPE_REGIST:
+        response = RemotingCommand.createResponseCommand(RegisterResultMessage.class);
+        responseHeader = response.readCustomHeader();
+        messageHandler.handleMessage(clientIp, (RegisterMessage) dtsMessage,
+            (RegisterResultMessage) responseHeader);
+        return response;
+      case DtsMessage.TYPE_GLOBAL_COMMIT:
+        response = RemotingCommand.createResponseCommand(GlobalCommitResultMessage.class);
+        responseHeader = response.readCustomHeader();
+        messageHandler.handleMessage(clientIp, (GlobalCommitMessage) dtsMessage,
+            (GlobalCommitResultMessage) responseHeader);
+        return response;
+      case DtsMessage.TYPE_GLOBAL_ROLLBACK:
+        response = RemotingCommand.createResponseCommand(BranchRollbackResultMessage.class);
+        responseHeader = response.readCustomHeader();
+        messageHandler.handleMessage(clientIp, (GlobalRollbackMessage) dtsMessage,
+            (BranchRollbackResultMessage) responseHeader);
+        return response;
+
+
 
       default:
         break;
     }
+
+
+
     return null;
   }
 

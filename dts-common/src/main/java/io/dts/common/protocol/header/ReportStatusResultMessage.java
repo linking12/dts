@@ -15,12 +15,14 @@ package io.dts.common.protocol.header;
 
 import io.dts.common.protocol.DtsMessage;
 import io.dts.common.protocol.ResultMessage;
+import io.dts.remoting.CommandCustomHeader;
+import io.dts.remoting.exception.RemotingCommandException;
 
 /**
  * @author liushiming
  * @version ReportStatusResultMessage.java, v 0.0.1 2017年9月4日 下午2:44:27 liushiming
  */
-public class ReportStatusResultMessage extends DtsMessage implements ResultMessage {
+public class ReportStatusResultMessage implements CommandCustomHeader, DtsMessage, ResultMessage {
   private long branchId;
 
   public long getBranchId() {
@@ -34,6 +36,12 @@ public class ReportStatusResultMessage extends DtsMessage implements ResultMessa
   @Override
   public short getTypeCode() {
     return TYPE_REPORT_STATUS_RESULT;
+  }
+
+  @Override
+  public void checkFields() throws RemotingCommandException {
+    // TODO Auto-generated method stub
+    
   }
 
 }

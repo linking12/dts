@@ -14,12 +14,14 @@
 package io.dts.common.protocol.header;
 
 import io.dts.common.protocol.DtsMessage;
+import io.dts.remoting.CommandCustomHeader;
+import io.dts.remoting.exception.RemotingCommandException;
 
 /**
  * @author liushiming
  * @version ClusterDumpMessage.java, v 0.0.1 2017年9月1日 下午6:25:11 liushiming
  */
-public class ClusterDumpMessage extends DtsMessage {
+public class ClusterDumpMessage implements CommandCustomHeader, DtsMessage {
 
   private boolean verbose;
 
@@ -34,6 +36,12 @@ public class ClusterDumpMessage extends DtsMessage {
   @Override
   public short getTypeCode() {
     return TYPE_CLUSTER_DUMP;
+  }
+
+  @Override
+  public void checkFields() throws RemotingCommandException {
+    // TODO Auto-generated method stub
+    
   }
 
 

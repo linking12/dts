@@ -11,18 +11,20 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-package io.dts.common.protocol.header;
+package io.dts.common.protocol.body;
 
 import java.util.List;
 
 import io.dts.common.protocol.DtsMessage;
 import io.dts.common.protocol.ResultMessage;
+import io.dts.remoting.protocol.RemotingSerializable;
 
 /**
  * @author liushiming
  * @version BranchCommitResultMessage.java, v 0.0.1 2017年9月4日 下午2:20:45 liushiming
  */
-public class BranchCommitResultMessage extends DtsMessage implements ResultMessage {
+public class BranchCommitResultMessage extends RemotingSerializable
+    implements DtsMessage, ResultMessage {
   /**
    * 事务IDs
    */
