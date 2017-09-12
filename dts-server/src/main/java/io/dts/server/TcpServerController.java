@@ -13,7 +13,10 @@
  */
 package io.dts.server;
 
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -21,15 +24,19 @@ import javax.annotation.PreDestroy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.google.common.collect.Queues;
+
+import io.dts.common.ThreadFactoryImpl;
 import io.dts.common.protocol.RequestCode;
 import io.dts.remoting.RemotingServer;
 import io.dts.remoting.netty.NettyRemotingServer;
 import io.dts.remoting.netty.NettyRequestProcessor;
 import io.dts.remoting.netty.NettyServerConfig;
-import io.dts.server.channel.ChannelHeatBeatProcessor;
-import io.dts.server.channel.ChannelRepository;
-import io.dts.server.channel.ChannelkeepingListener;
-import io.dts.server.processor.ServerMessageProcessor;
+import io.dts.server.remoting.channel.ChannelHeatBeatProcessor;
+import io.dts.server.remoting.channel.ChannelRepository;
+import io.dts.server.remoting.channel.ChannelkeepingListener;
+import io.dts.server.remoting.latency.ServerFixedThreadPoolExecutor;
+import io.dts.server.remoting.processor.ServerMessageProcessor;
 
 /**
  * @author liushiming
@@ -47,9 +54,30 @@ public class TcpServerController {
 
   private RemotingServer remotingServer;
 
+  private final ExecutorService clientMessageExecutor;
+
+  private final ExecutorService resourceMessageExecutor;
+
+  private final ExecutorService channelHeatBeatProcessorExecutor;
+
   public TcpServerController() {
     this.channelRepository = ChannelRepository.newChannelRepository();
     this.channelKeepingListener = ChannelkeepingListener.newChannelkeepingListener(this);
+    BlockingQueue<Runnable> clientThreadPoolQueue =
+        Queues.newLinkedBlockingDeque(tcpServerProperties.getClientThreadPoolQueueSize());
+    this.clientMessageExecutor =
+        new ServerFixedThreadPoolExecutor(tcpServerProperties.getClientThreadPoolSize(),
+            tcpServerProperties.getClientThreadPoolSize(), 1000 * 60, TimeUnit.MILLISECONDS,
+            clientThreadPoolQueue, new ThreadFactoryImpl("ClientMessageThread_"));
+    BlockingQueue<Runnable> resourceThreadPoolQueue =
+        Queues.newLinkedBlockingDeque(tcpServerProperties.getResourceThreadPoolQueueSize());
+    this.resourceMessageExecutor =
+        new ServerFixedThreadPoolExecutor(tcpServerProperties.getResourceThreadPoolSize(),
+            tcpServerProperties.getResourceThreadPoolSize(), 1000 * 60, TimeUnit.MILLISECONDS,
+            resourceThreadPoolQueue, new ThreadFactoryImpl("ResourceMessageThread_"));
+    this.channelHeatBeatProcessorExecutor =
+        Executors.newFixedThreadPool(tcpServerProperties.getChannelHeatThreadPoolSize(),
+            new ThreadFactoryImpl("ClientManageThread_"));
   }
 
   @PostConstruct
@@ -61,16 +89,12 @@ public class TcpServerController {
   }
 
   private void registerProcessor() {
-    ServerMessageProcessor serverMessageProcessor =
-        new ServerMessageProcessor(this, tcpServerProperties);
-    ChannelHeatBeatProcessor clientManageProcessor =
-        new ChannelHeatBeatProcessor(this, tcpServerProperties);
-    registerProcessor(RequestCode.HEADER_REQUEST, serverMessageProcessor,
-        serverMessageProcessor.getThreadPool());
-    registerProcessor(RequestCode.BODY_REQUEST, serverMessageProcessor,
-        serverMessageProcessor.getThreadPool());
+    ServerMessageProcessor serverMessageProcessor = new ServerMessageProcessor(this);
+    ChannelHeatBeatProcessor clientManageProcessor = new ChannelHeatBeatProcessor(this);
+    registerProcessor(RequestCode.HEADER_REQUEST, serverMessageProcessor, clientMessageExecutor);
+    registerProcessor(RequestCode.BODY_REQUEST, serverMessageProcessor, resourceMessageExecutor);
     registerProcessor(RequestCode.HEART_BEAT, clientManageProcessor,
-        clientManageProcessor.getThreadPool());
+        channelHeatBeatProcessorExecutor);
   }
 
   private void registerProcessor(int processorCode, NettyRequestProcessor processor,

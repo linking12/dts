@@ -20,16 +20,26 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import io.dts.common.protocol.body.BranchCommitResultMessage;
+import io.dts.common.protocol.body.DtsMultipleRequestMessage;
+import io.dts.common.protocol.body.DtsMultipleResonseMessage;
 import io.dts.common.protocol.handler.DtsMsgHandler;
 import io.dts.common.protocol.header.BeginMessage;
 import io.dts.common.protocol.header.BeginResultMessage;
+import io.dts.common.protocol.header.BeginRetryBranchMessage;
+import io.dts.common.protocol.header.BeginRetryBranchResultMessage;
 import io.dts.common.protocol.header.BranchRollbackResultMessage;
 import io.dts.common.protocol.header.GlobalCommitMessage;
 import io.dts.common.protocol.header.GlobalCommitResultMessage;
 import io.dts.common.protocol.header.GlobalRollbackMessage;
+import io.dts.common.protocol.header.GlobalRollbackResultMessage;
+import io.dts.common.protocol.header.QueryLockMessage;
+import io.dts.common.protocol.header.QueryLockResultMessage;
 import io.dts.common.protocol.header.RegisterMessage;
 import io.dts.common.protocol.header.RegisterResultMessage;
 import io.dts.common.protocol.header.ReportStatusMessage;
+import io.dts.common.protocol.header.ReportStatusResultMessage;
+import io.dts.common.protocol.header.ReportUdataMessage;
+import io.dts.common.protocol.header.ReportUdataResultMessage;
 import io.dts.server.model.BranchLog;
 import io.dts.server.model.GlobalLog;
 
@@ -69,46 +79,75 @@ public class DtsServerMessageHandler implements DtsMsgHandler {
   public void handleMessage(String clientIp, BeginMessage message,
       BeginResultMessage resultMessage) {
     // TODO Auto-generated method stub
-
-  }
-
-  @Override
-  public void handleMessage(String clientIp, RegisterMessage message,
-      RegisterResultMessage resultMessage) {
-    // TODO Auto-generated method stub
-
+    
   }
 
   @Override
   public void handleMessage(String clientIp, GlobalCommitMessage message,
       GlobalCommitResultMessage resultMessage) {
     // TODO Auto-generated method stub
-
+    
   }
 
   @Override
   public void handleMessage(String clientIp, GlobalRollbackMessage message,
-      BranchRollbackResultMessage resultMessage) {
+      GlobalRollbackResultMessage resultMessage) {
     // TODO Auto-generated method stub
+    
+  }
 
+  @Override
+  public void handleMessage(String clientIp, RegisterMessage message,
+      RegisterResultMessage resultMessage) {
+    // TODO Auto-generated method stub
+    
+  }
+
+  @Override
+  public void handleMessage(String clientIp, ReportStatusMessage message,
+      ReportStatusResultMessage resultMessage) {
+    // TODO Auto-generated method stub
+    
+  }
+
+  @Override
+  public void handleMessage(String clientIp, BeginRetryBranchMessage message,
+      BeginRetryBranchResultMessage resultMessage) {
+    // TODO Auto-generated method stub
+    
+  }
+
+  @Override
+  public void handleMessage(String clientIp, ReportUdataMessage message,
+      ReportUdataResultMessage resultMessage) {
+    // TODO Auto-generated method stub
+    
+  }
+
+  @Override
+  public void handleMessage(String clientIp, DtsMultipleRequestMessage message,
+      DtsMultipleResonseMessage resultMessage) {
+    // TODO Auto-generated method stub
+    
+  }
+
+  @Override
+  public void handleMessage(String clientIp, QueryLockMessage message,
+      QueryLockResultMessage resultMessage) {
+    // TODO Auto-generated method stub
+    
   }
 
   @Override
   public void handleMessage(String clientIp, BranchCommitResultMessage message) {
     // TODO Auto-generated method stub
-
+    
   }
 
   @Override
   public void handleMessage(String clientIp, BranchRollbackResultMessage message) {
     // TODO Auto-generated method stub
-
-  }
-
-  @Override
-  public void handleMessage(String clientIp, ReportStatusMessage message) {
-    // TODO Auto-generated method stub
-
+    
   }
 
 

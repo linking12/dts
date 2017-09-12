@@ -1,9 +1,5 @@
-package io.dts.server.channel;
+package io.dts.server.remoting.channel;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import io.dts.common.ThreadFactoryImpl;
 import io.dts.common.protocol.RequestCode;
 import io.dts.common.protocol.heatbeat.HeartbeatRequestHeader;
 import io.dts.common.protocol.heatbeat.HeartbeatResponseHeader;
@@ -12,7 +8,6 @@ import io.dts.remoting.netty.NettyRequestProcessor;
 import io.dts.remoting.protocol.RemotingCommand;
 import io.dts.remoting.protocol.RemotingSysResponseCode;
 import io.dts.server.TcpServerController;
-import io.dts.server.TcpServerProperties;
 import io.netty.channel.ChannelHandlerContext;
 
 /**
@@ -25,18 +20,11 @@ public class ChannelHeatBeatProcessor implements NettyRequestProcessor {
 
   private final TcpServerController serverController;
 
-  private final ExecutorService channelHeatBeatProcessorExecutor;
 
-  public ChannelHeatBeatProcessor(TcpServerController serverController,
-      TcpServerProperties properties) {
+  public ChannelHeatBeatProcessor(TcpServerController serverController) {
     this.serverController = serverController;
-    this.channelHeatBeatProcessorExecutor = Executors.newFixedThreadPool(
-        properties.getChannelHeatThreadPoolSize(), new ThreadFactoryImpl("ClientManageThread_"));
   }
 
-  public ExecutorService getThreadPool() {
-    return this.channelHeatBeatProcessorExecutor;
-  }
 
   @Override
   public RemotingCommand processRequest(ChannelHandlerContext ctx, RemotingCommand request)

@@ -24,46 +24,54 @@ public class TcpServerProperties {
 
   private int listenPort;
 
-  private int writeThreadPoolSize = 16 + Runtime.getRuntime().availableProcessors();
+  private int clientThreadPoolSize = 16 + Runtime.getRuntime().availableProcessors();
 
-  private int writeThreadPoolQueueSize = 10000;
+  private int clientThreadPoolQueueSize = 10000;
 
-  private int queryThreadPoolSize = Runtime.getRuntime().availableProcessors() * 2;
+  private int resourceThreadPoolSize = Runtime.getRuntime().availableProcessors() * 2;
 
-  private int queryThreadPoolQueueSize = 10000;
+  private int resourceThreadPoolQueueSize = 10000;
 
   private int channelHeatThreadPoolSize = 8;
 
-  public int getWriteThreadPoolSize() {
-    return writeThreadPoolSize;
+  public int getListenPort() {
+    return listenPort;
   }
 
-  public void setWriteThreadPoolSize(int writeThreadPoolSize) {
-    this.writeThreadPoolSize = writeThreadPoolSize;
+  public void setListenPort(int listenPort) {
+    this.listenPort = listenPort;
   }
 
-  public int getWriteThreadPoolQueueSize() {
-    return writeThreadPoolQueueSize;
+  public int getClientThreadPoolSize() {
+    return clientThreadPoolSize;
   }
 
-  public void setWriteThreadPoolQueueSize(int writeThreadPoolQueueSize) {
-    this.writeThreadPoolQueueSize = writeThreadPoolQueueSize;
+  public void setClientThreadPoolSize(int clientThreadPoolSize) {
+    this.clientThreadPoolSize = clientThreadPoolSize;
   }
 
-  public int getQueryThreadPoolSize() {
-    return queryThreadPoolSize;
+  public int getClientThreadPoolQueueSize() {
+    return clientThreadPoolQueueSize;
   }
 
-  public void setQueryThreadPoolSize(int queryThreadPoolSize) {
-    this.queryThreadPoolSize = queryThreadPoolSize;
+  public void setClientThreadPoolQueueSize(int clientThreadPoolQueueSize) {
+    this.clientThreadPoolQueueSize = clientThreadPoolQueueSize;
   }
 
-  public int getQueryThreadPoolQueueSize() {
-    return queryThreadPoolQueueSize;
+  public int getResourceThreadPoolSize() {
+    return resourceThreadPoolSize;
   }
 
-  public void setQueryThreadPoolQueueSize(int queryThreadPoolQueueSize) {
-    this.queryThreadPoolQueueSize = queryThreadPoolQueueSize;
+  public void setResourceThreadPoolSize(int resourceThreadPoolSize) {
+    this.resourceThreadPoolSize = resourceThreadPoolSize;
+  }
+
+  public int getResourceThreadPoolQueueSize() {
+    return resourceThreadPoolQueueSize;
+  }
+
+  public void setResourceThreadPoolQueueSize(int resourceThreadPoolQueueSize) {
+    this.resourceThreadPoolQueueSize = resourceThreadPoolQueueSize;
   }
 
   public int getChannelHeatThreadPoolSize() {
@@ -74,12 +82,6 @@ public class TcpServerProperties {
     this.channelHeatThreadPoolSize = channelHeatThreadPoolSize;
   }
 
-  public int getListenPort() {
-    return listenPort;
-  }
 
-  public void setListenPort(int listenPort) {
-    this.listenPort = listenPort;
-  }
 
 }

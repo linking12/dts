@@ -11,7 +11,7 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-package io.dts.server.channel;
+package io.dts.server.remoting.channel;
 
 import io.dts.remoting.protocol.LanguageCode;
 import io.netty.channel.Channel;
