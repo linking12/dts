@@ -25,6 +25,7 @@ import io.dts.common.protocol.header.RegisterResultMessage;
 import io.dts.remoting.CommandCustomHeader;
 import io.dts.remoting.netty.NettyRequestProcessor;
 import io.dts.remoting.protocol.RemotingCommand;
+import io.dts.remoting.protocol.RemotingSerializable;
 import io.dts.server.TcpServerController;
 import io.dts.server.TcpServerProperties;
 import io.dts.server.service.DtsServerMessageHandler;
@@ -37,9 +38,9 @@ import io.netty.channel.ChannelHandlerContext;
  * @version AddProcessor.java, v 0.0.1 2017年9月6日 上午11:36:12 liushiming
  */
 @SuppressWarnings("unused")
-public class HeaderMessageProcessor implements NettyRequestProcessor {
+public class ServerMessageProcessor implements NettyRequestProcessor {
 
-  private static final Logger logger = LoggerFactory.getLogger(HeaderMessageProcessor.class);
+  private static final Logger logger = LoggerFactory.getLogger(ServerMessageProcessor.class);
 
   private final ExecutorService addProcessorExecutor;
 
@@ -47,7 +48,7 @@ public class HeaderMessageProcessor implements NettyRequestProcessor {
 
   private final DtsServerMessageHandler messageHandler;
 
-  public HeaderMessageProcessor(TcpServerController serverController,
+  public ServerMessageProcessor(TcpServerController serverController,
       TcpServerProperties properties) {
     this.serverController = serverController;
     this.addProcessorExecutor = new ThreadPoolExecutor(//
@@ -70,9 +71,13 @@ public class HeaderMessageProcessor implements NettyRequestProcessor {
     final String clientIp = NetUtil.toStringAddress(ctx.channel().remoteAddress());
     switch (request.getCode()) {
       case RequestCode.HEADER_REQUEST:
-        final RequestHeaderMessage dtsMessage =
+        final RequestHeaderMessage headerMessage =
             (RequestHeaderMessage) request.decodeCommandCustomHeader(RequestHeaderMessage.class);
-        return processDtsMessage(clientIp, dtsMessage);
+        return processDtsMessage(clientIp, headerMessage);
+      case RequestCode.BODY_REQUEST:
+        final byte[] body = request.getBody();
+        DtsMessage bodyMessage = RemotingSerializable.decode(body, DtsMessage.class);
+        return processDtsMessage(clientIp, bodyMessage);
       default:
         break;
     }
@@ -82,7 +87,7 @@ public class HeaderMessageProcessor implements NettyRequestProcessor {
   }
 
 
-  private RemotingCommand processDtsMessage(String clientIp, RequestHeaderMessage dtsMessage) {
+  private RemotingCommand processDtsMessage(String clientIp, DtsMessage dtsMessage) {
     short typeCode = dtsMessage.getTypeCode();
     RemotingCommand response;
     CommandCustomHeader responseHeader;
@@ -111,9 +116,6 @@ public class HeaderMessageProcessor implements NettyRequestProcessor {
         messageHandler.handleMessage(clientIp, (GlobalRollbackMessage) dtsMessage,
             (BranchRollbackResultMessage) responseHeader);
         return response;
-
-
-
       default:
         break;
     }
