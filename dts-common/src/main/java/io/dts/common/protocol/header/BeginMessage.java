@@ -13,7 +13,7 @@
  */
 package io.dts.common.protocol.header;
 
-import io.dts.common.protocol.RequestHeader;
+import io.dts.common.protocol.RequestHeaderMessage;
 import io.dts.remoting.annotation.CFNotNull;
 import io.dts.remoting.exception.RemotingCommandException;
 
@@ -23,7 +23,7 @@ import io.dts.remoting.exception.RemotingCommandException;
  * @author liushiming
  * @version BeginMessage.java, v 0.0.1 2017年9月1日 下午5:45:54 liushiming
  */
-public class BeginMessage implements RequestHeader {
+public class BeginMessage implements RequestHeaderMessage {
 
   @CFNotNull
   public long timeout = 60000;

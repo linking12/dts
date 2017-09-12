@@ -13,14 +13,14 @@
  */
 package io.dts.common.protocol.header;
 
-import io.dts.common.protocol.RequestHeader;
+import io.dts.common.protocol.RequestHeaderMessage;
 import io.dts.remoting.exception.RemotingCommandException;
 
 /**
  * @author liushiming
  * @version BranchRollBackMessage.java, v 0.0.1 2017年9月1日 下午5:47:51 liushiming
  */
-public class BranchRollBackMessage implements RequestHeader {
+public class BranchRollBackMessage implements RequestHeaderMessage {
   /**
    * 服务端地址
    */

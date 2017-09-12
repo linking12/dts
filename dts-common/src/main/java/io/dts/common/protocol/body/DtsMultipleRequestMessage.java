@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.dts.common.protocol.DtsMessage;
-import io.dts.common.protocol.RequestHeader;
+import io.dts.common.protocol.RequestHeaderMessage;
 import io.dts.remoting.protocol.RemotingSerializable;
 
 /**
@@ -26,15 +26,15 @@ import io.dts.remoting.protocol.RemotingSerializable;
  */
 public class DtsMultipleRequestMessage extends RemotingSerializable implements DtsMessage {
 
-  public List<RequestHeader> msgs = new ArrayList<RequestHeader>();
+  public List<RequestHeaderMessage> msgs = new ArrayList<RequestHeaderMessage>();
 
   public List<Long> msgIds = new ArrayList<Long>();
 
-  public List<RequestHeader> getMsgs() {
+  public List<RequestHeaderMessage> getMsgs() {
     return msgs;
   }
 
-  public void setMsgs(List<RequestHeader> msgs) {
+  public void setMsgs(List<RequestHeaderMessage> msgs) {
     this.msgs = msgs;
   }
 

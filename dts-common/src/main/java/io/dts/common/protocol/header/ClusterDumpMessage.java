@@ -13,14 +13,14 @@
  */
 package io.dts.common.protocol.header;
 
-import io.dts.common.protocol.RequestHeader;
+import io.dts.common.protocol.RequestHeaderMessage;
 import io.dts.remoting.exception.RemotingCommandException;
 
 /**
  * @author liushiming
  * @version ClusterDumpMessage.java, v 0.0.1 2017年9月1日 下午6:25:11 liushiming
  */
-public class ClusterDumpMessage implements RequestHeader {
+public class ClusterDumpMessage implements RequestHeaderMessage {
 
   private boolean verbose;
 

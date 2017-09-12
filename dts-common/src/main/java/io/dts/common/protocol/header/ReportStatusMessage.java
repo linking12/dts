@@ -13,14 +13,14 @@
  */
 package io.dts.common.protocol.header;
 
-import io.dts.common.protocol.RequestHeader;
+import io.dts.common.protocol.RequestHeaderMessage;
 import io.dts.remoting.exception.RemotingCommandException;
 
 /**
  * @author liushiming
  * @version ReportStatusMessage.java, v 0.0.1 2017年9月1日 下午6:26:32 liushiming
  */
-public class ReportStatusMessage implements RequestHeader {
+public class ReportStatusMessage implements RequestHeaderMessage {
   /**
    * 事务ID
    */

@@ -17,8 +17,8 @@ import io.dts.remoting.CommandCustomHeader;
 
 /**
  * @author liushiming
- * @version RequestMessage.java, v 0.0.1 2017年9月12日 下午3:53:43 liushiming
+ * @version RequestHeaderMessage.java, v 0.0.1 2017年9月12日 下午3:53:43 liushiming
  */
-public interface RequestHeader extends CommandCustomHeader, DtsMessage {
+public interface RequestHeaderMessage extends CommandCustomHeader, DtsMessage {
 
 }

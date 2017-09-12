@@ -13,14 +13,14 @@
  */
 package io.dts.common.protocol.header;
 
-import io.dts.common.protocol.RequestHeader;
+import io.dts.common.protocol.RequestHeaderMessage;
 import io.dts.remoting.exception.RemotingCommandException;
 
 /**
  * @author liushiming
  * @version RegisterMessage.java, v 0.0.1 2017年9月1日 下午6:29:38 liushiming
  */
-public class RegisterMessage implements RequestHeader {
+public class RegisterMessage implements RequestHeaderMessage {
   /**
    * 事务ID
    */

@@ -12,7 +12,7 @@ import com.google.common.collect.Queues;
 import io.dts.common.ThreadFactoryImpl;
 import io.dts.common.protocol.DtsMessage;
 import io.dts.common.protocol.RequestCode;
-import io.dts.common.protocol.RequestHeader;
+import io.dts.common.protocol.RequestHeaderMessage;
 import io.dts.common.protocol.ResponseCode;
 import io.dts.common.protocol.header.BeginMessage;
 import io.dts.common.protocol.header.BeginResultMessage;
@@ -70,8 +70,8 @@ public class HeaderMessageProcessor implements NettyRequestProcessor {
     final String clientIp = NetUtil.toStringAddress(ctx.channel().remoteAddress());
     switch (request.getCode()) {
       case RequestCode.HEADER_REQUEST:
-        final RequestHeader dtsMessage =
-            (RequestHeader) request.decodeCommandCustomHeader(RequestHeader.class);
+        final RequestHeaderMessage dtsMessage =
+            (RequestHeaderMessage) request.decodeCommandCustomHeader(RequestHeaderMessage.class);
         return processDtsMessage(clientIp, dtsMessage);
       default:
         break;
@@ -82,7 +82,7 @@ public class HeaderMessageProcessor implements NettyRequestProcessor {
   }
 
 
-  private RemotingCommand processDtsMessage(String clientIp, RequestHeader dtsMessage) {
+  private RemotingCommand processDtsMessage(String clientIp, RequestHeaderMessage dtsMessage) {
     short typeCode = dtsMessage.getTypeCode();
     RemotingCommand response;
     CommandCustomHeader responseHeader;
