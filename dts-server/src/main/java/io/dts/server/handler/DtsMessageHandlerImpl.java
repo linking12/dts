@@ -43,6 +43,7 @@ import io.dts.common.protocol.header.ReportUdataMessage;
 import io.dts.common.protocol.header.ReportUdataResultMessage;
 import io.dts.server.model.BranchLog;
 import io.dts.server.model.GlobalLog;
+import io.dts.server.model.GlobalTransactionState;
 
 /**
  * @author liushiming
@@ -80,75 +81,88 @@ public class DtsMessageHandlerImpl implements DtsMessageHandler {
   @Override
   public void handleMessage(String clientIp, BeginMessage message,
       BeginResultMessage resultMessage) {
-    // TODO Auto-generated method stub
+    GlobalLog globalLog = new GlobalLog();
+    globalLog.setState(GlobalTransactionState.Begin.getValue());
+    globalLog.setTimeout(message.getTimeout());
+    globalLog.setClientAppName(clientIp);
+    globalLog.setContainPhase2CommitBranch(false);
+    try {
+      this.insertGlobalLog(globalLog);
+    } catch (Exception e) {
+      resultMessage.setResult(ResultCode.SYSTEMERROR.getValue());
+      resultMessage.setMsg(e.getMessage());
+      results[idx] = resultMessage;
+      return;
+    }
 
+    long tranId = globalLog.getTxId();
+    activeTranMap.put(tranId, globalLog);
+
+    String xid = TxcXID.generateXID(tranId);
+    resultMessage.setXid(xid);
+    resultMessage.setResult(ResultCode.OK.getValue());
+    if (this.clusterWorker != null)
+      resultMessage.setNextSvrAddr(this.clusterWorker.getNextNodeServerAddress());
+    results[idx] = resultMessage;
+    stat.StatBegin(clientAppName, clientIp);
+    return;
   }
 
   @Override
   public void handleMessage(String clientIp, GlobalCommitMessage message,
       GlobalCommitResultMessage resultMessage) {
-    // TODO Auto-generated method stub
 
   }
 
   @Override
   public void handleMessage(String clientIp, GlobalRollbackMessage message,
       GlobalRollbackResultMessage resultMessage) {
-    // TODO Auto-generated method stub
 
   }
 
   @Override
   public void handleMessage(String clientIp, RegisterMessage message,
       RegisterResultMessage resultMessage) {
-    // TODO Auto-generated method stub
 
   }
 
   @Override
   public void handleMessage(String clientIp, ReportStatusMessage message,
       ReportStatusResultMessage resultMessage) {
-    // TODO Auto-generated method stub
 
   }
 
   @Override
   public void handleMessage(String clientIp, BeginRetryBranchMessage message,
       BeginRetryBranchResultMessage resultMessage) {
-    // TODO Auto-generated method stub
 
   }
 
   @Override
   public void handleMessage(String clientIp, ReportUdataMessage message,
       ReportUdataResultMessage resultMessage) {
-    // TODO Auto-generated method stub
 
   }
 
   @Override
   public void handleMessage(String clientIp, DtsMultipleRequestMessage message,
       DtsMultipleResonseMessage resultMessage) {
-    // TODO Auto-generated method stub
 
   }
 
   @Override
   public void handleMessage(String clientIp, QueryLockMessage message,
       QueryLockResultMessage resultMessage) {
-    // TODO Auto-generated method stub
 
   }
 
   @Override
   public void handleMessage(String clientIp, BranchCommitResultMessage message) {
-    // TODO Auto-generated method stub
 
   }
 
   @Override
   public void handleMessage(String clientIp, BranchRollbackResultMessage message) {
-    // TODO Auto-generated method stub
 
   }
 
