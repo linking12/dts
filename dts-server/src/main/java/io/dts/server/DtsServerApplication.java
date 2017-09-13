@@ -16,9 +16,11 @@ package io.dts.server;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.ApplicationListener;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.event.ContextClosedEvent;
 
-import io.dts.server.remoting.DtsServerController;
+import io.dts.server.remoting.DtsServerContainer;
 
 /**
  * @author liushiming
@@ -31,8 +33,15 @@ public class DtsServerApplication {
   public static void main(String[] args) throws Exception {
     ConfigurableApplicationContext context =
         SpringApplication.run(DtsServerApplication.class, args);
-    DtsServerController tcpServer = context.getBean(DtsServerController.class);
-    tcpServer.start();
+    DtsServerContainer server = context.getBean(DtsServerContainer.class);
+    server.start();
+    context.addApplicationListener(new ApplicationListener<ContextClosedEvent>() {
+
+      @Override
+      public void onApplicationEvent(ContextClosedEvent event) {
+        server.stop();
+      }
+    });
   }
 
 }

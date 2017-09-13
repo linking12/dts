@@ -1,4 +1,8 @@
-package io.dts.server.remoting.channel;
+package io.dts.server.remoting.processor;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
 import io.dts.common.protocol.RequestCode;
 import io.dts.common.protocol.heatbeat.HeartbeatRequestHeader;
@@ -7,7 +11,8 @@ import io.dts.remoting.exception.RemotingCommandException;
 import io.dts.remoting.netty.NettyRequestProcessor;
 import io.dts.remoting.protocol.RemotingCommand;
 import io.dts.remoting.protocol.RemotingSysResponseCode;
-import io.dts.server.remoting.DtsServerController;
+import io.dts.server.remoting.channel.ChannelInfo;
+import io.dts.server.remoting.channel.ChannelRepository;
 import io.netty.channel.ChannelHandlerContext;
 
 /**
@@ -15,16 +20,12 @@ import io.netty.channel.ChannelHandlerContext;
  * @author liushiming
  * @version ChannelHeatBeatProcessor.java, v 0.0.1 2017年9月6日 上午11:37:02 liushiming
  */
-public class ChannelHeatBeatProcessor implements NettyRequestProcessor {
+@Component
+@Qualifier("heatBeatProcessor")
+public class HeatBeatProcessor implements NettyRequestProcessor {
 
-
-  private final DtsServerController serverController;
-
-
-  public ChannelHeatBeatProcessor(DtsServerController serverController) {
-    this.serverController = serverController;
-  }
-
+  @Autowired
+  private ChannelRepository channelRepository;
 
   @Override
   public RemotingCommand processRequest(ChannelHandlerContext ctx, RemotingCommand request)
@@ -48,7 +49,7 @@ public class ChannelHeatBeatProcessor implements NettyRequestProcessor {
         request.getLanguage(), //
         request.getVersion()//
     );
-    serverController.getChannelRepository().registerChannel("DEFAULT", clientChannelInfo);
+    channelRepository.registerChannel("DEFAULT", clientChannelInfo);
     RemotingCommand response = RemotingCommand.createResponseCommand(HeartbeatResponseHeader.class);
     response.setCode(RemotingSysResponseCode.SUCCESS);
     return response;

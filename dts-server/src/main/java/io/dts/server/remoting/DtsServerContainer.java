@@ -13,15 +13,16 @@
  */
 package io.dts.server.remoting;
 
+import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Queues;
@@ -30,100 +31,105 @@ import io.dts.common.ThreadFactoryImpl;
 import io.dts.common.protocol.RequestCode;
 import io.dts.remoting.RemotingServer;
 import io.dts.remoting.netty.NettyRemotingServer;
-import io.dts.remoting.netty.NettyRequestProcessor;
 import io.dts.remoting.netty.NettyServerConfig;
 import io.dts.server.DtsServerProperties;
-import io.dts.server.remoting.channel.ChannelHeatBeatProcessor;
-import io.dts.server.remoting.channel.ChannelRepository;
-import io.dts.server.remoting.channel.ChannelkeepingListener;
+import io.dts.server.common.AbstractLifecycleComponent;
+import io.dts.server.remoting.channel.ChannelkeepingComponent;
 import io.dts.server.remoting.latency.ServerFixedThreadPoolExecutor;
-import io.dts.server.remoting.processor.ServerMessageProcessor;
+import io.dts.server.remoting.processor.BizMessageProcessor;
+import io.dts.server.remoting.processor.HeatBeatProcessor;
 
 /**
  * @author liushiming
- * @version TcpServerController.java, v 0.0.1 2017年9月6日 上午10:06:17 liushiming
+ * @version DtsServerControllerComponent.java, v 0.0.1 2017年9月13日 下午1:58:27 liushiming
  */
 @Component
-public class DtsServerController {
+public class DtsServerContainer extends AbstractLifecycleComponent {
+
+  @Autowired
+  private ChannelkeepingComponent channelKeeping;
 
   @Autowired
   private DtsServerProperties serverProperties;
 
-  private final ChannelRepository channelRepository;
+  @Autowired
+  @Qualifier("bizMessageProcessor")
+  private BizMessageProcessor bizMessageProccessor;
 
-  private final ChannelkeepingListener channelKeepingListener;
+  @Autowired
+  @Qualifier("heatBeatProcessor")
+  private HeatBeatProcessor heatBeatProccessor;
+
 
   private RemotingServer remotingServer;
-
-  private ExecutorService clientMessageExecutor;
-
-  private ExecutorService resourceMessageExecutor;
-
-  private ExecutorService channelHeatBeatProcessorExecutor;
-
-  public DtsServerController() {
-    this.channelRepository = ChannelRepository.newChannelRepository();
-    this.channelKeepingListener = ChannelkeepingListener.newChannelkeepingListener(this);
-  }
 
   @PostConstruct
   public void init() {
     NettyServerConfig nettyServerConfig = new NettyServerConfig();
     nettyServerConfig.setListenPort(serverProperties.getListenPort());
-    this.remotingServer = new NettyRemotingServer(nettyServerConfig, channelKeepingListener);
-    BlockingQueue<Runnable> clientThreadPoolQueue =
-        Queues.newLinkedBlockingDeque(serverProperties.getClientThreadPoolQueueSize());
-    this.clientMessageExecutor =
-        new ServerFixedThreadPoolExecutor(serverProperties.getClientThreadPoolSize(),
-            serverProperties.getClientThreadPoolSize(), 1000 * 60, TimeUnit.MILLISECONDS,
-            clientThreadPoolQueue, new ThreadFactoryImpl("ClientMessageThread_"));
-    BlockingQueue<Runnable> resourceThreadPoolQueue =
-        Queues.newLinkedBlockingDeque(serverProperties.getResourceThreadPoolQueueSize());
-    this.resourceMessageExecutor =
-        new ServerFixedThreadPoolExecutor(serverProperties.getResourceThreadPoolSize(),
-            serverProperties.getResourceThreadPoolSize(), 1000 * 60, TimeUnit.MILLISECONDS,
-            resourceThreadPoolQueue, new ThreadFactoryImpl("ResourceMessageThread_"));
-    this.channelHeatBeatProcessorExecutor =
-        Executors.newFixedThreadPool(serverProperties.getChannelHeatThreadPoolSize(),
-            new ThreadFactoryImpl("ClientManageThread_"));
+    this.remotingServer = new NettyRemotingServer(nettyServerConfig, channelKeeping);
     this.registerProcessor();
   }
 
+  private void registerHeaderRequest() {
+    BlockingQueue<Runnable> clientThreadPoolQueue =
+        Queues.newLinkedBlockingDeque(serverProperties.getClientThreadPoolQueueSize());
+    ExecutorService clientMessageExecutor =
+        new ServerFixedThreadPoolExecutor(serverProperties.getClientThreadPoolSize(),
+            serverProperties.getClientThreadPoolSize(), 1000 * 60, TimeUnit.MILLISECONDS,
+            clientThreadPoolQueue, new ThreadFactoryImpl("ClientMessageThread_"));
+    this.remotingServer.registerProcessor(RequestCode.HEADER_REQUEST, bizMessageProccessor,
+        clientMessageExecutor);
+  }
+
+  private void registerBodyRequest() {
+    BlockingQueue<Runnable> resourceThreadPoolQueue =
+        Queues.newLinkedBlockingDeque(serverProperties.getResourceThreadPoolQueueSize());
+    ExecutorService resourceMessageExecutor =
+        new ServerFixedThreadPoolExecutor(serverProperties.getResourceThreadPoolSize(),
+            serverProperties.getResourceThreadPoolSize(), 1000 * 60, TimeUnit.MILLISECONDS,
+            resourceThreadPoolQueue, new ThreadFactoryImpl("ResourceMessageThread_"));
+    this.remotingServer.registerProcessor(RequestCode.BODY_REQUEST, bizMessageProccessor,
+        resourceMessageExecutor);
+  }
+
+  private void registerHeatBeatRequest() {
+    ExecutorService heatBeatProcessorExecutor =
+        Executors.newFixedThreadPool(serverProperties.getChannelHeatThreadPoolSize(),
+            new ThreadFactoryImpl("ClientManageThread_"));
+    this.remotingServer.registerProcessor(RequestCode.HEART_BEAT, heatBeatProccessor,
+        heatBeatProcessorExecutor);
+  }
+
   private void registerProcessor() {
-    ServerMessageProcessor serverMessageProcessor = new ServerMessageProcessor(this);
-    ChannelHeatBeatProcessor clientManageProcessor = new ChannelHeatBeatProcessor(this);
-    registerProcessor(RequestCode.HEADER_REQUEST, serverMessageProcessor, clientMessageExecutor);
-    registerProcessor(RequestCode.BODY_REQUEST, serverMessageProcessor, resourceMessageExecutor);
-    registerProcessor(RequestCode.HEART_BEAT, clientManageProcessor,
-        channelHeatBeatProcessorExecutor);
+    registerHeaderRequest();
+    registerBodyRequest();
+    registerHeatBeatRequest();
   }
 
-  private void registerProcessor(int processorCode, NettyRequestProcessor processor,
-      ExecutorService processorThreadPool) {
-    this.remotingServer.registerProcessor(processorCode, processor, processorThreadPool);
-  }
-
-  public void start() {
+  @Override
+  protected void doStart() {
     if (this.remotingServer != null) {
       this.remotingServer.start();
     }
-    if (this.channelKeepingListener != null) {
-      this.channelKeepingListener.start();
+    if (this.channelKeeping != null) {
+      this.channelKeeping.start();
     }
   }
 
-  @PreDestroy
-  public void shutdown() {
-    if (this.channelKeepingListener != null) {
-      this.channelKeepingListener.shutdown();
+  @Override
+  protected void doStop() {
+    if (this.channelKeeping != null) {
+      this.channelKeeping.stop();
     }
     if (this.remotingServer != null) {
       this.remotingServer.shutdown();
     }
   }
 
-  public final ChannelRepository getChannelRepository() {
-    return channelRepository;
+  @Override
+  protected void doClose() throws IOException {
+
   }
 
 }

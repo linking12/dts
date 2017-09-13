@@ -1,7 +1,21 @@
+/*
+ * Copyright 2014-2017 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package io.dts.server.remoting.processor;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
 import io.dts.common.protocol.DtsMessage;
 import io.dts.common.protocol.RequestCode;
@@ -32,29 +46,20 @@ import io.dts.remoting.netty.NettyRequestProcessor;
 import io.dts.remoting.protocol.RemotingCommand;
 import io.dts.remoting.protocol.RemotingSerializable;
 import io.dts.remoting.protocol.RemotingSysResponseCode;
-import io.dts.server.handler.DtsMessageHandlerImpl;
-import io.dts.server.remoting.DtsServerController;
+import io.dts.server.handler.DtsMessageHandler;
 import io.dts.util.NetUtil;
 import io.netty.channel.ChannelHandlerContext;
 
 /**
- * 
  * @author liushiming
- * @version AddProcessor.java, v 0.0.1 2017年9月6日 上午11:36:12 liushiming
+ * @version MessageProcessorComponent.java, v 0.0.1 2017年9月13日 下午2:00:41 liushiming
  */
-@SuppressWarnings("unused")
-public class ServerMessageProcessor implements NettyRequestProcessor {
+@Component
+@Qualifier("bizMessageProcessor")
+public class BizMessageProcessor implements NettyRequestProcessor {
 
-  private static final Logger logger = LoggerFactory.getLogger(ServerMessageProcessor.class);
-
-  private final DtsServerController serverController;
-
-  private final DtsMessageHandlerImpl messageHandler;
-
-  public ServerMessageProcessor(DtsServerController serverController) {
-    this.serverController = serverController;
-    this.messageHandler = new DtsMessageHandlerImpl();
-  }
+  @Autowired
+  private DtsMessageHandler messageHandler;
 
   @Override
   public RemotingCommand processRequest(ChannelHandlerContext ctx, RemotingCommand request)
@@ -76,7 +81,6 @@ public class ServerMessageProcessor implements NettyRequestProcessor {
         .createResponseCommand(ResponseCode.REQUEST_CODE_NOT_SUPPORTED, "No request Code");
     return response;
   }
-
 
   private RemotingCommand processDtsMessage(String clientIp, DtsMessage dtsMessage) {
     short typeCode = dtsMessage.getTypeCode();
@@ -164,5 +168,6 @@ public class ServerMessageProcessor implements NettyRequestProcessor {
     }
     return null;
   }
+
 
 }

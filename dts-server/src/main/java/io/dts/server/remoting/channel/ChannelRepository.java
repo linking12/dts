@@ -22,6 +22,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import io.dts.remoting.common.RemotingHelper;
 import io.dts.remoting.common.RemotingUtil;
@@ -31,7 +32,7 @@ import io.netty.channel.Channel;
  * @author liushiming
  * @version ChannelRepository.java, v 0.0.1 2017年9月6日 上午10:12:58 liushiming
  */
-
+@Component
 public class ChannelRepository {
 
   private static final Logger log = LoggerFactory.getLogger(ChannelRepository.class);
@@ -44,12 +45,6 @@ public class ChannelRepository {
 
   private final HashMap<String /* group name */, HashMap<Channel, ChannelInfo>> groupChannelTable =
       new HashMap<String, HashMap<Channel, ChannelInfo>>();
-
-  private ChannelRepository() {}
-
-  public static ChannelRepository newChannelRepository() {
-    return new ChannelRepository();
-  }
 
   public HashMap<String, HashMap<Channel, ChannelInfo>> getGroupChannelTable() {
     return groupChannelTable;

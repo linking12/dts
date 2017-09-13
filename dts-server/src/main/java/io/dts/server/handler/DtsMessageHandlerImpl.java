@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.springframework.stereotype.Component;
+
 import io.dts.common.protocol.body.BranchCommitResultMessage;
 import io.dts.common.protocol.body.DtsMultipleRequestMessage;
 import io.dts.common.protocol.body.DtsMultipleResonseMessage;
@@ -46,6 +48,7 @@ import io.dts.server.model.GlobalLog;
  * @author liushiming
  * @version DtsServerMessageListener.java, v 0.0.1 2017年9月6日 下午5:33:51 liushiming
  */
+@Component
 public class DtsMessageHandlerImpl implements DtsMessageHandler {
 
   /**
@@ -78,75 +81,75 @@ public class DtsMessageHandlerImpl implements DtsMessageHandler {
   public void handleMessage(String clientIp, BeginMessage message,
       BeginResultMessage resultMessage) {
     // TODO Auto-generated method stub
-    
+
   }
 
   @Override
   public void handleMessage(String clientIp, GlobalCommitMessage message,
       GlobalCommitResultMessage resultMessage) {
     // TODO Auto-generated method stub
-    
+
   }
 
   @Override
   public void handleMessage(String clientIp, GlobalRollbackMessage message,
       GlobalRollbackResultMessage resultMessage) {
     // TODO Auto-generated method stub
-    
+
   }
 
   @Override
   public void handleMessage(String clientIp, RegisterMessage message,
       RegisterResultMessage resultMessage) {
     // TODO Auto-generated method stub
-    
+
   }
 
   @Override
   public void handleMessage(String clientIp, ReportStatusMessage message,
       ReportStatusResultMessage resultMessage) {
     // TODO Auto-generated method stub
-    
+
   }
 
   @Override
   public void handleMessage(String clientIp, BeginRetryBranchMessage message,
       BeginRetryBranchResultMessage resultMessage) {
     // TODO Auto-generated method stub
-    
+
   }
 
   @Override
   public void handleMessage(String clientIp, ReportUdataMessage message,
       ReportUdataResultMessage resultMessage) {
     // TODO Auto-generated method stub
-    
+
   }
 
   @Override
   public void handleMessage(String clientIp, DtsMultipleRequestMessage message,
       DtsMultipleResonseMessage resultMessage) {
     // TODO Auto-generated method stub
-    
+
   }
 
   @Override
   public void handleMessage(String clientIp, QueryLockMessage message,
       QueryLockResultMessage resultMessage) {
     // TODO Auto-generated method stub
-    
+
   }
 
   @Override
   public void handleMessage(String clientIp, BranchCommitResultMessage message) {
     // TODO Auto-generated method stub
-    
+
   }
 
   @Override
   public void handleMessage(String clientIp, BranchRollbackResultMessage message) {
     // TODO Auto-generated method stub
-    
+
   }
 
 

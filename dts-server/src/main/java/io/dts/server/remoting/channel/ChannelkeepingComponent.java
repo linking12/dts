@@ -13,46 +13,44 @@
  */
 package io.dts.server.remoting.channel;
 
+import java.io.IOException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import io.dts.common.ThreadFactoryImpl;
 import io.dts.remoting.ChannelEventListener;
-import io.dts.server.remoting.DtsServerController;
+import io.dts.server.common.AbstractLifecycleComponent;
 import io.netty.channel.Channel;
 
 /**
  * @author liushiming
  * @version ChannelHousekeepingService.java, v 0.0.1 2017年9月6日 上午10:16:20 liushiming
  */
-public class ChannelkeepingListener implements ChannelEventListener {
+@Component
+public class ChannelkeepingComponent extends AbstractLifecycleComponent
+    implements ChannelEventListener {
 
-  private static final Logger logger = LoggerFactory.getLogger(ChannelkeepingListener.class);
+  private static final Logger logger = LoggerFactory.getLogger(ChannelkeepingComponent.class);
 
-  private final DtsServerController serverController;
+  @Autowired
+  private ChannelRepository channelRepository;
 
-  private ScheduledExecutorService scheduledExecutorService = Executors
+  private final ScheduledExecutorService scheduledExecutorService = Executors
       .newSingleThreadScheduledExecutor(new ThreadFactoryImpl("ClientHousekeepingScheduledThread"));
 
-  private ChannelkeepingListener(final DtsServerController serverController) {
-    this.serverController = serverController;
-  }
-
-  public static ChannelkeepingListener newChannelkeepingListener(
-      final DtsServerController serverController) {
-    return new ChannelkeepingListener(serverController);
-  }
-
-  public void start() {
+  @Override
+  protected void doStart() {
     this.scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
       @Override
       public void run() {
         try {
-          ChannelkeepingListener.this.scanExceptionChannel();
+          channelRepository.scanNotActiveChannel();
         } catch (Exception e) {
           logger.error("", e);
         }
@@ -60,15 +58,13 @@ public class ChannelkeepingListener implements ChannelEventListener {
     }, 1000 * 10, 1000 * 10, TimeUnit.MILLISECONDS);
   }
 
-  public void shutdown() {
+  @Override
+  protected void doStop() {
     this.scheduledExecutorService.shutdown();
   }
 
-
-  private void scanExceptionChannel() {
-    this.serverController.getChannelRepository().scanNotActiveChannel();
-  }
-
+  @Override
+  protected void doClose() throws IOException {}
 
   @Override
   public void onChannelConnect(String remoteAddr, Channel channel) {}
@@ -76,18 +72,19 @@ public class ChannelkeepingListener implements ChannelEventListener {
 
   @Override
   public void onChannelClose(String remoteAddr, Channel channel) {
-    this.serverController.getChannelRepository().doChannelCloseEvent(remoteAddr, channel);
+    channelRepository.doChannelCloseEvent(remoteAddr, channel);
   }
 
 
   @Override
   public void onChannelException(String remoteAddr, Channel channel) {
-    this.serverController.getChannelRepository().doChannelCloseEvent(remoteAddr, channel);
+    channelRepository.doChannelCloseEvent(remoteAddr, channel);
   }
 
 
   @Override
   public void onChannelIdle(String remoteAddr, Channel channel) {
-    this.serverController.getChannelRepository().doChannelCloseEvent(remoteAddr, channel);
+    channelRepository.doChannelCloseEvent(remoteAddr, channel);
   }
+
 }
