@@ -32,4 +32,8 @@ public class RequestCode {
 
     public static final int BRANCH_RETRY = 120;
 
+    public static final int REPORT_STATUS = 200;
+
+
+
 }

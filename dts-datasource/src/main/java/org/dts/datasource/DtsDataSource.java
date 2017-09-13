@@ -11,7 +11,12 @@ import com.alibaba.druid.proxy.jdbc.StatementProxy;
 import com.google.common.collect.Lists;
 import com.quancheng.dts.common.CommitMode;
 import com.quancheng.dts.common.DtsContext;
+import com.quancheng.dts.common.DtsXID;
+import com.quansheng.dts.resourcemanager.DtsRTResourceManager;
 import com.quansheng.dts.resourcemanager.DtsResourceManager;
+import com.quansheng.dts.resourcemanager.undo.UndoLogManager;
+
+import javax.sql.DataSource;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -21,13 +26,14 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Created by guoyubo on 2017/8/22.
  */
-public class DtsDataSource extends DruidDataSource {
+public class DtsDataSource extends DruidDataSource implements IDtsDataSource{
 
   private static final Logger log = LoggerFactory.getLogger(DtsDataSource.class);
 
   private ThreadLocal<ConcurrentHashMap<ConnectionProxy, Long>> statementHolder = new ThreadLocal<>();
 
-  private DtsResourceManager resourceManager;
+  private DtsRTResourceManager resourceManager;
+  private UndoLogManager undoLogManager;
 
   public DtsDataSource() {
     super();
@@ -57,15 +63,21 @@ public class DtsDataSource extends DruidDataSource {
       }
 
       @Override
-      public void beforeExecute(final StatementProxy statement, final String sql) {
+      public void beforeExecute(final StatementProxy statement, final String sql) throws SQLException {
         if (DtsContext.inTxcTransaction()) {
+          int result = resourceManager.insertUndoLog(statement.getConnectionProxy(), DtsContext.getCurrentXid(),
+              getBindBranchId(statement), DtsXID.getServerAddress(DtsContext.getCurrentXid()), 0);
+          if (result == 0) {
+            throw  new SQLException("insertUndoLog error");
+          }
         }
       }
 
       @Override
-      public void afterExecute(final StatementProxy statement, String sql, final Throwable error) {
+      public void afterExecute(final StatementProxy statement, String sql, final Throwable error) throws SQLException {
         if (DtsContext.inRetryContext()) {
           if (error != null) {
+            resourceManager.beginRtBranch(DtsDataSource.this, sql);
           }
         } else {
           if (error != null) {
@@ -99,4 +111,18 @@ public class DtsDataSource extends DruidDataSource {
     return branchId;
   }
 
+  @Override
+  public DataSource getCommonDataSource() throws SQLException {
+    return null;
+  }
+
+  @Override
+  public String getDbName() {
+    return null;
+  }
+
+  @Override
+  public String getInstanceId() {
+    return System.getProperty("instanceId");
+  }
 }

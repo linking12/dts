@@ -10,6 +10,9 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="dts-rpc" />
+    <orderEntry type="module" module-name="dts-resourcemanager" />
+    <orderEntry type="library" name="Maven: com.alibaba:druid:1.0.15" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: junit:junit:4.5" level="project" />
     <orderEntry type="module" module-name="dts-common" />
     <orderEntry type="library" name="Maven: io.netty:netty-all:4.0.43.Final" level="project" />

@@ -2,6 +2,10 @@ package com.quansheng.dts.resourcemanager;
 
 import com.quancheng.dts.common.CommitMode;
 import com.quancheng.dts.exception.DtsException;
+import com.quansheng.dts.resourcemanager.attribute.TxcIsolation;
+
+import java.sql.Connection;
+import java.sql.SQLException;
 
 /**
  * Created by guoyubo on 2017/9/4.
@@ -17,6 +21,10 @@ public interface DtsResourceManager {
    * @throws DtsException
    */
   public long register(String key, CommitMode commitMode) throws DtsException;
+
+
+  public int insertUndoLog(Connection conn, String xid, Long branchId, String serverAddr,
+      final int status) throws DtsException;
 
   /**
    * 分支状态上报
@@ -73,4 +81,6 @@ public interface DtsResourceManager {
 
   public void branchRollback(String xid, long branchId, String key, String udata, byte commitMode, int isDelKey) throws DtsException;
 
+
+  TxcIsolation getIsolationLevel();
 }
