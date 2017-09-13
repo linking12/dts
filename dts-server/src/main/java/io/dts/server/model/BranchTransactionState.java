@@ -5,7 +5,7 @@ package io.dts.server.model;
  * 
  *         事务分支的提交状态
  */
-public enum CommitingResultCode {
+public enum BranchTransactionState {
 
   /**
    * 分支提交已发出，还没有响应
@@ -25,7 +25,7 @@ public enum CommitingResultCode {
   /**
    * @param value
    */
-  private CommitingResultCode(int value) {
+  private BranchTransactionState(int value) {
     this.value = value;
   }
 

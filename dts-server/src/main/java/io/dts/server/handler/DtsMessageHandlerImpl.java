@@ -48,7 +48,7 @@ import io.dts.common.protocol.header.ReportUdataResultMessage;
 import io.dts.server.exception.DtsBizException;
 import io.dts.server.model.BranchLog;
 import io.dts.server.model.BranchLogState;
-import io.dts.server.model.CommitingResultCode;
+import io.dts.server.model.BranchTransactionState;
 import io.dts.server.model.GlobalLog;
 import io.dts.server.model.GlobalTransactionState;
 import io.dts.server.store.TxcServerRestorer;
@@ -163,7 +163,7 @@ public class DtsMessageHandlerImpl implements DtsMessageHandler {
                 if (!globalLog.isContainPhase2CommitBranch()) {
                   for (BranchLog branchLog : branchLogs) {
                     committingMap.put(branchLog.getBranchId(),
-                        CommitingResultCode.BEGIN.getValue());
+                        BranchTransactionState.BEGIN.getValue());
                   }
                 } else {
                   Collections.sort(branchLogs, new Comparator<BranchLog>() {
@@ -204,7 +204,7 @@ public class DtsMessageHandlerImpl implements DtsMessageHandler {
 
 
   // 往resourceManager发送消息
-  //TODO
+  // TODO
   private void syncGlobalCommit(List<BranchLog> branchLogs, GlobalLog globalLog, long tranId) {
 
   }
