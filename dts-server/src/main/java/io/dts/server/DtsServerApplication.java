@@ -18,18 +18,21 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ConfigurableApplicationContext;
 
+import io.dts.server.remoting.DtsServerController;
+import io.dts.server.remoting.DtsServerProperties;
+
 /**
  * @author liushiming
  * @version Application.java, v 0.0.1 2017年9月5日 下午6:31:29 liushiming
  */
 @SpringBootApplication
-@EnableConfigurationProperties(TcpServerProperties.class)
-public class TcpServerApplication {
+@EnableConfigurationProperties(DtsServerProperties.class)
+public class DtsServerApplication {
 
   public static void main(String[] args) throws Exception {
     ConfigurableApplicationContext context =
-        SpringApplication.run(TcpServerApplication.class, args);
-    TcpServerController tcpServer = context.getBean(TcpServerController.class);
+        SpringApplication.run(DtsServerApplication.class, args);
+    DtsServerController tcpServer = context.getBean(DtsServerController.class);
     tcpServer.start();
   }
 

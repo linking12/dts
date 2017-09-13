@@ -11,7 +11,7 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-package io.dts.server;
+package io.dts.server.remoting;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -20,7 +20,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @version TcpServerProperties.java, v 0.0.1 2017年9月6日 上午11:17:24 liushiming
  */
 @ConfigurationProperties(prefix = "tcp")
-public class TcpServerProperties {
+public class DtsServerProperties {
 
   private int listenPort;
 

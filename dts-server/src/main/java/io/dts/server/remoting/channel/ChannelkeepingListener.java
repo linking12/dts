@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import io.dts.common.ThreadFactoryImpl;
 import io.dts.remoting.ChannelEventListener;
-import io.dts.server.TcpServerController;
+import io.dts.server.remoting.DtsServerController;
 import io.netty.channel.Channel;
 
 /**
@@ -33,17 +33,17 @@ public class ChannelkeepingListener implements ChannelEventListener {
 
   private static final Logger logger = LoggerFactory.getLogger(ChannelkeepingListener.class);
 
-  private final TcpServerController serverController;
+  private final DtsServerController serverController;
 
   private ScheduledExecutorService scheduledExecutorService = Executors
       .newSingleThreadScheduledExecutor(new ThreadFactoryImpl("ClientHousekeepingScheduledThread"));
 
-  private ChannelkeepingListener(final TcpServerController serverController) {
+  private ChannelkeepingListener(final DtsServerController serverController) {
     this.serverController = serverController;
   }
 
   public static ChannelkeepingListener newChannelkeepingListener(
-      final TcpServerController serverController) {
+      final DtsServerController serverController) {
     return new ChannelkeepingListener(serverController);
   }
 

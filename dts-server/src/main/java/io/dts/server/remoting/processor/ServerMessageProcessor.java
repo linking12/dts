@@ -32,7 +32,7 @@ import io.dts.remoting.netty.NettyRequestProcessor;
 import io.dts.remoting.protocol.RemotingCommand;
 import io.dts.remoting.protocol.RemotingSerializable;
 import io.dts.remoting.protocol.RemotingSysResponseCode;
-import io.dts.server.TcpServerController;
+import io.dts.server.remoting.DtsServerController;
 import io.dts.server.service.DtsServerMessageHandler;
 import io.dts.util.NetUtil;
 import io.netty.channel.ChannelHandlerContext;
@@ -47,11 +47,11 @@ public class ServerMessageProcessor implements NettyRequestProcessor {
 
   private static final Logger logger = LoggerFactory.getLogger(ServerMessageProcessor.class);
 
-  private final TcpServerController serverController;
+  private final DtsServerController serverController;
 
   private final DtsServerMessageHandler messageHandler;
 
-  public ServerMessageProcessor(TcpServerController serverController) {
+  public ServerMessageProcessor(DtsServerController serverController) {
     this.serverController = serverController;
     this.messageHandler = new DtsServerMessageHandler();
   }

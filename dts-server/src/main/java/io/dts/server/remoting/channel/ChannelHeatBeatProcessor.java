@@ -7,7 +7,7 @@ import io.dts.remoting.exception.RemotingCommandException;
 import io.dts.remoting.netty.NettyRequestProcessor;
 import io.dts.remoting.protocol.RemotingCommand;
 import io.dts.remoting.protocol.RemotingSysResponseCode;
-import io.dts.server.TcpServerController;
+import io.dts.server.remoting.DtsServerController;
 import io.netty.channel.ChannelHandlerContext;
 
 /**
@@ -18,10 +18,10 @@ import io.netty.channel.ChannelHandlerContext;
 public class ChannelHeatBeatProcessor implements NettyRequestProcessor {
 
 
-  private final TcpServerController serverController;
+  private final DtsServerController serverController;
 
 
-  public ChannelHeatBeatProcessor(TcpServerController serverController) {
+  public ChannelHeatBeatProcessor(DtsServerController serverController) {
     this.serverController = serverController;
   }
 

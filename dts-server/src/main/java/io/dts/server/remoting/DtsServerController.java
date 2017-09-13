@@ -11,7 +11,7 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-package io.dts.server;
+package io.dts.server.remoting;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
@@ -43,10 +43,10 @@ import io.dts.server.remoting.processor.ServerMessageProcessor;
  * @version TcpServerController.java, v 0.0.1 2017年9月6日 上午10:06:17 liushiming
  */
 @Component
-public class TcpServerController {
+public class DtsServerController {
 
   @Autowired
-  private TcpServerProperties tcpServerProperties;
+  private DtsServerProperties tcpServerProperties;
 
   private final ChannelRepository channelRepository;
 
@@ -60,7 +60,7 @@ public class TcpServerController {
 
   private final ExecutorService channelHeatBeatProcessorExecutor;
 
-  public TcpServerController() {
+  public DtsServerController() {
     this.channelRepository = ChannelRepository.newChannelRepository();
     this.channelKeepingListener = ChannelkeepingListener.newChannelkeepingListener(this);
     BlockingQueue<Runnable> clientThreadPoolQueue =
