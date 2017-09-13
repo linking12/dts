@@ -141,8 +141,45 @@ public class DtsMessageHandlerImpl implements DtsMessageHandler {
           }
         case Begin:
         case CommitHeuristic:
-          CommitGlobalTransaction commitGlobalTransaction =
-              new CommitGlobalTransaction(globalLog, clientIp);
+          class CommitGlobalTransaction {
+            private final GlobalLog globalLog;
+            private final List<BranchLog> branchLogs;
+
+            CommitGlobalTransaction(final GlobalLog globalLog) {
+              this.globalLog = globalLog;
+              try {
+                branchLogs = getBranchLogs(globalLog.getTxId());
+              } catch (Exception e) {
+                throw new DtsBizException("get branch logs fail. " + e.getMessage());
+              }
+            }
+
+            private List<BranchLog> queryBranchLogs() {
+              return branchLogs;
+            }
+
+            private void commitBranchLog() {
+              try {
+                if (!globalLog.isContainPhase2CommitBranch()) {
+                  for (BranchLog branchLog : branchLogs) {
+                    committingMap.put(branchLog.getBranchId(),
+                        CommitingResultCode.BEGIN.getValue());
+                  }
+                } else {
+                  Collections.sort(branchLogs, new Comparator<BranchLog>() {
+                    @Override
+                    public int compare(BranchLog o1, BranchLog o2) {
+                      return (int) (o1.getBranchId() - o2.getBranchId());
+                    }
+                  });
+                  syncGlobalCommit(branchLogs, globalLog, globalLog.getTxId());
+                }
+              } catch (Exception e) {
+                logger.error("errorCode", e.getMessage(), e);
+              }
+            }
+          }
+          CommitGlobalTransaction commitGlobalTransaction = new CommitGlobalTransaction(globalLog);
           List<BranchLog> branchLogs = commitGlobalTransaction.queryBranchLogs();
           if (branchLogs.size() == 0) {
             // TODO
@@ -165,43 +202,6 @@ public class DtsMessageHandlerImpl implements DtsMessageHandler {
 
   }
 
-  class CommitGlobalTransaction {
-    private final GlobalLog globalLog;
-    private final List<BranchLog> branchLogs;
-
-    CommitGlobalTransaction(final GlobalLog globalLog, final String clientIp) {
-      this.globalLog = globalLog;
-      try {
-        branchLogs = getBranchLogs(globalLog.getTxId());
-      } catch (Exception e) {
-        throw new DtsBizException("get branch logs fail. " + e.getMessage());
-      }
-    }
-
-    protected List<BranchLog> queryBranchLogs() {
-      return branchLogs;
-    }
-
-    protected void commitBranchLog() {
-      try {
-        if (!globalLog.isContainPhase2CommitBranch()) {
-          for (BranchLog branchLog : branchLogs) {
-            committingMap.put(branchLog.getBranchId(), CommitingResultCode.BEGIN.getValue());
-          }
-        } else {
-          Collections.sort(branchLogs, new Comparator<BranchLog>() {
-            @Override
-            public int compare(BranchLog o1, BranchLog o2) {
-              return (int) (o1.getBranchId() - o2.getBranchId());
-            }
-          });
-          syncGlobalCommit(branchLogs, globalLog, globalLog.getTxId());
-        }
-      } catch (Exception e) {
-        logger.error("errorCode", e.getMessage(), e);
-      }
-    }
-  }
 
   public void syncGlobalCommit(List<BranchLog> branchLogs, GlobalLog globalLog, long tranId) {
 
