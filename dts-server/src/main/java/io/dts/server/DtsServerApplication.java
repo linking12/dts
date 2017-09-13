@@ -19,7 +19,6 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.ConfigurableApplicationContext;
 
 import io.dts.server.remoting.DtsServerController;
-import io.dts.server.remoting.DtsServerProperties;
 
 /**
  * @author liushiming

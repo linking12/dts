@@ -32,6 +32,7 @@ import io.dts.remoting.RemotingServer;
 import io.dts.remoting.netty.NettyRemotingServer;
 import io.dts.remoting.netty.NettyRequestProcessor;
 import io.dts.remoting.netty.NettyServerConfig;
+import io.dts.server.DtsServerProperties;
 import io.dts.server.remoting.channel.ChannelHeatBeatProcessor;
 import io.dts.server.remoting.channel.ChannelRepository;
 import io.dts.server.remoting.channel.ChannelkeepingListener;
@@ -46,7 +47,7 @@ import io.dts.server.remoting.processor.ServerMessageProcessor;
 public class DtsServerController {
 
   @Autowired
-  private DtsServerProperties tcpServerProperties;
+  private DtsServerProperties serverProperties;
 
   private final ChannelRepository channelRepository;
 
@@ -54,37 +55,37 @@ public class DtsServerController {
 
   private RemotingServer remotingServer;
 
-  private final ExecutorService clientMessageExecutor;
+  private ExecutorService clientMessageExecutor;
 
-  private final ExecutorService resourceMessageExecutor;
+  private ExecutorService resourceMessageExecutor;
 
-  private final ExecutorService channelHeatBeatProcessorExecutor;
+  private ExecutorService channelHeatBeatProcessorExecutor;
 
   public DtsServerController() {
     this.channelRepository = ChannelRepository.newChannelRepository();
     this.channelKeepingListener = ChannelkeepingListener.newChannelkeepingListener(this);
-    BlockingQueue<Runnable> clientThreadPoolQueue =
-        Queues.newLinkedBlockingDeque(tcpServerProperties.getClientThreadPoolQueueSize());
-    this.clientMessageExecutor =
-        new ServerFixedThreadPoolExecutor(tcpServerProperties.getClientThreadPoolSize(),
-            tcpServerProperties.getClientThreadPoolSize(), 1000 * 60, TimeUnit.MILLISECONDS,
-            clientThreadPoolQueue, new ThreadFactoryImpl("ClientMessageThread_"));
-    BlockingQueue<Runnable> resourceThreadPoolQueue =
-        Queues.newLinkedBlockingDeque(tcpServerProperties.getResourceThreadPoolQueueSize());
-    this.resourceMessageExecutor =
-        new ServerFixedThreadPoolExecutor(tcpServerProperties.getResourceThreadPoolSize(),
-            tcpServerProperties.getResourceThreadPoolSize(), 1000 * 60, TimeUnit.MILLISECONDS,
-            resourceThreadPoolQueue, new ThreadFactoryImpl("ResourceMessageThread_"));
-    this.channelHeatBeatProcessorExecutor =
-        Executors.newFixedThreadPool(tcpServerProperties.getChannelHeatThreadPoolSize(),
-            new ThreadFactoryImpl("ClientManageThread_"));
   }
 
   @PostConstruct
   public void init() {
     NettyServerConfig nettyServerConfig = new NettyServerConfig();
-    nettyServerConfig.setListenPort(tcpServerProperties.getListenPort());
+    nettyServerConfig.setListenPort(serverProperties.getListenPort());
     this.remotingServer = new NettyRemotingServer(nettyServerConfig, channelKeepingListener);
+    BlockingQueue<Runnable> clientThreadPoolQueue =
+        Queues.newLinkedBlockingDeque(serverProperties.getClientThreadPoolQueueSize());
+    this.clientMessageExecutor =
+        new ServerFixedThreadPoolExecutor(serverProperties.getClientThreadPoolSize(),
+            serverProperties.getClientThreadPoolSize(), 1000 * 60, TimeUnit.MILLISECONDS,
+            clientThreadPoolQueue, new ThreadFactoryImpl("ClientMessageThread_"));
+    BlockingQueue<Runnable> resourceThreadPoolQueue =
+        Queues.newLinkedBlockingDeque(serverProperties.getResourceThreadPoolQueueSize());
+    this.resourceMessageExecutor =
+        new ServerFixedThreadPoolExecutor(serverProperties.getResourceThreadPoolSize(),
+            serverProperties.getResourceThreadPoolSize(), 1000 * 60, TimeUnit.MILLISECONDS,
+            resourceThreadPoolQueue, new ThreadFactoryImpl("ResourceMessageThread_"));
+    this.channelHeatBeatProcessorExecutor =
+        Executors.newFixedThreadPool(serverProperties.getChannelHeatThreadPoolSize(),
+            new ThreadFactoryImpl("ClientManageThread_"));
     this.registerProcessor();
   }
 
