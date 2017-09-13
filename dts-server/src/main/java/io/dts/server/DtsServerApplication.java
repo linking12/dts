@@ -33,13 +33,13 @@ public class DtsServerApplication {
   public static void main(String[] args) throws Exception {
     ConfigurableApplicationContext context =
         SpringApplication.run(DtsServerApplication.class, args);
-    DtsServerContainer server = context.getBean(DtsServerContainer.class);
-    server.start();
+    DtsServerContainer nettyServer = context.getBean(DtsServerContainer.class);
+    nettyServer.start();
     context.addApplicationListener(new ApplicationListener<ContextClosedEvent>() {
 
       @Override
       public void onApplicationEvent(ContextClosedEvent event) {
-        server.stop();
+        nettyServer.stop();
       }
     });
   }
