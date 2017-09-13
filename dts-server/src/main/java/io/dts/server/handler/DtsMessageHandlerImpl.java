@@ -203,16 +203,18 @@ public class DtsMessageHandlerImpl implements DtsMessageHandler {
   }
 
 
-  public void syncGlobalCommit(List<BranchLog> branchLogs, GlobalLog globalLog, long tranId) {
+  // 往resourceManager发送消息
+  //TODO
+  private void syncGlobalCommit(List<BranchLog> branchLogs, GlobalLog globalLog, long tranId) {
 
   }
 
-  public List<BranchLog> getBranchLogs(long tranId) {
+  private List<BranchLog> getBranchLogs(long tranId) {
     return getBranchLogs(tranId, false, false, false);
   }
 
 
-  public List<BranchLog> getBranchLogs(long tranId, boolean sort, boolean reverse,
+  private List<BranchLog> getBranchLogs(long tranId, boolean sort, boolean reverse,
       boolean fromBkup) {
     List<BranchLog> branchLogs = new ArrayList<BranchLog>();
     Map<Long, BranchLog> branchMap = activeTranBranchMap;
