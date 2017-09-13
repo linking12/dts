@@ -28,6 +28,7 @@ import org.springframework.stereotype.Component;
 import com.google.common.collect.Queues;
 
 import io.dts.common.ThreadFactoryImpl;
+import io.dts.common.common.TxcXID;
 import io.dts.common.protocol.RequestCode;
 import io.dts.remoting.RemotingServer;
 import io.dts.remoting.netty.NettyRemotingServer;
@@ -38,6 +39,7 @@ import io.dts.server.remoting.channel.ChannelkeepingComponent;
 import io.dts.server.remoting.latency.ServerFixedThreadPoolExecutor;
 import io.dts.server.remoting.processor.BizMessageProcessor;
 import io.dts.server.remoting.processor.HeatBeatProcessor;
+import io.dts.util.NetUtil;
 
 /**
  * @author liushiming
@@ -69,6 +71,8 @@ public class DtsServerContainer extends AbstractLifecycleComponent {
     nettyServerConfig.setListenPort(serverProperties.getListenPort());
     this.remotingServer = new NettyRemotingServer(nettyServerConfig, channelKeeping);
     this.registerProcessor();
+    TxcXID.setIpAddress(NetUtil.getLocalIp());
+    TxcXID.setPort(serverProperties.getListenPort());
   }
 
   private void registerHeaderRequest() {

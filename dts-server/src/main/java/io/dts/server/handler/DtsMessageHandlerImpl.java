@@ -21,6 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.stereotype.Component;
 
+import io.dts.common.common.TxcXID;
 import io.dts.common.protocol.body.BranchCommitResultMessage;
 import io.dts.common.protocol.body.DtsMultipleRequestMessage;
 import io.dts.common.protocol.body.DtsMultipleResonseMessage;
@@ -41,9 +42,12 @@ import io.dts.common.protocol.header.ReportStatusMessage;
 import io.dts.common.protocol.header.ReportStatusResultMessage;
 import io.dts.common.protocol.header.ReportUdataMessage;
 import io.dts.common.protocol.header.ReportUdataResultMessage;
+import io.dts.server.exception.DtsBizException;
 import io.dts.server.model.BranchLog;
+import io.dts.server.model.BranchLogState;
 import io.dts.server.model.GlobalLog;
 import io.dts.server.model.GlobalTransactionState;
+import io.dts.server.util.RollbackingResultCode;
 
 /**
  * @author liushiming
@@ -86,25 +90,13 @@ public class DtsMessageHandlerImpl implements DtsMessageHandler {
     globalLog.setTimeout(message.getTimeout());
     globalLog.setClientAppName(clientIp);
     globalLog.setContainPhase2CommitBranch(false);
-    try {
-      this.insertGlobalLog(globalLog);
-    } catch (Exception e) {
-      resultMessage.setResult(ResultCode.SYSTEMERROR.getValue());
-      resultMessage.setMsg(e.getMessage());
-      results[idx] = resultMessage;
-      return;
-    }
-
+    // TODO
+    // this.insertGlobalLog(globalLog);
+    //
     long tranId = globalLog.getTxId();
     activeTranMap.put(tranId, globalLog);
-
     String xid = TxcXID.generateXID(tranId);
     resultMessage.setXid(xid);
-    resultMessage.setResult(ResultCode.OK.getValue());
-    if (this.clusterWorker != null)
-      resultMessage.setNextSvrAddr(this.clusterWorker.getNextNodeServerAddress());
-    results[idx] = resultMessage;
-    stat.StatBegin(clientAppName, clientIp);
     return;
   }
 
@@ -123,13 +115,60 @@ public class DtsMessageHandlerImpl implements DtsMessageHandler {
   @Override
   public void handleMessage(String clientIp, RegisterMessage message,
       RegisterResultMessage resultMessage) {
-
+    long tranId = message.getTranId();
+    byte commitMode = message.getCommitMode();
+    GlobalLog globalLog = activeTranMap.get(tranId);
+    if (globalLog == null || globalLog.getState() != GlobalTransactionState.Begin.getValue()) {
+      if (globalLog == null) {
+        throw new DtsBizException("Transaction " + tranId + " doesn't exist");
+      } else {
+        throw new DtsBizException("Transaction " + tranId + " is in state:"
+            + this.getStateString(GlobalTransactionState.class, globalLog.getState()));
+      }
+    }
+    BranchLog branchLog = new BranchLog();
+    branchLog.setTxId(tranId);
+    branchLog.setWaitPeriods(0);
+    branchLog.setClientAppName(clientIp);
+    branchLog.setClientInfo(message.getKey());
+    branchLog.setBusinessKey(message.getBusinessKey());
+    branchLog.setClientIp(clientIp);
+    branchLog.setState(BranchLogState.Begin.getValue());
+    branchLog.setCommitMode(commitMode);
+    // TODO
+    // this.insertBranchLog(branchLog);
+    activeTranBranchMap.put(branchLog.getBranchId(), branchLog);
+    globalLog.getBranchIds().add(branchLog.getBranchId());
+    resultMessage.setBranchId(branchLog.getBranchId());
+    resultMessage.setTranId((int) tranId);
+    return;
   }
 
   @Override
   public void handleMessage(String clientIp, ReportStatusMessage message,
       ReportStatusResultMessage resultMessage) {
-
+    resultMessage.setBranchId(message.getBranchId());
+    BranchLog branchLog = activeTranBranchMap.get(message.getBranchId());
+    if (branchLog == null) {
+      throw new DtsBizException("branch doesn't exist.");
+    }
+    int state = (message.isSuccess()) ? BranchLogState.Success.getValue()
+        : BranchLogState.Failed.getValue();
+    branchLog.setState(state);
+    boolean optimized = true;
+    if (message.getUdata() != null) {
+      branchLog.setUdata(message.getUdata());
+      optimized = false;
+    }
+    // TODO
+    // this.updataBranchLog(branchLog, optimized);
+    GlobalLog globalLog = activeTranMap.get(branchLog.getTxId());
+    if (globalLog == null) {
+      throw new DtsBizException("global log doesn't exist.");
+    }
+    if (globalLog.getState() == GlobalTransactionState.Rollbacking.getValue()) {
+      rollbackingMap.put(branchLog.getBranchId(), RollbackingResultCode.TIMEOUT.getValue());
+    }
   }
 
   @Override
@@ -164,6 +203,26 @@ public class DtsMessageHandlerImpl implements DtsMessageHandler {
   @Override
   public void handleMessage(String clientIp, BranchRollbackResultMessage message) {
 
+  }
+
+  public String getStateString(Class<?> cl, int value) {
+    if (cl.equals(GlobalTransactionState.class)) {
+      switch (value) {
+        case 1:
+          return "begin";
+        case 2:
+          return "committed";
+        case 3:
+          return "rollbacked";
+        case 4:
+          return "committing";
+        case 5:
+          return "rollbacking";
+        default:
+          return "unknown";
+      }
+    }
+    return "unknown";
   }
 
 

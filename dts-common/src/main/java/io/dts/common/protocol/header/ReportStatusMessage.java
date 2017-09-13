@@ -35,6 +35,9 @@ public class ReportStatusMessage implements RequestHeaderMessage {
 
   String key;
 
+  private String udata = null;
+
+
   public long getTranId() {
     return tranId;
   }
@@ -65,6 +68,14 @@ public class ReportStatusMessage implements RequestHeaderMessage {
 
   public void setKey(String key) {
     this.key = key;
+  }
+
+  public String getUdata() {
+    return udata;
+  }
+
+  public void setUdata(String udata) {
+    this.udata = udata;
   }
 
   @Override
