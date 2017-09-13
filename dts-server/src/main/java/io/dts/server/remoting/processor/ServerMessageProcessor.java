@@ -32,8 +32,8 @@ import io.dts.remoting.netty.NettyRequestProcessor;
 import io.dts.remoting.protocol.RemotingCommand;
 import io.dts.remoting.protocol.RemotingSerializable;
 import io.dts.remoting.protocol.RemotingSysResponseCode;
+import io.dts.server.handler.DtsMessageHandlerImpl;
 import io.dts.server.remoting.DtsServerController;
-import io.dts.server.service.DtsServerMessageHandler;
 import io.dts.util.NetUtil;
 import io.netty.channel.ChannelHandlerContext;
 
@@ -49,11 +49,11 @@ public class ServerMessageProcessor implements NettyRequestProcessor {
 
   private final DtsServerController serverController;
 
-  private final DtsServerMessageHandler messageHandler;
+  private final DtsMessageHandlerImpl messageHandler;
 
   public ServerMessageProcessor(DtsServerController serverController) {
     this.serverController = serverController;
-    this.messageHandler = new DtsServerMessageHandler();
+    this.messageHandler = new DtsMessageHandlerImpl();
   }
 
   @Override

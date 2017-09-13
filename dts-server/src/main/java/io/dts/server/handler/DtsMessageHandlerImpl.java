@@ -11,7 +11,7 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-package io.dts.server.service;
+package io.dts.server.handler;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,7 +22,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import io.dts.common.protocol.body.BranchCommitResultMessage;
 import io.dts.common.protocol.body.DtsMultipleRequestMessage;
 import io.dts.common.protocol.body.DtsMultipleResonseMessage;
-import io.dts.common.protocol.handler.DtsMsgHandler;
 import io.dts.common.protocol.header.BeginMessage;
 import io.dts.common.protocol.header.BeginResultMessage;
 import io.dts.common.protocol.header.BeginRetryBranchMessage;
@@ -47,7 +46,7 @@ import io.dts.server.model.GlobalLog;
  * @author liushiming
  * @version DtsServerMessageListener.java, v 0.0.1 2017年9月6日 下午5:33:51 liushiming
  */
-public class DtsServerMessageHandler implements DtsMsgHandler {
+public class DtsMessageHandlerImpl implements DtsMessageHandler {
 
   /**
    * 当前活动的所有事务

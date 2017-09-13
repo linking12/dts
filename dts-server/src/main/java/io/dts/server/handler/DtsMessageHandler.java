@@ -1,4 +1,4 @@
-package io.dts.common.protocol.handler;
+package io.dts.server.handler;
 
 import io.dts.common.protocol.body.BranchCommitResultMessage;
 import io.dts.common.protocol.body.DtsMultipleRequestMessage;
@@ -26,7 +26,7 @@ import io.dts.common.protocol.header.ReportUdataResultMessage;
  * 
  *         TXC 消息处理器
  */
-public interface DtsMsgHandler extends MsgHandler {
+public interface DtsMessageHandler {
 
   /**
    * 开始一个分布式事务
