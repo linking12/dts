@@ -55,4 +55,13 @@ public enum GlobalTransactionState {
    * 状态值
    */
   private int value;
+
+  public static GlobalTransactionState parse(int value) {
+    for (GlobalTransactionState state : GlobalTransactionState.values()) {
+      if (state.getValue() == value) {
+        return state;
+      }
+    }
+    return null;
+  }
 }

@@ -15,10 +15,13 @@ package io.dts.server.handler;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import io.dts.common.common.TxcXID;
@@ -45,8 +48,10 @@ import io.dts.common.protocol.header.ReportUdataResultMessage;
 import io.dts.server.exception.DtsBizException;
 import io.dts.server.model.BranchLog;
 import io.dts.server.model.BranchLogState;
+import io.dts.server.model.CommitingResultCode;
 import io.dts.server.model.GlobalLog;
 import io.dts.server.model.GlobalTransactionState;
+import io.dts.server.store.TxcServerRestorer;
 import io.dts.server.util.RollbackingResultCode;
 
 /**
@@ -56,6 +61,7 @@ import io.dts.server.util.RollbackingResultCode;
 @Component
 public class DtsMessageHandlerImpl implements DtsMessageHandler {
 
+  private static final Logger logger = LoggerFactory.getLogger(DtsMessageHandler.class);
   /**
    * 当前活动的所有事务
    */
@@ -103,8 +109,143 @@ public class DtsMessageHandlerImpl implements DtsMessageHandler {
   @Override
   public void handleMessage(String clientIp, GlobalCommitMessage message,
       GlobalCommitResultMessage resultMessage) {
+    resultMessage.setTranId(message.getTranId());
+    GlobalLog globalLog = activeTranMap.get(message.getTranId());
+    if (globalLog == null) {
+      // 事务已超时
+      if (timeoutTranList.contains(message.getTranId())) {
+        timeoutTranList.remove(message.getTranId());
+        throw new DtsBizException(
+            "transaction doesn't exist. It has been rollbacked because of timeout.");
+      } // 事务已提交
+      else if (TxcServerRestorer.restoredCommittingTransactions.contains(message.getTranId())) {
+        return;
+      } // 在本地缓存未查到事务
+      else {
+        throw new DtsBizException("transaction doesn't exist.");
+      }
+    } else {
+      switch (GlobalTransactionState.parse(globalLog.getState())) {
+        case Committing:
+          if (!globalLog.isContainPhase2CommitBranch()) {
+            return;
+          } else {
+            throw new DtsBizException("transaction is committing.");
+          }
+        case Rollbacking:
+          if (timeoutTranList.contains(message.getTranId())) {
+            timeoutTranList.remove(message.getTranId());
+            throw new DtsBizException("transaction is rollbacking because of timeout.");
+          } else {
+            throw new DtsBizException("transaction is rollbacking.");
+          }
+        case Begin:
+        case CommitHeuristic:
+          CommitGlobalTransaction commitGlobalTransaction =
+              new CommitGlobalTransaction(globalLog, clientIp);
+          List<BranchLog> branchLogs = commitGlobalTransaction.queryBranchLogs();
+          if (branchLogs.size() == 0) {
+            // TODO
+            // this.deleteGlobalLog(globalLog);
+            activeTranMap.remove(message.getTranId());
+            return;
+          }
+          globalLog.setState(GlobalTransactionState.Committing.getValue());
+          globalLog.setLeftBranches(branchLogs.size());
+          // TODO
+          // this.updateGlobalLog(globalLog);
+          commitGlobalTransaction.commitBranchLog();
+          break;
+
+        default:
+          break;
+      }
+
+    }
 
   }
+
+  class CommitGlobalTransaction {
+    private final GlobalLog globalLog;
+    private final List<BranchLog> branchLogs;
+
+    CommitGlobalTransaction(final GlobalLog globalLog, final String clientIp) {
+      this.globalLog = globalLog;
+      try {
+        branchLogs = getBranchLogs(globalLog.getTxId());
+      } catch (Exception e) {
+        throw new DtsBizException("get branch logs fail. " + e.getMessage());
+      }
+    }
+
+    protected List<BranchLog> queryBranchLogs() {
+      return branchLogs;
+    }
+
+    protected void commitBranchLog() {
+      try {
+        if (!globalLog.isContainPhase2CommitBranch()) {
+          for (BranchLog branchLog : branchLogs) {
+            committingMap.put(branchLog.getBranchId(), CommitingResultCode.BEGIN.getValue());
+          }
+        } else {
+          Collections.sort(branchLogs, new Comparator<BranchLog>() {
+            @Override
+            public int compare(BranchLog o1, BranchLog o2) {
+              return (int) (o1.getBranchId() - o2.getBranchId());
+            }
+          });
+          syncGlobalCommit(branchLogs, globalLog, globalLog.getTxId());
+        }
+      } catch (Exception e) {
+        logger.error("errorCode", e.getMessage(), e);
+      }
+    }
+  }
+
+  public void syncGlobalCommit(List<BranchLog> branchLogs, GlobalLog globalLog, long tranId) {
+
+  }
+
+  public List<BranchLog> getBranchLogs(long tranId) {
+    return getBranchLogs(tranId, false, false, false);
+  }
+
+
+  public List<BranchLog> getBranchLogs(long tranId, boolean sort, boolean reverse,
+      boolean fromBkup) {
+    List<BranchLog> branchLogs = new ArrayList<BranchLog>();
+    Map<Long, BranchLog> branchMap = activeTranBranchMap;
+    GlobalLog globalLog;
+    globalLog = activeTranMap.get(tranId);
+    if (globalLog == null)
+      return branchLogs;
+    for (long branchId : globalLog.getBranchIds()) {
+      BranchLog branchLog;
+      if ((branchLog = branchMap.get(branchId)) != null) {
+        branchLogs.add(branchLog);
+      }
+    }
+    if (sort) {
+      if (reverse) {
+        Collections.sort(branchLogs, new Comparator<BranchLog>() {
+          @Override
+          public int compare(BranchLog o1, BranchLog o2) {
+            return (int) (o2.getBranchId() - o1.getBranchId());
+          }
+        });
+      } else {
+        Collections.sort(branchLogs, new Comparator<BranchLog>() {
+          @Override
+          public int compare(BranchLog o1, BranchLog o2) {
+            return (int) (o1.getBranchId() - o2.getBranchId());
+          }
+        });
+      }
+    }
+    return branchLogs;
+  }
+
 
   @Override
   public void handleMessage(String clientIp, GlobalRollbackMessage message,
