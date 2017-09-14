@@ -3,7 +3,6 @@ package io.dts.client;
 import io.dts.client.exception.DtsTransactionException;
 import io.dts.client.transport.DtsClientMessageSenderImpl;
 import io.dts.common.api.DtsClientMessageSender;
-import io.dts.common.common.ResultCode;
 import io.dts.common.common.TxcXID;
 import io.dts.common.context.DtsContext;
 import io.dts.common.exception.DtsException;
@@ -14,9 +13,11 @@ import io.dts.common.protocol.header.GlobalCommitMessage;
 import io.dts.common.protocol.header.GlobalCommitResultMessage;
 import io.dts.common.protocol.header.GlobalRollbackMessage;
 import io.dts.common.protocol.header.GlobalRollbackResultMessage;
+import io.dts.remoting.exception.RemotingCommandException;
 import io.dts.remoting.netty.NettyClientConfig;
 import io.dts.remoting.protocol.RemotingCommand;
 import io.dts.remoting.protocol.RemotingSerializable;
+import io.dts.remoting.protocol.RemotingSysResponseCode;
 
 /**
  * Created by guoyubo on 2017/8/24.
@@ -36,14 +37,17 @@ public class DefaultDtsTransactionManager implements DtsTransactionManager {
     RemotingCommand request = RemotingCommand.createRequestCommand(RequestCode.HEADER_REQUEST, beginMessage);
     try {
       RemotingCommand response = (RemotingCommand) dtsClient.invoke(request, timeout);
-      if (response.getCode() == ResultCode.OK.getValue()) {
-        BeginResultMessage beginResultMessage = RemotingSerializable.decode(response.getBody(), BeginResultMessage.class);
-        System.out.println(beginResultMessage);
+      System.out.println(response);
+      if (response.getCode() == RemotingSysResponseCode.SUCCESS) {
+        BeginResultMessage beginResultMessage = (BeginResultMessage)response.decodeCommandCustomHeader(BeginResultMessage.class);
         DtsContext.bind(beginResultMessage.getXid(), beginResultMessage.getNextSvrAddr());
+      } else {
+        throw new DtsTransactionException(String.format("res code %s is not success", response.getCode()));
       }
-      throw new DtsTransactionException("transaction begin fail");
     } catch (DtsException e) {
-      throw new DtsTransactionException("transaction begin fail", e);
+      throw new DtsTransactionException("request remote sever error", e);
+    } catch (RemotingCommandException e) {
+      throw new DtsTransactionException("decode header error", e);
     }
   }
 
@@ -60,7 +64,7 @@ public class DefaultDtsTransactionManager implements DtsTransactionManager {
     request.setBody(RemotingSerializable.encode(commitMessage));
     try {
       RemotingCommand response = (RemotingCommand) dtsClient.invoke(request, 3000l);
-      if (response.getCode() == ResultCode.OK.getValue()) {
+      if (response.getCode() == RemotingSysResponseCode.SUCCESS) {
         GlobalCommitResultMessage commitResultMessage = RemotingSerializable.decode(response.getBody(), GlobalCommitResultMessage.class);
         System.out.println(commitResultMessage);
         DtsContext.unbind();
@@ -86,7 +90,7 @@ public class DefaultDtsTransactionManager implements DtsTransactionManager {
     request.setBody(RemotingSerializable.encode(rollbackMessage));
     try {
       RemotingCommand response = (RemotingCommand) dtsClient.invoke(request, 3000l);
-      if (response.getCode() == ResultCode.OK.getValue()) {
+      if (response.getCode() == RemotingSysResponseCode.SUCCESS) {
         GlobalRollbackResultMessage rollbackResultMessage = RemotingSerializable.decode(response.getBody(), GlobalRollbackResultMessage.class);
         System.out.println(rollbackResultMessage);
         DtsContext.unbind();
