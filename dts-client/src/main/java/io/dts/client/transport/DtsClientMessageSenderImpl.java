@@ -47,33 +47,38 @@ public class DtsClientMessageSenderImpl implements DtsClientMessageSender {
   }
 
   @Override
-  public <T> T invoke(final Object msg, final long timeout) throws DtsException {
+  public <T> T invoke(int requestCode, final DtsMessage msg, final long timeout) throws DtsException {
     if (DtsContext.getCurrentXid() != null) {
-      return this.invoke(TxcXID.getServerAddress(DtsContext.getCurrentXid()), msg, timeout);
+      return this.invoke(TxcXID.getServerAddress(DtsContext.getCurrentXid()), requestCode, msg, timeout);
     } else {
-      return this.invoke(null, msg, timeout);
+      return this.invoke(null, requestCode, msg, timeout);
     }
   }
 
   @Override
-  public <T> T invoke(final String serverAddress, final Object msg, final long timeout)
+  public <T> T invoke(final String serverAddress, int requestCode, final DtsMessage msg, final long timeout)
       throws DtsException {
     try {
-      RemotingCommand remotingCommand = remotingClient.invokeSync(serverAddress, (RemotingCommand) msg, timeout);
-      switch (((RemotingCommand) msg).getCode()) {
+      RemotingCommand request;
+      RemotingCommand response;
+      switch (requestCode) {
         case RequestCode.HEADER_REQUEST:
-          if (remotingCommand.getCode() == RemotingSysResponseCode.SUCCESS) {
-            return (T) remotingCommand.decodeCommandCustomHeader(CommandCustomHeader.class);
+          request = RemotingCommand.createRequestCommand(RequestCode.HEADER_REQUEST, (RequestHeaderMessage)msg);
+          response = remotingClient.invokeSync(serverAddress, request, timeout);
+          if (response.getCode() == RemotingSysResponseCode.SUCCESS) {
+            return (T) response.decodeCommandCustomHeader(CommandCustomHeader.class);
           }
           break;
         case RequestCode.BODY_REQUEST:
-          final byte[] body = remotingCommand.getBody();
-          if (remotingCommand.getCode() == RemotingSysResponseCode.SUCCESS) {
-            return  (T) RemotingSerializable.decode(body, DtsMessage.class);
+          request = RemotingCommand.createRequestCommand(RequestCode.HEADER_REQUEST, null);
+          request.setBody(RemotingSerializable.encode(msg));
+          response = remotingClient.invokeSync(serverAddress, request, timeout);
+          if (response.getCode() == RemotingSysResponseCode.SUCCESS) {
+            return  (T) RemotingSerializable.decode(response.getBody(), DtsMessage.class);
           }
           break;
         default:
-          break;
+          throw new DtsException("unsupport request code " + requestCode);
       }
       return null;
     } catch (InterruptedException e) {
@@ -90,8 +95,8 @@ public class DtsClientMessageSenderImpl implements DtsClientMessageSender {
   }
 
   @Override
-  public <T> T invoke(final Object msg) throws DtsException {
-    return this.invoke(msg, 3000l);
+  public <T> T invoke(int requestCode, final DtsMessage msg) throws DtsException {
+    return this.invoke(requestCode, msg, 3000l);
   }
 
   @Override

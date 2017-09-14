@@ -9,6 +9,7 @@ import io.dts.common.common.TxcXID;
 import io.dts.common.context.DtsContext;
 import io.dts.common.exception.DtsException;
 import io.dts.common.protocol.DtsMessage;
+import io.dts.common.protocol.RequestCode;
 import io.dts.common.protocol.header.RegisterMessage;
 import io.dts.common.protocol.header.RegisterResultMessage;
 import io.dts.remoting.protocol.RemotingCommand;
@@ -39,10 +40,8 @@ public class ATResourceManager implements ResourceManager {
       try {
 
         final String serverAddress = TxcXID.getServerAddress(DtsContext.getCurrentXid());
-        final RemotingCommand remotingCommand = RemotingCommand.createRequestCommand(DtsMessage.TYPE_REGIST, registerMessage);
-
         RegisterResultMessage
-            resultMessage = (RegisterResultMessage)clientMessageSender.invoke(serverAddress, remotingCommand, 3000l);
+            resultMessage = clientMessageSender.invoke(serverAddress, RequestCode.HEADER_REQUEST, registerMessage, 3000l);
 
         if (resultMessage.getResult() != RemotingSysResponseCode.SUCCESS) {
           throw new DtsException(resultMessage.getResult(), resultMessage.getMsg());

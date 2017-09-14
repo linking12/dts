@@ -14,7 +14,6 @@ import io.dts.common.protocol.header.GlobalCommitResultMessage;
 import io.dts.common.protocol.header.GlobalRollbackMessage;
 import io.dts.common.protocol.header.GlobalRollbackResultMessage;
 import io.dts.remoting.netty.NettyClientConfig;
-import io.dts.remoting.protocol.RemotingCommand;
 
 /**
  * Created by guoyubo on 2017/8/24.
@@ -31,9 +30,8 @@ public class DefaultDtsTransactionManager implements DtsTransactionManager {
   public void begin(final long timeout) throws DtsTransactionException {
     final BeginMessage beginMessage = new BeginMessage();
     beginMessage.setTimeout(timeout);
-    RemotingCommand request = RemotingCommand.createRequestCommand(RequestCode.HEADER_REQUEST, beginMessage);
     try {
-      BeginResultMessage beginResultMessage = dtsClient.invoke(request, timeout);
+      BeginResultMessage beginResultMessage = dtsClient.invoke(RequestCode.HEADER_REQUEST, beginMessage, timeout);
       System.out.println(beginResultMessage);
       if (beginResultMessage != null) {
         DtsContext.bind(beginResultMessage.getXid(), beginResultMessage.getNextSvrAddr());
@@ -54,9 +52,8 @@ public class DefaultDtsTransactionManager implements DtsTransactionManager {
   public void commit(final int retryTimes) throws DtsTransactionException {
     GlobalCommitMessage commitMessage = new GlobalCommitMessage();
     commitMessage.setTranId(TxcXID.getTransactionId(DtsContext.getCurrentXid()));
-    RemotingCommand request = RemotingCommand.createRequestCommand(RequestCode.HEADER_REQUEST, commitMessage);
     try {
-      GlobalCommitResultMessage commitResultMessage = dtsClient.invoke(request, 3000l);
+      GlobalCommitResultMessage commitResultMessage = dtsClient.invoke(RequestCode.HEADER_REQUEST, commitMessage, 3000l);
       if (commitResultMessage != null) {
         DtsContext.unbind();
       } else {
@@ -78,9 +75,8 @@ public class DefaultDtsTransactionManager implements DtsTransactionManager {
     GlobalRollbackMessage rollbackMessage = new GlobalRollbackMessage();
     rollbackMessage.setTranId(TxcXID.getTransactionId(DtsContext.getCurrentXid()));
     rollbackMessage.setRealSvrAddr(TxcXID.getServerAddress(DtsContext.getCurrentXid()));
-    RemotingCommand request = RemotingCommand.createRequestCommand(RequestCode.HEADER_REQUEST, rollbackMessage);
     try {
-      GlobalRollbackResultMessage rollbackResultMessage = dtsClient.invoke(request, 3000l);
+      GlobalRollbackResultMessage rollbackResultMessage = dtsClient.invoke(RequestCode.HEADER_REQUEST, rollbackMessage, 3000l);
       if (rollbackResultMessage != null) {
         DtsContext.unbind();
       } else {
