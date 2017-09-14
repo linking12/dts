@@ -10,11 +10,11 @@ import io.dts.common.exception.DtsException;
  */
 public interface DtsClientMessageSender {
 
-  public Object invoke(Object msg, long timeout) throws DtsException;
+  public <T> T invoke(Object msg, long timeout) throws DtsException;
 
-  public Object invoke(String serverAddress, Object msg, long timeout) throws DtsException;
+  public <T> T invoke(String serverAddress, Object msg, long timeout) throws DtsException;
 
-  public Object invoke(Object msg) throws DtsException;
+  public <T> T invoke(Object msg) throws DtsException;
 
   public void sendResponse(long msgId, String serverAddress, Object msg);
 }

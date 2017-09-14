@@ -13,11 +13,8 @@ import io.dts.common.protocol.header.GlobalCommitMessage;
 import io.dts.common.protocol.header.GlobalCommitResultMessage;
 import io.dts.common.protocol.header.GlobalRollbackMessage;
 import io.dts.common.protocol.header.GlobalRollbackResultMessage;
-import io.dts.remoting.exception.RemotingCommandException;
 import io.dts.remoting.netty.NettyClientConfig;
 import io.dts.remoting.protocol.RemotingCommand;
-import io.dts.remoting.protocol.RemotingSerializable;
-import io.dts.remoting.protocol.RemotingSysResponseCode;
 
 /**
  * Created by guoyubo on 2017/8/24.
@@ -36,18 +33,15 @@ public class DefaultDtsTransactionManager implements DtsTransactionManager {
     beginMessage.setTimeout(timeout);
     RemotingCommand request = RemotingCommand.createRequestCommand(RequestCode.HEADER_REQUEST, beginMessage);
     try {
-      RemotingCommand response = (RemotingCommand) dtsClient.invoke(request, timeout);
-      System.out.println(response);
-      if (response.getCode() == RemotingSysResponseCode.SUCCESS) {
-        BeginResultMessage beginResultMessage = (BeginResultMessage)response.decodeCommandCustomHeader(BeginResultMessage.class);
+      BeginResultMessage beginResultMessage = dtsClient.invoke(request, timeout);
+      System.out.println(beginResultMessage);
+      if (beginResultMessage != null) {
         DtsContext.bind(beginResultMessage.getXid(), beginResultMessage.getNextSvrAddr());
       } else {
-        throw new DtsTransactionException(String.format("res code %s is not success", response.getCode()));
+        throw new DtsTransactionException("begin response is null");
       }
     } catch (DtsException e) {
       throw new DtsTransactionException("request remote sever error", e);
-    } catch (RemotingCommandException e) {
-      throw new DtsTransactionException("decode header error", e);
     }
   }
 
@@ -61,13 +55,12 @@ public class DefaultDtsTransactionManager implements DtsTransactionManager {
     GlobalCommitMessage commitMessage = new GlobalCommitMessage();
     commitMessage.setTranId(TxcXID.getTransactionId(DtsContext.getCurrentXid()));
     RemotingCommand request = RemotingCommand.createRequestCommand(RequestCode.HEADER_REQUEST, commitMessage);
-    request.setBody(RemotingSerializable.encode(commitMessage));
     try {
-      RemotingCommand response = (RemotingCommand) dtsClient.invoke(request, 3000l);
-      if (response.getCode() == RemotingSysResponseCode.SUCCESS) {
-        GlobalCommitResultMessage commitResultMessage = RemotingSerializable.decode(response.getBody(), GlobalCommitResultMessage.class);
-        System.out.println(commitResultMessage);
+      GlobalCommitResultMessage commitResultMessage = dtsClient.invoke(request, 3000l);
+      if (commitResultMessage != null) {
         DtsContext.unbind();
+      } else {
+        throw new DtsTransactionException("commit response is null");
       }
       throw new DtsTransactionException("transaction commit fail");
     } catch (DtsException e) {
@@ -85,15 +78,13 @@ public class DefaultDtsTransactionManager implements DtsTransactionManager {
     GlobalRollbackMessage rollbackMessage = new GlobalRollbackMessage();
     rollbackMessage.setTranId(TxcXID.getTransactionId(DtsContext.getCurrentXid()));
     rollbackMessage.setRealSvrAddr(TxcXID.getServerAddress(DtsContext.getCurrentXid()));
-
     RemotingCommand request = RemotingCommand.createRequestCommand(RequestCode.HEADER_REQUEST, rollbackMessage);
-    request.setBody(RemotingSerializable.encode(rollbackMessage));
     try {
-      RemotingCommand response = (RemotingCommand) dtsClient.invoke(request, 3000l);
-      if (response.getCode() == RemotingSysResponseCode.SUCCESS) {
-        GlobalRollbackResultMessage rollbackResultMessage = RemotingSerializable.decode(response.getBody(), GlobalRollbackResultMessage.class);
-        System.out.println(rollbackResultMessage);
+      GlobalRollbackResultMessage rollbackResultMessage = dtsClient.invoke(request, 3000l);
+      if (rollbackResultMessage != null) {
         DtsContext.unbind();
+      } else {
+        throw new DtsTransactionException("rollback response is null");
       }
       throw new DtsTransactionException("transaction rollback fail");
     } catch (DtsException e) {
