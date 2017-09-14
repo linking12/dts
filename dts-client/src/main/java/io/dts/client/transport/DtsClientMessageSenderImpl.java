@@ -1,4 +1,4 @@
-package io.dts.resourcemanager.transport;
+package io.dts.client.transport;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -22,8 +22,7 @@ public class DtsClientMessageSenderImpl implements DtsClientMessageSender {
 
   private RemotingClient remotingClient;
 
-  public DtsClientMessageSenderImpl() {
-    final NettyClientConfig nettyClientConfig = new NettyClientConfig();
+  public DtsClientMessageSenderImpl(NettyClientConfig nettyClientConfig) {
     this.remotingClient = new NettyRemotingClient(nettyClientConfig);
   }
 
