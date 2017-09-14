@@ -175,11 +175,11 @@ public class BizMessageProcessor implements NettyRequestProcessor {
           break;
       }
     } catch (Throwable e) {
-      response.setCode(RemotingSysResponseCode.SYSTEM_ERROR);
+      response.setCode(ResponseCode.SYSTEM_ERROR);
       response.setRemark(e.getMessage());
       return response;
     }
-    response.setCode(RemotingSysResponseCode.REQUEST_CODE_NOT_SUPPORTED);
+    response.setCode(ResponseCode.REQUEST_CODE_NOT_SUPPORTED);
     response.setRemark("not found request message proccessor");
     return response;
   }
