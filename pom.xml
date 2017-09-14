@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>io.dts</groupId>
 	<artifactId>dts</artifactId>
@@ -10,12 +11,12 @@
 		<module>dts-client</module>
 		<module>dts-server</module>
 		<module>dts-remoting</module>
-    <module>dts-datasource</module>
-    <module>dts-parser</module>
-    <module>dts-rm-rabbit</module>
-    <module>dts-rocketmq</module>
-    <module>dts-resourcemanager</module>
-  </modules>
+		<module>dts-datasource</module>
+		<module>dts-parser</module>
+		<module>dts-rm-rabbit</module>
+		<module>dts-rm-rocketmq</module>
+		<module>dts-resourcemanager</module>
+	</modules>
 	<properties>
 		<java_source_version>1.8</java_source_version>
 		<java_target_version>1.8</java_target_version>
