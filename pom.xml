@@ -14,12 +14,14 @@
     <module>dts-parser</module>
     <module>dts-rm-rabbit</module>
     <module>dts-rocketmq</module>
+    <module>dts-resourcemanager</module>
   </modules>
 	<properties>
 		<java_source_version>1.8</java_source_version>
 		<java_target_version>1.8</java_target_version>
 		<file_encoding>UTF-8</file_encoding>
 		<springboot.version>1.5.6.RELEASE</springboot.version>
+		<spring.version>4.3.9.RELEASE</spring.version>
 	</properties>
 	<dependencyManagement>
 		<dependencies>
@@ -72,6 +74,11 @@
 				<groupId>commons-lang</groupId>
 				<artifactId>commons-lang</artifactId>
 				<version>2.6</version>
+			</dependency>
+			<dependency>
+				<groupId>com.google.guava</groupId>
+				<artifactId>guava</artifactId>
+				<version>20.0</version>
 			</dependency>
 			<dependency>
 				<groupId>commons-collections</groupId>

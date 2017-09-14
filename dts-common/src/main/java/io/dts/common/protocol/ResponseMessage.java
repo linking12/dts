@@ -19,4 +19,5 @@ package io.dts.common.protocol;
  */
 public interface ResponseMessage extends DtsMessage {
 
+
 }

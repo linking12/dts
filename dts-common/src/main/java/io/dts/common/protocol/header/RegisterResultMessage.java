@@ -13,6 +13,7 @@
  */
 package io.dts.common.protocol.header;
 
+import io.dts.common.protocol.AbstractResultMessage;
 import io.dts.common.protocol.ResponseMessage;
 import io.dts.remoting.CommandCustomHeader;
 import io.dts.remoting.exception.RemotingCommandException;
@@ -21,7 +22,7 @@ import io.dts.remoting.exception.RemotingCommandException;
  * @author liushiming
  * @version RegisterResultMessage.java, v 0.0.1 2017年9月4日 下午2:43:44 liushiming
  */
-public class RegisterResultMessage implements CommandCustomHeader, ResponseMessage {
+public class RegisterResultMessage extends AbstractResultMessage implements CommandCustomHeader, ResponseMessage {
   /**
    * 事务ID
    */
