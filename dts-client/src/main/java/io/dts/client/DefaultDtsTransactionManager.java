@@ -3,10 +3,11 @@ package io.dts.client;
 import io.dts.client.exception.DtsTransactionException;
 import io.dts.client.transport.DtsClientMessageSenderImpl;
 import io.dts.common.api.DtsClientMessageSender;
+import io.dts.common.common.ResultCode;
 import io.dts.common.common.TxcXID;
 import io.dts.common.context.DtsContext;
 import io.dts.common.exception.DtsException;
-import io.dts.common.protocol.DtsMessage;
+import io.dts.common.protocol.RequestCode;
 import io.dts.common.protocol.header.BeginMessage;
 import io.dts.common.protocol.header.BeginResultMessage;
 import io.dts.common.protocol.header.GlobalCommitMessage;
@@ -32,14 +33,18 @@ public class DefaultDtsTransactionManager implements DtsTransactionManager {
   public void begin(final long timeout) throws DtsTransactionException {
     final BeginMessage beginMessage = new BeginMessage();
     beginMessage.setTimeout(timeout);
-    RemotingCommand request = RemotingCommand.createRequestCommand(DtsMessage.TYPE_BEGIN, beginMessage);
-    BeginResultMessage beginResultMessage = null;
+    RemotingCommand request = RemotingCommand.createRequestCommand(RequestCode.HEADER_REQUEST, beginMessage);
     try {
-      beginResultMessage = (BeginResultMessage) dtsClient.invoke(request, timeout);
+      RemotingCommand response = (RemotingCommand) dtsClient.invoke(request, timeout);
+      if (response.getCode() == ResultCode.OK.getValue()) {
+        BeginResultMessage beginResultMessage = RemotingSerializable.decode(response.getBody(), BeginResultMessage.class);
+        System.out.println(beginResultMessage);
+        DtsContext.bind(beginResultMessage.getXid(), beginResultMessage.getNextSvrAddr());
+      }
+      throw new DtsTransactionException("transaction begin fail");
     } catch (DtsException e) {
-      e.printStackTrace();
+      throw new DtsTransactionException("transaction begin fail", e);
     }
-    DtsContext.bind(beginResultMessage.getXid(), beginResultMessage.getNextSvrAddr());
   }
 
   @Override
@@ -51,16 +56,19 @@ public class DefaultDtsTransactionManager implements DtsTransactionManager {
   public void commit(final int retryTimes) throws DtsTransactionException {
     GlobalCommitMessage commitMessage = new GlobalCommitMessage();
     commitMessage.setTranId(TxcXID.getTransactionId(DtsContext.getCurrentXid()));
-    RemotingCommand request = RemotingCommand.createRequestCommand(DtsMessage.TYPE_GLOBAL_COMMIT, commitMessage);
+    RemotingCommand request = RemotingCommand.createRequestCommand(RequestCode.HEADER_REQUEST, commitMessage);
     request.setBody(RemotingSerializable.encode(commitMessage));
-    GlobalCommitResultMessage commitResultMessage = null;
     try {
-      commitResultMessage = (GlobalCommitResultMessage) dtsClient.invoke(request, 3000l);
+      RemotingCommand response = (RemotingCommand) dtsClient.invoke(request, 3000l);
+      if (response.getCode() == ResultCode.OK.getValue()) {
+        GlobalCommitResultMessage commitResultMessage = RemotingSerializable.decode(response.getBody(), GlobalCommitResultMessage.class);
+        System.out.println(commitResultMessage);
+        DtsContext.unbind();
+      }
+      throw new DtsTransactionException("transaction commit fail");
     } catch (DtsException e) {
-      e.printStackTrace();
+      throw new DtsTransactionException("transaction commit fail", e);
     }
-    System.out.println(commitResultMessage.getTranId());
-    DtsContext.unbind();
   }
 
   @Override
@@ -74,19 +82,22 @@ public class DefaultDtsTransactionManager implements DtsTransactionManager {
     rollbackMessage.setTranId(TxcXID.getTransactionId(DtsContext.getCurrentXid()));
     rollbackMessage.setRealSvrAddr(TxcXID.getServerAddress(DtsContext.getCurrentXid()));
 
-    RemotingCommand request = RemotingCommand.createRequestCommand(DtsMessage.TYPE_GLOBAL_ROLLBACK, rollbackMessage);
+    RemotingCommand request = RemotingCommand.createRequestCommand(RequestCode.HEADER_REQUEST, rollbackMessage);
     request.setBody(RemotingSerializable.encode(rollbackMessage));
-    GlobalRollbackResultMessage rollbackResultMessage = null;
     try {
-      rollbackResultMessage = (GlobalRollbackResultMessage) dtsClient.invoke(request);
+      RemotingCommand response = (RemotingCommand) dtsClient.invoke(request, 3000l);
+      if (response.getCode() == ResultCode.OK.getValue()) {
+        GlobalRollbackResultMessage rollbackResultMessage = RemotingSerializable.decode(response.getBody(), GlobalRollbackResultMessage.class);
+        System.out.println(rollbackResultMessage);
+        DtsContext.unbind();
+      }
+      throw new DtsTransactionException("transaction rollback fail");
     } catch (DtsException e) {
-      e.printStackTrace();
+      throw new DtsTransactionException("transaction rollback fail", e);
     }
-    System.out.println(rollbackResultMessage.getTranId());
-    DtsContext.unbind();
   }
 
-  public static void main(String[] args) throws DtsTransactionException {
+  public static void main(String[] args) {
     NettyClientConfig nettyClientConfig = new NettyClientConfig();
     nettyClientConfig.setConnectTimeoutMillis(3000);
     DtsClientMessageSenderImpl dtsClient = new DtsClientMessageSenderImpl(nettyClientConfig);
@@ -94,9 +105,14 @@ public class DefaultDtsTransactionManager implements DtsTransactionManager {
 //    dtsClient.setGroup("Default");
 //    dtsClient.setAppName("Demo");
     dtsClient.init();
-    DefaultDtsTransactionManager transactionManager = new DefaultDtsTransactionManager(dtsClient);
-    transactionManager.begin(3000L);
-    System.out.println(DtsContext.getCurrentXid());
-    dtsClient.destroy();
+    try {
+      DefaultDtsTransactionManager transactionManager = new DefaultDtsTransactionManager(dtsClient);
+      transactionManager.begin(3000L);
+      System.out.println(DtsContext.getCurrentXid());
+    } catch (DtsTransactionException e) {
+      e.printStackTrace();
+    } finally {
+      dtsClient.destroy();
+    }
   }
 }

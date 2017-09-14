@@ -16,6 +16,8 @@
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.5" level="project" />
     <orderEntry type="library" name="Maven: com.alibaba:fastjson:1.2.3" level="project" />
     <orderEntry type="module" module-name="dts-common" />
+    <orderEntry type="library" name="Maven: commons-lang:commons-lang:2.6" level="project" />
+    <orderEntry type="library" name="Maven: commons-io:commons-io:2.4" level="project" />
     <orderEntry type="library" name="Maven: com.google.guava:guava:18.0" level="project" />
   </component>
 </module>

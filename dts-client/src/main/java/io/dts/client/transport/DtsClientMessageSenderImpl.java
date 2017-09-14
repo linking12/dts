@@ -3,6 +3,8 @@ package io.dts.client.transport;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
+import java.util.Collections;
+
 import io.dts.common.api.DtsClientMessageSender;
 import io.dts.common.common.TxcXID;
 import io.dts.common.context.DtsContext;
@@ -24,6 +26,7 @@ public class DtsClientMessageSenderImpl implements DtsClientMessageSender {
 
   public DtsClientMessageSenderImpl(NettyClientConfig nettyClientConfig) {
     this.remotingClient = new NettyRemotingClient(nettyClientConfig);
+    this.remotingClient.updateNameServerAddressList(Collections.singletonList("127.0.0.1:10086"));
   }
 
   @PostConstruct
@@ -38,7 +41,11 @@ public class DtsClientMessageSenderImpl implements DtsClientMessageSender {
 
   @Override
   public Object invoke(final Object msg, final long timeout) throws DtsException {
-    return this.invoke(TxcXID.getServerAddress(DtsContext.getCurrentXid()), msg, timeout);
+    if (DtsContext.getCurrentXid() != null) {
+      return this.invoke(TxcXID.getServerAddress(DtsContext.getCurrentXid()), msg, timeout);
+    } else {
+      return this.invoke(null, msg, timeout);
+    }
   }
 
   @Override
