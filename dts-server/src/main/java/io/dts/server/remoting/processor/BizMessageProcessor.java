@@ -15,6 +15,7 @@ package io.dts.server.remoting.processor;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import io.dts.common.protocol.DtsMessage;
@@ -56,6 +57,7 @@ import io.netty.channel.ChannelHandlerContext;
  */
 @Component
 @Qualifier("bizMessageProcessor")
+@Scope("prototype")
 public class BizMessageProcessor implements NettyRequestProcessor {
 
   @Autowired

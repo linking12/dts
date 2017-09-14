@@ -22,6 +22,7 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Lookup;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
@@ -55,13 +56,8 @@ public class DtsServerContainer extends AbstractLifecycleComponent {
   private DtsServerProperties serverProperties;
 
   @Autowired
-  @Qualifier("bizMessageProcessor")
-  private BizMessageProcessor bizMessageProccessor;
-
-  @Autowired
   @Qualifier("heatBeatProcessor")
   private HeatBeatProcessor heatBeatProccessor;
-
 
   private RemotingServer remotingServer;
 
@@ -76,24 +72,26 @@ public class DtsServerContainer extends AbstractLifecycleComponent {
   }
 
   private void registerHeaderRequest() {
+    BizMessageProcessor messageProcessor = createMessageProcessor();
     BlockingQueue<Runnable> clientThreadPoolQueue =
         Queues.newLinkedBlockingDeque(serverProperties.getClientThreadPoolQueueSize());
     ExecutorService clientMessageExecutor =
         new ServerFixedThreadPoolExecutor(serverProperties.getClientThreadPoolSize(),
             serverProperties.getClientThreadPoolSize(), 1000 * 60, TimeUnit.MILLISECONDS,
             clientThreadPoolQueue, new ThreadFactoryImpl("ClientMessageThread_"));
-    this.remotingServer.registerProcessor(RequestCode.HEADER_REQUEST, bizMessageProccessor,
+    this.remotingServer.registerProcessor(RequestCode.HEADER_REQUEST, messageProcessor,
         clientMessageExecutor);
   }
 
   private void registerBodyRequest() {
+    BizMessageProcessor messageProcessor = createMessageProcessor();
     BlockingQueue<Runnable> resourceThreadPoolQueue =
         Queues.newLinkedBlockingDeque(serverProperties.getResourceThreadPoolQueueSize());
     ExecutorService resourceMessageExecutor =
         new ServerFixedThreadPoolExecutor(serverProperties.getResourceThreadPoolSize(),
             serverProperties.getResourceThreadPoolSize(), 1000 * 60, TimeUnit.MILLISECONDS,
             resourceThreadPoolQueue, new ThreadFactoryImpl("ResourceMessageThread_"));
-    this.remotingServer.registerProcessor(RequestCode.BODY_REQUEST, bizMessageProccessor,
+    this.remotingServer.registerProcessor(RequestCode.BODY_REQUEST, messageProcessor,
         resourceMessageExecutor);
   }
 
@@ -103,6 +101,11 @@ public class DtsServerContainer extends AbstractLifecycleComponent {
             new ThreadFactoryImpl("ClientManageThread_"));
     this.remotingServer.registerProcessor(RequestCode.HEART_BEAT, heatBeatProccessor,
         heatBeatProcessorExecutor);
+  }
+
+  @Lookup(value = "bizMessageProcessor")
+  protected BizMessageProcessor createMessageProcessor() {
+    return null;
   }
 
   private void registerProcessor() {
