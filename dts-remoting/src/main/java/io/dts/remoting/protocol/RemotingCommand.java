@@ -37,7 +37,7 @@ public class RemotingCommand {
   public static String RemotingVersionKey = "rocketmq.remoting.version";
   private static volatile int ConfigVersion = -1;
   private static AtomicInteger RequestId = new AtomicInteger(0);
-  private static String HeadTypeKey = "headType";
+  private static String HeadTypeKey = "remoting.customheader.type";
 
   private static final int RPC_TYPE = 0; // 0, REQUEST_COMMAND
   // 1, RESPONSE_COMMAND
