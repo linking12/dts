@@ -191,7 +191,7 @@ public class RemotingCommand {
       try {
         if (headType != null) {
           objectHeader = (CommandCustomHeader) Class.forName(headType).newInstance();
-          this.extFields.remove("headType");
+          this.extFields.remove(HeadTypeKey);
         } else {
           objectHeader = classHeader.newInstance();
         }
