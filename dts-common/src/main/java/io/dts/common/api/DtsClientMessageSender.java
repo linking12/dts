@@ -10,6 +10,7 @@ import java.util.concurrent.TimeoutException;
  *
  */
 public interface DtsClientMessageSender {
+
   public Object invoke(Object msg, long timeout) throws IOException, TimeoutException;
 
   public Object invoke(String serverAddress, Object msg, long timeout)

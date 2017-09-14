@@ -14,6 +14,7 @@
     <module>dts-parser</module>
     <module>dts-rm-rabbit</module>
     <module>dts-rocketmq</module>
+    <module>dts-resourcemanager</module>
   </modules>
 	<properties>
 		<java_source_version>1.8</java_source_version>
