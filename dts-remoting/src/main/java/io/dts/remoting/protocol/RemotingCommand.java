@@ -100,7 +100,6 @@ public class RemotingCommand {
     cmd.setCode(code);
     cmd.setRemark(remark);
     setCmdVersion(cmd);
-
     if (classHeader != null) {
       try {
         CommandCustomHeader objectHeader = classHeader.newInstance();
