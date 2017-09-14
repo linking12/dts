@@ -13,8 +13,10 @@
  */
 package io.dts.common.protocol;
 
+import java.nio.ByteBuffer;
+
 import io.dts.common.protocol.header.BeginMessage;
-import io.dts.remoting.protocol.RemotingSerializable;
+import io.dts.remoting.protocol.RemotingCommand;
 
 /**
  * @author liushiming
@@ -24,9 +26,12 @@ public class TestMain {
 
   public static void main(String[] args) {
     BeginMessage message = new BeginMessage();
-    byte[] bytes = RemotingSerializable.encode(message);
-    DtsMessage messageDecode = RemotingSerializable.decode(bytes, DtsMessage.class);
-    System.out.println(messageDecode.getTypeCode());
+//    RemotingCommand remotingCommand = RemotingCommand.createRequestCommand(200, message);
+//    ByteBuffer requestCommand = remotingCommand.encode();
+//    RemotingCommand serverCommand = RemotingCommand.decode(requestCommand);
+//    System.out.println(serverCommand);
+    System.out.println(message.getClass().getName());
+//    
   }
 
 }

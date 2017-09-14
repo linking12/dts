@@ -14,7 +14,6 @@
 package io.dts.remoting.protocol;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.serializer.SerializerFeature;
 
 import java.nio.charset.Charset;
 
@@ -26,13 +25,6 @@ import java.nio.charset.Charset;
  * @since 2013-7-13
  */
 public abstract class RemotingSerializable {
-
-  private static final SerializerFeature[] featuresPrettyFormat =
-      new SerializerFeature[] {SerializerFeature.WriteClassName};
-
-  private static final SerializerFeature[] featuresWriteClassName =
-      new SerializerFeature[] {SerializerFeature.PrettyFormat, SerializerFeature.WriteClassName};
-
   public String toJson() {
     return toJson(false);
   }
@@ -44,10 +36,7 @@ public abstract class RemotingSerializable {
 
 
   public static String toJson(final Object obj, boolean prettyFormat) {
-    if (!prettyFormat) {
-      return JSON.toJSONString(obj, featuresPrettyFormat);
-    }
-    return JSON.toJSONString(obj, featuresWriteClassName);
+    return JSON.toJSONString(obj, prettyFormat);
   }
 
 
