@@ -22,6 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import io.dts.common.common.TxcXID;
@@ -59,6 +60,7 @@ import io.dts.server.util.RollbackingResultCode;
  * @version DtsServerMessageListener.java, v 0.0.1 2017年9月6日 下午5:33:51 liushiming
  */
 @Component
+@Scope("prototype")
 public class DtsMessageHandlerImpl implements DtsMessageHandler {
 
   private static final Logger logger = LoggerFactory.getLogger(DtsMessageHandler.class);

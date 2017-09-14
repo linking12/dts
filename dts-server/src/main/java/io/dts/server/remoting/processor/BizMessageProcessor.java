@@ -13,7 +13,7 @@
  */
 package io.dts.server.remoting.processor;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Lookup;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -60,8 +60,10 @@ import io.netty.channel.ChannelHandlerContext;
 @Scope("prototype")
 public class BizMessageProcessor implements NettyRequestProcessor {
 
-  @Autowired
-  private DtsMessageHandler messageHandler;
+  @Lookup
+  protected DtsMessageHandler createMessageHandler() {
+    return null;
+  }
 
   @Override
   public RemotingCommand processRequest(ChannelHandlerContext ctx, RemotingCommand request)
@@ -94,7 +96,7 @@ public class BizMessageProcessor implements NettyRequestProcessor {
         case DtsMessage.TYPE_BEGIN:
           response = RemotingCommand.createResponseCommand(BeginResultMessage.class);
           responseHeader = response.readCustomHeader();
-          messageHandler.handleMessage(clientIp, (BeginMessage) dtsMessage,
+          createMessageHandler().handleMessage(clientIp, (BeginMessage) dtsMessage,
               (BeginResultMessage) responseHeader);
           response.setCode(RemotingSysResponseCode.SUCCESS);
           return response;
@@ -102,14 +104,14 @@ public class BizMessageProcessor implements NettyRequestProcessor {
         case DtsMessage.TYPE_GLOBAL_COMMIT:
           response = RemotingCommand.createResponseCommand(GlobalCommitResultMessage.class);
           responseHeader = response.readCustomHeader();
-          messageHandler.handleMessage(clientIp, (GlobalCommitMessage) dtsMessage,
+          createMessageHandler().handleMessage(clientIp, (GlobalCommitMessage) dtsMessage,
               (GlobalCommitResultMessage) responseHeader);
           return response;
         // 处理全局事务回滚
         case DtsMessage.TYPE_GLOBAL_ROLLBACK:
           response = RemotingCommand.createResponseCommand(BranchRollbackResultMessage.class);
           responseHeader = response.readCustomHeader();
-          messageHandler.handleMessage(clientIp, (GlobalRollbackMessage) dtsMessage,
+          createMessageHandler().handleMessage(clientIp, (GlobalRollbackMessage) dtsMessage,
               (GlobalRollbackResultMessage) responseHeader);
           response.setCode(RemotingSysResponseCode.SUCCESS);
           return response;
@@ -117,7 +119,7 @@ public class BizMessageProcessor implements NettyRequestProcessor {
         case DtsMessage.TYPE_REGIST:
           response = RemotingCommand.createResponseCommand(RegisterResultMessage.class);
           responseHeader = response.readCustomHeader();
-          messageHandler.handleMessage(clientIp, (RegisterMessage) dtsMessage,
+          createMessageHandler().handleMessage(clientIp, (RegisterMessage) dtsMessage,
               (RegisterResultMessage) responseHeader);
           response.setCode(RemotingSysResponseCode.SUCCESS);
           return response;
@@ -125,7 +127,7 @@ public class BizMessageProcessor implements NettyRequestProcessor {
         case DtsMessage.TYPE_REPORT_STATUS:
           response = RemotingCommand.createResponseCommand(ReportStatusResultMessage.class);
           responseHeader = response.readCustomHeader();
-          messageHandler.handleMessage(clientIp, (ReportStatusMessage) dtsMessage,
+          createMessageHandler().handleMessage(clientIp, (ReportStatusMessage) dtsMessage,
               (ReportStatusResultMessage) responseHeader);
           response.setCode(RemotingSysResponseCode.SUCCESS);
           return response;
@@ -133,7 +135,7 @@ public class BizMessageProcessor implements NettyRequestProcessor {
         case DtsMessage.TYPE_BEGIN_RETRY_BRANCH_RESULT:
           response = RemotingCommand.createResponseCommand(BeginRetryBranchResultMessage.class);
           responseHeader = response.readCustomHeader();
-          messageHandler.handleMessage(clientIp, (BeginRetryBranchMessage) dtsMessage,
+          createMessageHandler().handleMessage(clientIp, (BeginRetryBranchMessage) dtsMessage,
               (BeginRetryBranchResultMessage) responseHeader);
           response.setCode(RemotingSysResponseCode.SUCCESS);
           return response;
@@ -141,13 +143,13 @@ public class BizMessageProcessor implements NettyRequestProcessor {
         case DtsMessage.TYPE_REPORT_UDATA_RESULT:
           response = RemotingCommand.createResponseCommand(ReportUdataResultMessage.class);
           responseHeader = response.readCustomHeader();
-          messageHandler.handleMessage(clientIp, (ReportUdataMessage) dtsMessage,
+          createMessageHandler().handleMessage(clientIp, (ReportUdataMessage) dtsMessage,
               (ReportUdataResultMessage) responseHeader);
           return response;
         // 合并消息的处理
         case DtsMessage.TYPE_DTS_MERGE:
           DtsMultipleResonseMessage responseMessage = new DtsMultipleResonseMessage();
-          messageHandler.handleMessage(clientIp, (DtsMultipleRequestMessage) dtsMessage,
+          createMessageHandler().handleMessage(clientIp, (DtsMultipleRequestMessage) dtsMessage,
               responseMessage);
           response.setCode(RemotingSysResponseCode.SUCCESS);
           response.setBody(responseMessage.encode());
@@ -156,17 +158,17 @@ public class BizMessageProcessor implements NettyRequestProcessor {
         case DtsMessage.TYPE_QUERY_LOCK:
           response = RemotingCommand.createResponseCommand(QueryLockResultMessage.class);
           responseHeader = response.readCustomHeader();
-          messageHandler.handleMessage(clientIp, (QueryLockMessage) dtsMessage,
+          createMessageHandler().handleMessage(clientIp, (QueryLockMessage) dtsMessage,
               (QueryLockResultMessage) responseHeader);
           response.setCode(RemotingSysResponseCode.SUCCESS);
           return response;
         // 处理事务分支提交的反馈结果
         case DtsMessage.TYPE_BRANCH_COMMIT_RESULT:
-          messageHandler.handleMessage(clientIp, (BranchCommitResultMessage) dtsMessage);
+          createMessageHandler().handleMessage(clientIp, (BranchCommitResultMessage) dtsMessage);
           response.setCode(RemotingSysResponseCode.SUCCESS);
           return response;
         case DtsMessage.TYPE_BRANCH_ROLLBACK_RESULT:
-          messageHandler.handleMessage(clientIp, (BranchRollbackResultMessage) dtsMessage);
+          createMessageHandler().handleMessage(clientIp, (BranchRollbackResultMessage) dtsMessage);
           response.setCode(RemotingSysResponseCode.SUCCESS);
           return response;
         default:
