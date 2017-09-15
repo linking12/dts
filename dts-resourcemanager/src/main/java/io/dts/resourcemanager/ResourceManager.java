@@ -29,31 +29,6 @@ public interface ResourceManager {
    */
   public void reportStatus(long branchId, boolean success, String key, String udata) throws DtsException;
 
-  /**
-   * 分支提交
-   *
-   * @param xid
-   * @param branchId
-   * @param key
-   * @param udata
-   * @param commitMode
-   * @throws DtsException
-   */
-  public void branchCommit(String xid, long branchId, String key, String udata, byte commitMode, String retrySql) throws DtsException;
-
-  /**
-   * 分支回滚
-   *
-   * @param xid
-   * @param branchId
-   * @param key
-   * @param udata
-   * @param commitMode
-   * @throws DtsException
-   */
-  public void branchRollback(String xid, long branchId, String key, String udata, byte commitMode) throws DtsException;
-
-  public void branchRollback(String xid, long branchId, String key, String udata, byte commitMode, int isDelKey) throws DtsException;
 
 
 }

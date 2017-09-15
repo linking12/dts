@@ -8,24 +8,24 @@ import io.dts.common.common.CommitMode;
 import io.dts.common.common.TxcXID;
 import io.dts.common.context.DtsContext;
 import io.dts.common.exception.DtsException;
-import io.dts.common.protocol.DtsMessage;
 import io.dts.common.protocol.RequestCode;
 import io.dts.common.protocol.header.RegisterMessage;
 import io.dts.common.protocol.header.RegisterResultMessage;
-import io.dts.remoting.protocol.RemotingCommand;
+import io.dts.common.protocol.header.ReportStatusMessage;
+import io.dts.common.protocol.header.ReportStatusResultMessage;
 import io.dts.remoting.protocol.RemotingSysResponseCode;
 import io.dts.resourcemanager.ResourceManager;
 
 /**
  * Created by guoyubo on 2017/9/13.
  */
-public class ATResourceManager implements ResourceManager {
+public class BaseResourceManager implements ResourceManager {
 
-  private static final Logger logger = LoggerFactory.getLogger(ATResourceManager.class);
+  private static final Logger logger = LoggerFactory.getLogger(BaseResourceManager.class);
 
   private DtsClientMessageSender clientMessageSender;
 
-  public ATResourceManager(final DtsClientMessageSender clientMessageSender) {
+  public BaseResourceManager(final DtsClientMessageSender clientMessageSender) {
     this.clientMessageSender = clientMessageSender;
   }
 
@@ -40,8 +40,7 @@ public class ATResourceManager implements ResourceManager {
       try {
 
         final String serverAddress = TxcXID.getServerAddress(DtsContext.getCurrentXid());
-        RegisterResultMessage
-            resultMessage = clientMessageSender.invoke(serverAddress, RequestCode.HEADER_REQUEST, registerMessage, 3000l);
+        RegisterResultMessage resultMessage = clientMessageSender.invoke(serverAddress, RequestCode.HEADER_REQUEST, registerMessage, 3000l);
 
         if (resultMessage.getResult() != RemotingSysResponseCode.SUCCESS) {
           throw new DtsException(resultMessage.getResult(), resultMessage.getMsg());
@@ -62,26 +61,20 @@ public class ATResourceManager implements ResourceManager {
   @Override
   public void reportStatus(final long branchId, final boolean success, final String key, final String udata)
       throws DtsException {
-
+    if (DtsContext.inTxcTransaction()) {
+      ReportStatusMessage reportStatusMessage = new ReportStatusMessage();
+      reportStatusMessage.setBranchId(branchId);
+      reportStatusMessage.setKey(key);
+      reportStatusMessage.setTranId(TxcXID.getTransactionId(DtsContext.getCurrentXid()));
+      reportStatusMessage.setSuccess(success);
+      reportStatusMessage.setUdata(udata);
+      final String serverAddress = TxcXID.getServerAddress(DtsContext.getCurrentXid());
+      ReportStatusResultMessage resultMessage = clientMessageSender.invoke(serverAddress, RequestCode.HEADER_REQUEST, reportStatusMessage, 3000l);
+    } else {
+      throw new IllegalStateException("current thread is not bind to dts transaction.");
+    }
   }
 
-  @Override
-  public void branchCommit(final String xid, final long branchId, final String key, final String udata,
-      final byte commitMode, final String retrySql)
-      throws DtsException {
 
-  }
-
-  @Override
-  public void branchRollback(final String xid, final long branchId, final String key, final String udata,
-      final byte commitMode) throws DtsException {
-
-  }
-
-  @Override
-  public void branchRollback(final String xid, final long branchId, final String key, final String udata,
-      final byte commitMode, final int isDelKey)
-      throws DtsException {
-  }
 
 }

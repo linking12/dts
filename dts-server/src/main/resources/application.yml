@@ -1,2 +1,10 @@
 tcp:
   listenPort: 10086
+
+datasource:
+    driverClassName: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/dts
+    username: root
+    password: 123456
+    maxActive: 15
+    minIdle: 5
