@@ -26,7 +26,7 @@ import io.dts.common.protocol.header.ReportUdataResultMessage;
  * 
  *         TXC 消息处理器
  */
-public interface DtsMessageHandler {
+public interface DtsServerMessageHandler {
 
   /**
    * 开始一个分布式事务

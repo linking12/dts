@@ -18,7 +18,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import io.dts.common.api.DtsMessageHandler;
+import io.dts.common.api.DtsServerMessageHandler;
 import io.dts.common.protocol.DtsMessage;
 import io.dts.common.protocol.RequestCode;
 import io.dts.common.protocol.RequestHeaderMessage;
@@ -60,7 +60,7 @@ import io.netty.channel.ChannelHandlerContext;
 public class BizMessageProcessor implements NettyRequestProcessor {
 
   @Lookup
-  protected DtsMessageHandler createMessageHandler() {
+  protected DtsServerMessageHandler createMessageHandler() {
     return null;
   }
 
