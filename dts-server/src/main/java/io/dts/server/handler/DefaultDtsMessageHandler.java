@@ -13,15 +13,13 @@
  */
 package io.dts.server.handler;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -54,6 +52,8 @@ import io.dts.server.model.BranchTransactionState;
 import io.dts.server.model.GlobalLog;
 import io.dts.server.model.GlobalTransactionState;
 import io.dts.server.resultcode.RollbackingResultCode;
+import io.dts.server.store.DtsLogDao;
+import io.dts.server.store.DtsTransStatusDao;
 import io.dts.server.store.impl.DtsServerRestorer;
 
 /**
@@ -65,31 +65,12 @@ import io.dts.server.store.impl.DtsServerRestorer;
 public class DefaultDtsMessageHandler implements DtsServerMessageHandler {
 
   private static final Logger logger = LoggerFactory.getLogger(DtsServerMessageHandler.class);
-  /**
-   * 当前活动的所有事务
-   */
-  private static Map<Long, GlobalLog> activeTranMap = new ConcurrentHashMap<Long, GlobalLog>();
 
-  /**
-   * 当前活动的所有事务分支
-   */
-  private static Map<Long, BranchLog> activeTranBranchMap =
-      new ConcurrentHashMap<Long, BranchLog>();
+  @Autowired
+  private DtsTransStatusDao dtsTransStatusDao;
 
-  /**
-   * 保存已经发送BranchCommitMessage消息，但是还没收到响应或者失败的分支
-   */
-  private static Map<Long, Integer> committingMap = new ConcurrentHashMap<Long, Integer>();
-
-  /**
-   * 保存已经发送BranchRollbackMessage消息，但是还没收到响应或者失败的分支
-   */
-  private static Map<Long, Integer> rollbackingMap = new ConcurrentHashMap<Long, Integer>();
-
-  /**
-   * 超时的事务列表
-   */
-  private static List<Long> timeoutTranList = Collections.synchronizedList(new ArrayList<Long>());
+  @Autowired
+  private DtsLogDao dtsLogDao;
 
   /**
    * 开始一个分布式事务
@@ -106,7 +87,7 @@ public class DefaultDtsMessageHandler implements DtsServerMessageHandler {
     // this.insertGlobalLog(globalLog);
     //
     long tranId = globalLog.getTxId();
-    activeTranMap.put(tranId, globalLog);
+    dtsTransStatusDao.insertGlobalLog(tranId, globalLog);
     String xid = TxcXID.generateXID(tranId);
     resultMessage.setXid(xid);
     return;
@@ -119,11 +100,11 @@ public class DefaultDtsMessageHandler implements DtsServerMessageHandler {
   public void handleMessage(String clientIp, GlobalCommitMessage message,
       GlobalCommitResultMessage resultMessage) {
     resultMessage.setTranId(message.getTranId());
-    GlobalLog globalLog = activeTranMap.get(message.getTranId());
+    GlobalLog globalLog = dtsTransStatusDao.queryGlobalLog(message.getTranId());
     if (globalLog == null) {
       // 事务已超时
-      if (timeoutTranList.contains(message.getTranId())) {
-        timeoutTranList.remove(message.getTranId());
+      if (dtsTransStatusDao.queryTimeOut(message.getTranId())) {
+        dtsTransStatusDao.removeTimeOut(message.getTranId());
         throw new DtsBizException(
             "transaction doesn't exist. It has been rollbacked because of timeout.");
       } // 事务已提交
@@ -142,8 +123,8 @@ public class DefaultDtsMessageHandler implements DtsServerMessageHandler {
             throw new DtsBizException("transaction is committing.");
           }
         case Rollbacking:
-          if (timeoutTranList.contains(message.getTranId())) {
-            timeoutTranList.remove(message.getTranId());
+          if (dtsTransStatusDao.queryTimeOut(message.getTranId())) {
+            dtsTransStatusDao.removeTimeOut(message.getTranId());
             throw new DtsBizException("transaction is rollbacking because of timeout.");
           } else {
             throw new DtsBizException("transaction is rollbacking.");
@@ -157,7 +138,7 @@ public class DefaultDtsMessageHandler implements DtsServerMessageHandler {
             CommitGlobalTransaction(final GlobalLog globalLog) {
               this.globalLog = globalLog;
               try {
-                branchLogs = getBranchLogs(globalLog.getTxId());
+                branchLogs = dtsTransStatusDao.queryBranchLogByTransId(globalLog.getTxId());
               } catch (Exception e) {
                 throw new DtsBizException("get branch logs fail. " + e.getMessage());
               }
@@ -171,7 +152,7 @@ public class DefaultDtsMessageHandler implements DtsServerMessageHandler {
               try {
                 if (!globalLog.isContainPhase2CommitBranch()) {
                   for (BranchLog branchLog : branchLogs) {
-                    committingMap.put(branchLog.getBranchId(),
+                    dtsTransStatusDao.insertCommitedBranchLog(branchLog.getBranchId(),
                         BranchTransactionState.BEGIN.getValue());
                   }
                 } else {
@@ -193,7 +174,7 @@ public class DefaultDtsMessageHandler implements DtsServerMessageHandler {
           if (branchLogs.size() == 0) {
             // TODO
             // this.deleteGlobalLog(globalLog);
-            activeTranMap.remove(message.getTranId());
+            dtsTransStatusDao.clearGlobalLog(message.getTranId());
             return;
           }
           globalLog.setState(GlobalTransactionState.Committing.getValue());
@@ -218,45 +199,6 @@ public class DefaultDtsMessageHandler implements DtsServerMessageHandler {
 
   }
 
-  private List<BranchLog> getBranchLogs(long tranId) {
-    return getBranchLogs(tranId, false, false, false);
-  }
-
-
-  private List<BranchLog> getBranchLogs(long tranId, boolean sort, boolean reverse,
-      boolean fromBkup) {
-    List<BranchLog> branchLogs = new ArrayList<BranchLog>();
-    Map<Long, BranchLog> branchMap = activeTranBranchMap;
-    GlobalLog globalLog;
-    globalLog = activeTranMap.get(tranId);
-    if (globalLog == null)
-      return branchLogs;
-    for (long branchId : globalLog.getBranchIds()) {
-      BranchLog branchLog;
-      if ((branchLog = branchMap.get(branchId)) != null) {
-        branchLogs.add(branchLog);
-      }
-    }
-    if (sort) {
-      if (reverse) {
-        Collections.sort(branchLogs, new Comparator<BranchLog>() {
-          @Override
-          public int compare(BranchLog o1, BranchLog o2) {
-            return (int) (o2.getBranchId() - o1.getBranchId());
-          }
-        });
-      } else {
-        Collections.sort(branchLogs, new Comparator<BranchLog>() {
-          @Override
-          public int compare(BranchLog o1, BranchLog o2) {
-            return (int) (o1.getBranchId() - o2.getBranchId());
-          }
-        });
-      }
-    }
-    return branchLogs;
-  }
-
 
   @Override
   public void handleMessage(String clientIp, GlobalRollbackMessage message,
@@ -269,7 +211,7 @@ public class DefaultDtsMessageHandler implements DtsServerMessageHandler {
       RegisterResultMessage resultMessage) {
     long tranId = message.getTranId();
     byte commitMode = message.getCommitMode();
-    GlobalLog globalLog = activeTranMap.get(tranId);
+    GlobalLog globalLog = dtsTransStatusDao.queryGlobalLog(tranId);
     if (globalLog == null || globalLog.getState() != GlobalTransactionState.Begin.getValue()) {
       if (globalLog == null) {
         throw new DtsBizException("Transaction " + tranId + " doesn't exist");
@@ -289,7 +231,7 @@ public class DefaultDtsMessageHandler implements DtsServerMessageHandler {
     branchLog.setCommitMode(commitMode);
     // TODO
     // this.insertBranchLog(branchLog);
-    activeTranBranchMap.put(branchLog.getBranchId(), branchLog);
+    dtsTransStatusDao.insertBranchLog(branchLog.getBranchId(), branchLog);
     globalLog.getBranchIds().add(branchLog.getBranchId());
     resultMessage.setBranchId(branchLog.getBranchId());
     resultMessage.setTranId((int) tranId);
@@ -300,7 +242,7 @@ public class DefaultDtsMessageHandler implements DtsServerMessageHandler {
   public void handleMessage(String clientIp, ReportStatusMessage message,
       ReportStatusResultMessage resultMessage) {
     resultMessage.setBranchId(message.getBranchId());
-    BranchLog branchLog = activeTranBranchMap.get(message.getBranchId());
+    BranchLog branchLog = dtsTransStatusDao.queryBranchLog(message.getBranchId());
     if (branchLog == null) {
       throw new DtsBizException("branch doesn't exist.");
     }
@@ -314,12 +256,16 @@ public class DefaultDtsMessageHandler implements DtsServerMessageHandler {
     }
     // TODO
     // this.updataBranchLog(branchLog, optimized);
-    GlobalLog globalLog = activeTranMap.get(branchLog.getTxId());
+    /**
+     * 如果事务因为超时而回滚，事务在rollbacking状态，需要把这个分支放入rollbackingMap
+     */
+    GlobalLog globalLog = dtsTransStatusDao.queryGlobalLog(branchLog.getTxId());
     if (globalLog == null) {
       throw new DtsBizException("global log doesn't exist.");
     }
     if (globalLog.getState() == GlobalTransactionState.Rollbacking.getValue()) {
-      rollbackingMap.put(branchLog.getBranchId(), RollbackingResultCode.TIMEOUT.getValue());
+      dtsTransStatusDao.insertRollbackBranchLog(branchLog.getBranchId(),
+          RollbackingResultCode.TIMEOUT.getValue());
     }
   }
 

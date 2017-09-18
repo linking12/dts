@@ -13,12 +13,7 @@
  */
 package io.dts.server.store;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 import io.dts.server.model.BranchLog;
 import io.dts.server.model.GlobalLog;
@@ -28,37 +23,27 @@ import io.dts.server.model.GlobalLog;
  * @version DtsTranStateDao.java, v 0.0.1 2017年9月18日 下午4:01:20 liushiming
  */
 public interface DtsTransStatusDao {
-  /**
-   * 当前活动的所有事务
-   */
-  static final Map<Long, GlobalLog> activeTranMap = Maps.newConcurrentMap();
-  /**
-   * 当前活动的所有事务分支
-   */
-  static final Map<Long, BranchLog> activeTranBranchMap = Maps.newConcurrentMap();
-  /**
-   * 保存已经发送BranchCommitMessage消息，但是还没收到响应或者失败的分支
-   */
-  static final Map<Long, Integer> committingMap = Maps.newConcurrentMap();
 
-  /**
-   * 保存已经发送BranchRollbackMessage消息，但是还没收到响应或者失败的分支
-   */
-  static final Map<Long, Integer> rollbackingMap = Maps.newConcurrentMap();
+  public void insertGlobalLog(Long transId, GlobalLog globalLog);
 
-  /**
-   * 超时的事务列表
-   */
-  static final List<Long> timeoutTranList = Collections.synchronizedList(Lists.newArrayList());
-
-  public void insertGlobalLog(Long tranId, GlobalLog globalLog);
+  public void clearGlobalLog(Long transId);
 
   public void insertBranchLog(Long branchId, BranchLog branchLog);
+
+  public void clearBranchLog(Long branchId);
 
   public void insertCommitedBranchLog(Long branchId, Integer commitResultCode);
 
   public void insertRollbackBranchLog(Long branchId, Integer rollbackingResultCode);
 
+  public GlobalLog queryGlobalLog(Long transId);
+
+  public BranchLog queryBranchLog(Long branchId);
+
   public List<BranchLog> queryBranchLogByTransId(Long transId);
+
+  public boolean queryTimeOut(Long transId);
+
+  public boolean removeTimeOut(Long transId);
 
 }
