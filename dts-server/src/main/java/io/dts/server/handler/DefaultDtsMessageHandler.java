@@ -73,8 +73,8 @@ public class DefaultDtsMessageHandler implements DtsServerMessageHandler {
   @Override
   public void handleMessage(String clientIp, BeginMessage message,
       BeginResultMessage resultMessage) {
-    InternalClientMessageProcessor processor =
-        InternalClientMessageProcessor.createClientMessageProcessor(dtsTransStatusDao, dtsLogDao);
+    ClientMessageHandler processor =
+        ClientMessageHandler.createClientMessageProcessor(dtsTransStatusDao, dtsLogDao);
     String xid = processor.processMessage(message, clientIp);
     resultMessage.setXid(xid);
     return;
@@ -87,8 +87,8 @@ public class DefaultDtsMessageHandler implements DtsServerMessageHandler {
   public void handleMessage(String clientIp, GlobalCommitMessage message,
       GlobalCommitResultMessage resultMessage) {
     resultMessage.setTranId(message.getTranId());
-    InternalClientMessageProcessor processor =
-        InternalClientMessageProcessor.createClientMessageProcessor(dtsTransStatusDao, dtsLogDao);
+    ClientMessageHandler processor =
+        ClientMessageHandler.createClientMessageProcessor(dtsTransStatusDao, dtsLogDao);
     processor.processMessage(message, clientIp, this);
   }
 
@@ -97,8 +97,8 @@ public class DefaultDtsMessageHandler implements DtsServerMessageHandler {
   public void handleMessage(String clientIp, GlobalRollbackMessage message,
       GlobalRollbackResultMessage resultMessage) {
     resultMessage.setTranId(message.getTranId());
-    InternalClientMessageProcessor processor =
-        InternalClientMessageProcessor.createClientMessageProcessor(dtsTransStatusDao, dtsLogDao);
+    ClientMessageHandler processor =
+        ClientMessageHandler.createClientMessageProcessor(dtsTransStatusDao, dtsLogDao);
     processor.processMessage(message, clientIp, this);
   }
 

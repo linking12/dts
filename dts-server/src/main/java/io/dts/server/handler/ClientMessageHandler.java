@@ -32,9 +32,9 @@ import io.dts.server.store.impl.DtsServerRestorer;
 
 /**
  * @author liushiming
- * @version InternalMessageHandler.java, v 0.0.1 2017年9月18日 下午5:38:29 liushiming
+ * @version ClientMessageHandler.java, v 0.0.1 2017年9月18日 下午5:38:29 liushiming
  */
-public interface InternalClientMessageProcessor {
+public interface ClientMessageHandler {
 
 
   String processMessage(BeginMessage beginMessage, String clientIp);
@@ -46,10 +46,10 @@ public interface InternalClientMessageProcessor {
       DefaultDtsMessageHandler handler);
 
 
-  public static InternalClientMessageProcessor createClientMessageProcessor(
+  public static ClientMessageHandler createClientMessageProcessor(
       DtsTransStatusDao dtsTransStatusDao, DtsLogDao dtsLogDao) {
 
-    return new InternalClientMessageProcessor() {
+    return new ClientMessageHandler() {
 
 
       @Override
@@ -129,7 +129,70 @@ public interface InternalClientMessageProcessor {
       @Override
       public String processMessage(GlobalRollbackMessage globalRollbackMessage, String clientIp,
           DefaultDtsMessageHandler handler) {
-        return null;
+        long tranId = globalRollbackMessage.getTranId();
+        GlobalLog globalLog = null;
+        if (message.getRealSvrAddr() != null && this.clusterWorker != null) {
+          globalLog = ClusterMessageHandlerImpl.getBkupGlobalLogMap().get(tranId);
+        } else
+          globalLog = activeTranMap.get(tranId);
+
+        if (globalLog == null) {
+          resultMessage.setResult(ResultCode.SYSTEMERROR.getValue());
+          if (timeoutTranList.contains(tranId)) {
+            resultMessage
+                .setMsg("transaction doesn't exist. It has been rollbacked because of timeout.");
+            timeoutTranList.remove(tranId);
+          } else {
+            resultMessage.setMsg("transaction doesn't exist.");
+          }
+        } else if (globalLog.getState() == GlobalTransactionState.Committing.getValue()) {
+          resultMessage.setResult(ResultCode.SYSTEMERROR.getValue());
+          resultMessage.setMsg("transaction is committing.");
+        } else if (globalLog.getState() == GlobalTransactionState.Rollbacking.getValue()) {
+          resultMessage.setResult(ResultCode.SYSTEMERROR.getValue());
+          if (timeoutTranList.contains(tranId) && message.getRealSvrAddr() == null) {
+            resultMessage.setMsg("transaction has been rollbacking because of timeout.");
+            timeoutTranList.remove(tranId);
+          } else {
+            resultMessage.setMsg("transaction has been rollbacking.");
+          }
+        } else if (globalLog.getState() == GlobalTransactionState.Begin.getValue()) {
+          List<BranchLog> branchLogs = null;
+          branchLogs = this.getBranchLogs(tranId, true, true, message.getRealSvrAddr() != null);
+          BranchLog.setLastBranchDelTrxKey(branchLogs);
+          globalLog.setState(GlobalTransactionState.Rollbacking.getValue());
+          stat.StatRollback(clientAppName, clientIp);
+          try {
+            if (message.getRealSvrAddr() == null)
+              this.updateGlobalLog(globalLog);
+          } catch (Exception e) {
+            /**
+             * 状态恢复为Begin
+             */
+            globalLog.setState(GlobalTransactionState.Begin.getValue());
+            resultMessage.setMsg("update global status fail.");
+            results[idx] = resultMessage;
+            return;
+          }
+
+          try {
+            if (message.getRealSvrAddr() == null)
+              this.syncGlobalRollback(branchLogs, globalLog, resultMessage, clientIp, clientAppName,
+                  tranId, msgId, false, results, idx);
+            else
+              this.globalRollbackForPrevNode(branchLogs, globalLog, resultMessage, clientIp,
+                  clientAppName, tranId, msgId, false, message.getRealSvrAddr(), results, idx);
+            return;
+          } catch (Exception e) {
+            logger.error(TxcErrCode.SyncGlobalRollback.errCode, e.getMessage(), e);
+            resultMessage.setResult(ResultCode.SYSTEMERROR.getValue());
+            resultMessage.setMsg("Catch Exception:" + e.getMessage());
+          }
+        } else {
+          resultMessage.setResult(ResultCode.SYSTEMERROR.getValue());
+          resultMessage.setMsg("Unknown state " + globalLog.getState());
+        }
+        results[idx] = resultMessage;
       }
 
     };
