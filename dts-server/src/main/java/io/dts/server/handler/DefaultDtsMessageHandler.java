@@ -83,9 +83,7 @@ public class DefaultDtsMessageHandler implements DtsServerMessageHandler {
     globalLog.setTimeout(message.getTimeout());
     globalLog.setClientAppName(clientIp);
     globalLog.setContainPhase2CommitBranch(false);
-    // TODO
-    // this.insertGlobalLog(globalLog);
-    //
+    dtsLogDao.insertGlobalLog(globalLog, 1);;
     long tranId = globalLog.getTxId();
     dtsTransStatusDao.insertGlobalLog(tranId, globalLog);
     String xid = TxcXID.generateXID(tranId);
@@ -172,15 +170,13 @@ public class DefaultDtsMessageHandler implements DtsServerMessageHandler {
           CommitGlobalTransaction commitGlobalTransaction = new CommitGlobalTransaction(globalLog);
           List<BranchLog> branchLogs = commitGlobalTransaction.queryBranchLogs();
           if (branchLogs.size() == 0) {
-            // TODO
-            // this.deleteGlobalLog(globalLog);
+            dtsLogDao.deleteGlobalLog(globalLog.getTxId(), 1);
             dtsTransStatusDao.clearGlobalLog(message.getTranId());
             return;
           }
           globalLog.setState(GlobalTransactionState.Committing.getValue());
           globalLog.setLeftBranches(branchLogs.size());
-          // TODO
-          // this.updateGlobalLog(globalLog);
+          dtsLogDao.updateGlobalLog(globalLog, 1);
           commitGlobalTransaction.commitBranchLog();
           break;
 
@@ -191,7 +187,6 @@ public class DefaultDtsMessageHandler implements DtsServerMessageHandler {
     }
 
   }
-
 
   // 往resourceManager发送消息
   // TODO
@@ -229,8 +224,7 @@ public class DefaultDtsMessageHandler implements DtsServerMessageHandler {
     branchLog.setClientIp(clientIp);
     branchLog.setState(BranchLogState.Begin.getValue());
     branchLog.setCommitMode(commitMode);
-    // TODO
-    // this.insertBranchLog(branchLog);
+    dtsLogDao.insertBranchLog(branchLog, 1);
     dtsTransStatusDao.insertBranchLog(branchLog.getBranchId(), branchLog);
     globalLog.getBranchIds().add(branchLog.getBranchId());
     resultMessage.setBranchId(branchLog.getBranchId());
@@ -249,13 +243,8 @@ public class DefaultDtsMessageHandler implements DtsServerMessageHandler {
     int state = (message.isSuccess()) ? BranchLogState.Success.getValue()
         : BranchLogState.Failed.getValue();
     branchLog.setState(state);
-    boolean optimized = true;
-    if (message.getUdata() != null) {
-      branchLog.setUdata(message.getUdata());
-      optimized = false;
-    }
-    // TODO
-    // this.updataBranchLog(branchLog, optimized);
+    branchLog.setUdata(message.getUdata());
+    dtsLogDao.updateBranchLog(branchLog, 1);
     /**
      * 如果事务因为超时而回滚，事务在rollbacking状态，需要把这个分支放入rollbackingMap
      */

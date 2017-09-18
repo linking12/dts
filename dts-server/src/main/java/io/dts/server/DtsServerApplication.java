@@ -18,10 +18,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.Import;
 import org.springframework.context.event.ContextClosedEvent;
 
-import io.dts.server.config.AppConfig;
 import io.dts.server.remoting.DtsServerContainer;
 
 /**
