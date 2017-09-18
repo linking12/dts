@@ -53,8 +53,8 @@ import io.dts.server.model.BranchLogState;
 import io.dts.server.model.BranchTransactionState;
 import io.dts.server.model.GlobalLog;
 import io.dts.server.model.GlobalTransactionState;
-import io.dts.server.store.TxcServerRestorer;
-import io.dts.server.util.RollbackingResultCode;
+import io.dts.server.resultcode.RollbackingResultCode;
+import io.dts.server.store.impl.DtsServerRestorer;
 
 /**
  * @author liushiming
@@ -91,6 +91,9 @@ public class DefaultDtsMessageHandler implements DtsServerMessageHandler {
    */
   private static List<Long> timeoutTranList = Collections.synchronizedList(new ArrayList<Long>());
 
+  /**
+   * 开始一个分布式事务
+   */
   @Override
   public void handleMessage(String clientIp, BeginMessage message,
       BeginResultMessage resultMessage) {
@@ -109,6 +112,9 @@ public class DefaultDtsMessageHandler implements DtsServerMessageHandler {
     return;
   }
 
+  /**
+   * 处理全局事务提交
+   */
   @Override
   public void handleMessage(String clientIp, GlobalCommitMessage message,
       GlobalCommitResultMessage resultMessage) {
@@ -121,7 +127,7 @@ public class DefaultDtsMessageHandler implements DtsServerMessageHandler {
         throw new DtsBizException(
             "transaction doesn't exist. It has been rollbacked because of timeout.");
       } // 事务已提交
-      else if (TxcServerRestorer.restoredCommittingTransactions.contains(message.getTranId())) {
+      else if (DtsServerRestorer.restoredCommittingTransactions.contains(message.getTranId())) {
         return;
       } // 在本地缓存未查到事务
       else {

@@ -1,4 +1,4 @@
-package io.dts.server.store;
+package io.dts.server.store.impl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,7 +8,7 @@ import java.util.List;
  * 
  *         TXC Server重启后的恢复工作
  */
-public class TxcServerRestorer {
+public class DtsServerRestorer {
 
   public static List<Long> restoredCommittingTransactions = new ArrayList<Long>();
 

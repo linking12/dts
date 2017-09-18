@@ -1,4 +1,4 @@
-package io.dts.server.store;
+package io.dts.server.store.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,11 +27,12 @@ import io.dts.common.util.BlobUtil;
 import io.dts.server.config.AppConfig;
 import io.dts.server.model.BranchLog;
 import io.dts.server.model.GlobalLog;
+import io.dts.server.store.DtsLogDao;
 
 @Component
-public class TxcLogDaoImpl implements TxcLogDao {
+public class DtsLogDaoImpl implements DtsLogDao {
 
-	private static final Logger logger = LoggerFactory.getLogger(TxcLogDaoImpl.class);
+	private static final Logger logger = LoggerFactory.getLogger(DtsLogDaoImpl.class);
 
 	@Autowired
 	private JdbcTemplate jdbcTemplate;

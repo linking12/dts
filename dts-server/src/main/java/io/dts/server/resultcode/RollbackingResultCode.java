@@ -1,4 +1,4 @@
-package io.dts.server.util;
+package io.dts.server.resultcode;
 
 /**
  * @author jiangyu.jy

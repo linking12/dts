@@ -6,7 +6,7 @@ import java.util.List;
 import io.dts.server.model.BranchLog;
 import io.dts.server.model.GlobalLog;
 
-public interface TxcLogDao {
+public interface DtsLogDao {
 
 	public void insertGlobalLog(GlobalLog globalLog, int mid);
 
