@@ -130,31 +130,23 @@ public interface ClientMessageHandler {
       public String processMessage(GlobalRollbackMessage globalRollbackMessage, String clientIp,
           DefaultDtsMessageHandler handler) {
         long tranId = globalRollbackMessage.getTranId();
-        GlobalLog globalLog = null;
-        if (message.getRealSvrAddr() != null && this.clusterWorker != null) {
-          globalLog = ClusterMessageHandlerImpl.getBkupGlobalLogMap().get(tranId);
-        } else
-          globalLog = activeTranMap.get(tranId);
-
+        GlobalLog globalLog = dtsTransStatusDao.queryGlobalLog(tranId);
         if (globalLog == null) {
-          resultMessage.setResult(ResultCode.SYSTEMERROR.getValue());
-          if (timeoutTranList.contains(tranId)) {
-            resultMessage
-                .setMsg("transaction doesn't exist. It has been rollbacked because of timeout.");
-            timeoutTranList.remove(tranId);
+          if (dtsTransStatusDao.queryTimeOut(tranId)) {
+            dtsTransStatusDao.removeTimeOut(tranId);
+            throw new DtsBizException(
+                "transaction doesn't exist. It has been rollbacked because of timeout.");
           } else {
-            resultMessage.setMsg("transaction doesn't exist.");
+            throw new DtsBizException("transaction doesn't exist.");
           }
         } else if (globalLog.getState() == GlobalTransactionState.Committing.getValue()) {
-          resultMessage.setResult(ResultCode.SYSTEMERROR.getValue());
-          resultMessage.setMsg("transaction is committing.");
+          throw new DtsBizException("transaction is committing.");
         } else if (globalLog.getState() == GlobalTransactionState.Rollbacking.getValue()) {
-          resultMessage.setResult(ResultCode.SYSTEMERROR.getValue());
-          if (timeoutTranList.contains(tranId) && message.getRealSvrAddr() == null) {
-            resultMessage.setMsg("transaction has been rollbacking because of timeout.");
-            timeoutTranList.remove(tranId);
+          if (dtsTransStatusDao.queryTimeOut(tranId)) {
+            dtsTransStatusDao.removeTimeOut(tranId);
+            throw new DtsBizException("transaction has been rollbacking because of timeout.");
           } else {
-            resultMessage.setMsg("transaction has been rollbacking.");
+            throw new DtsBizException("transaction has been rollbacking.");
           }
         } else if (globalLog.getState() == GlobalTransactionState.Begin.getValue()) {
           List<BranchLog> branchLogs = null;
