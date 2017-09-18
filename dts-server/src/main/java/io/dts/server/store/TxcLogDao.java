@@ -1,4 +1,4 @@
-package io.dts.server.repostory;
+package io.dts.server.store;
 
 
 import java.util.List;

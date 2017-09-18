@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import io.dts.common.api.DtsMessageHandler;
 import io.dts.common.common.TxcXID;
 import io.dts.common.protocol.body.BranchCommitResultMessage;
 import io.dts.common.protocol.body.DtsMultipleRequestMessage;
@@ -61,7 +62,7 @@ import io.dts.server.util.RollbackingResultCode;
  */
 @Component
 @Scope("prototype")
-public class DtsMessageHandlerImpl implements DtsMessageHandler {
+public class DefaultDtsMessageHandler implements DtsMessageHandler {
 
   private static final Logger logger = LoggerFactory.getLogger(DtsMessageHandler.class);
   /**

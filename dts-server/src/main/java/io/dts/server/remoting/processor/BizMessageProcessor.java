@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import io.dts.common.api.DtsMessageHandler;
 import io.dts.common.protocol.DtsMessage;
 import io.dts.common.protocol.RequestCode;
 import io.dts.common.protocol.RequestHeaderMessage;
@@ -46,7 +47,6 @@ import io.dts.remoting.CommandCustomHeader;
 import io.dts.remoting.netty.NettyRequestProcessor;
 import io.dts.remoting.protocol.RemotingCommand;
 import io.dts.remoting.protocol.RemotingSerializable;
-import io.dts.server.handler.DtsMessageHandler;
 import io.dts.util.NetUtil;
 import io.netty.channel.ChannelHandlerContext;
 
