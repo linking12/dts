@@ -93,6 +93,9 @@ public class DefaultDtsMessageHandler implements DtsServerMessageHandler {
   }
 
 
+  /**
+   * 处理全局事务回滚
+   */
   @Override
   public void handleMessage(String clientIp, GlobalRollbackMessage message,
       GlobalRollbackResultMessage resultMessage) {
@@ -102,9 +105,15 @@ public class DefaultDtsMessageHandler implements DtsServerMessageHandler {
     processor.processMessage(message, clientIp, this);
   }
 
-  // 往resourceManager发送消息
+  // 往resourceManager发送提交信息消息
   // TODO
   protected void syncGlobalCommit(List<BranchLog> branchLogs, GlobalLog globalLog, long tranId) {
+
+  }
+
+  // 往resourceManager发送全局回滚消息
+  // TODO
+  protected void syncGlobalRollback(List<BranchLog> branchLogs, GlobalLog globalLog, long tranId) {
 
   }
 
