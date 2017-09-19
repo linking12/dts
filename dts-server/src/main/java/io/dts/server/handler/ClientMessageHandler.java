@@ -42,7 +42,7 @@ public interface ClientMessageHandler {
   void processMessage(GlobalCommitMessage globalCommitMessage, String clientIp,
       DefaultDtsMessageHandler handler);
 
-  String processMessage(GlobalRollbackMessage globalRollbackMessage, String clientIp,
+  void processMessage(GlobalRollbackMessage globalRollbackMessage, String clientIp,
       DefaultDtsMessageHandler handler);
 
 
@@ -52,6 +52,7 @@ public interface ClientMessageHandler {
     return new ClientMessageHandler() {
 
 
+      // 开始一个事务
       @Override
       public String processMessage(BeginMessage beginMessage, String clientIp) {
         GlobalLog globalLog = new GlobalLog();
@@ -66,6 +67,7 @@ public interface ClientMessageHandler {
         return xid;
       }
 
+      // 事务提交
       @Override
       public void processMessage(GlobalCommitMessage globalCommitMessage, String clientIp,
           DefaultDtsMessageHandler handler) {
@@ -101,8 +103,8 @@ public interface ClientMessageHandler {
               }
             case Begin:
             case CommitHeuristic:
-              List<BranchLog> branchLogs =
-                  dtsTransStatusDao.queryBranchLogByTransId(globalLog.getTxId());
+              List<BranchLog> branchLogs = dtsTransStatusDao
+                  .queryBranchLogByTransId(globalLog.getTxId(), false, false, false);
               if (branchLogs.size() == 0) {
                 dtsLogDao.deleteGlobalLog(globalLog.getTxId(), 1);
                 dtsTransStatusDao.clearGlobalLog(tranId);
@@ -126,8 +128,9 @@ public interface ClientMessageHandler {
         }
       }
 
+      // 事务回滚
       @Override
-      public String processMessage(GlobalRollbackMessage globalRollbackMessage, String clientIp,
+      public void processMessage(GlobalRollbackMessage globalRollbackMessage, String clientIp,
           DefaultDtsMessageHandler handler) {
         long tranId = globalRollbackMessage.getTranId();
         GlobalLog globalLog = dtsTransStatusDao.queryGlobalLog(tranId);
@@ -149,42 +152,28 @@ public interface ClientMessageHandler {
             throw new DtsBizException("transaction has been rollbacking.");
           }
         } else if (globalLog.getState() == GlobalTransactionState.Begin.getValue()) {
-          List<BranchLog> branchLogs = null;
-          branchLogs = this.getBranchLogs(tranId, true, true, message.getRealSvrAddr() != null);
+          List<BranchLog> branchLogs =
+              dtsTransStatusDao.queryBranchLogByTransId(globalLog.getTxId(), true, true, false);
           BranchLog.setLastBranchDelTrxKey(branchLogs);
           globalLog.setState(GlobalTransactionState.Rollbacking.getValue());
-          stat.StatRollback(clientAppName, clientIp);
           try {
-            if (message.getRealSvrAddr() == null)
-              this.updateGlobalLog(globalLog);
+            if (globalRollbackMessage.getRealSvrAddr() == null)
+              dtsLogDao.updateGlobalLog(globalLog, 1);
           } catch (Exception e) {
-            /**
-             * 状态恢复为Begin
-             */
             globalLog.setState(GlobalTransactionState.Begin.getValue());
-            resultMessage.setMsg("update global status fail.");
-            results[idx] = resultMessage;
-            return;
+            throw new DtsBizException("update global status fail.");
           }
-
           try {
-            if (message.getRealSvrAddr() == null)
-              this.syncGlobalRollback(branchLogs, globalLog, resultMessage, clientIp, clientAppName,
-                  tranId, msgId, false, results, idx);
-            else
-              this.globalRollbackForPrevNode(branchLogs, globalLog, resultMessage, clientIp,
-                  clientAppName, tranId, msgId, false, message.getRealSvrAddr(), results, idx);
-            return;
+            String clusterNode = globalRollbackMessage.getRealSvrAddr();
+            if (clusterNode == null)
+              handler.syncGlobalRollback(branchLogs, globalLog, tranId);
+            // handler.globalRollbackForPrevNode(branchLogs, globalLog, tranId, clusterNode);
           } catch (Exception e) {
-            logger.error(TxcErrCode.SyncGlobalRollback.errCode, e.getMessage(), e);
-            resultMessage.setResult(ResultCode.SYSTEMERROR.getValue());
-            resultMessage.setMsg("Catch Exception:" + e.getMessage());
+            throw new DtsBizException("Catch Exception:" + e.getMessage());
           }
         } else {
-          resultMessage.setResult(ResultCode.SYSTEMERROR.getValue());
-          resultMessage.setMsg("Unknown state " + globalLog.getState());
+          throw new DtsBizException("Unknown state " + globalLog.getState());
         }
-        results[idx] = resultMessage;
       }
 
     };

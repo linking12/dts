@@ -40,7 +40,8 @@ public interface DtsTransStatusDao {
 
   public BranchLog queryBranchLog(Long branchId);
 
-  public List<BranchLog> queryBranchLogByTransId(Long transId);
+  public List<BranchLog> queryBranchLogByTransId(long tranId, boolean sort, boolean reverse,
+      boolean fromBkup);
 
   public boolean queryTimeOut(Long transId);
 

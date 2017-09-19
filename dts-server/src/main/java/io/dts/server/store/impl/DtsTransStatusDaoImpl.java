@@ -96,11 +96,7 @@ public class DtsTransStatusDaoImpl implements DtsTransStatusDao {
   }
 
   @Override
-  public List<BranchLog> queryBranchLogByTransId(Long transId) {
-    return getBranchLogs(transId, false, false, false);
-  }
-
-  private List<BranchLog> getBranchLogs(long tranId, boolean sort, boolean reverse,
+  public List<BranchLog> queryBranchLogByTransId(long tranId, boolean sort, boolean reverse,
       boolean fromBkup) {
     List<BranchLog> branchLogs = new ArrayList<BranchLog>();
     Map<Long, BranchLog> branchMap = activeTranBranchMap;
