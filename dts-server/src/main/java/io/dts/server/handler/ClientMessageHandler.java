@@ -105,6 +105,7 @@ public interface ClientMessageHandler {
             case CommitHeuristic:
               List<BranchLog> branchLogs = dtsTransStatusDao
                   .queryBranchLogByTransId(globalLog.getTxId(), false, false, false);
+              BranchLog.setLastBranchDelTrxKey(branchLogs);
               if (branchLogs.size() == 0) {
                 dtsLogDao.deleteGlobalLog(globalLog.getTxId(), 1);
                 dtsTransStatusDao.clearGlobalLog(tranId);
@@ -112,13 +113,19 @@ public interface ClientMessageHandler {
               }
               globalLog.setState(GlobalTransactionState.Committing.getValue());
               globalLog.setLeftBranches(branchLogs.size());
-              dtsLogDao.updateGlobalLog(globalLog, 1);
+              try {
+                dtsLogDao.updateGlobalLog(globalLog, 1);
+              } catch (Exception e) {
+                // 状态设置为提交未决
+                globalLog.setState(GlobalTransactionState.CommitHeuristic.getValue());
+                throw new DtsBizException("update global status fail.");
+              }
               CommitGlobalTransaction commitGlobalTransaction =
                   new CommitGlobalTransaction(branchLogs);
               if (!globalLog.isContainPhase2CommitBranch()) {
                 commitGlobalTransaction.doInsert(dtsTransStatusDao);
               } else {
-                commitGlobalTransaction.doNotifyResourceManager(globalLog, handler);
+                commitGlobalTransaction.doNotify(globalLog, handler);
               }
               return;
             default:
@@ -193,7 +200,7 @@ public interface ClientMessageHandler {
       }
     }
 
-    private void doNotifyResourceManager(GlobalLog globalLog, DefaultDtsMessageHandler handler) {
+    private void doNotify(GlobalLog globalLog, DefaultDtsMessageHandler handler) {
       Collections.sort(branchLogs, new Comparator<BranchLog>() {
         @Override
         public int compare(BranchLog o1, BranchLog o2) {
