@@ -32,6 +32,9 @@ public class BranchCommitResultMessage extends RemotingSerializable implements R
    */
   private List<Long> branchIds;
 
+
+  private int result;
+
   public List<Long> getTranIds() {
     return tranIds;
   }
@@ -52,5 +55,15 @@ public class BranchCommitResultMessage extends RemotingSerializable implements R
   public short getTypeCode() {
     return TYPE_BRANCH_COMMIT_RESULT;
   }
+
+  public int getResult() {
+    return result;
+  }
+
+  public void setResult(int result) {
+    this.result = result;
+  }
+
+
 
 }

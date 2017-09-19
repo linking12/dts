@@ -167,6 +167,7 @@ public class BizMessageProcessor implements NettyRequestProcessor {
           createMessageHandler().handleMessage(clientIp, (BranchCommitResultMessage) dtsMessage);
           response.setCode(ResponseCode.SUCCESS);
           return response;
+        // 处理事务分支回滚的反馈结果
         case DtsMessage.TYPE_BRANCH_ROLLBACK_RESULT:
           createMessageHandler().handleMessage(clientIp, (BranchRollbackResultMessage) dtsMessage);
           response.setCode(ResponseCode.SUCCESS);
