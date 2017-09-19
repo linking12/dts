@@ -13,18 +13,26 @@
  */
 package io.dts.server.handler;
 
+import java.util.Calendar;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.dts.common.common.CommitMode;
+import io.dts.common.common.TxcXID;
+import io.dts.common.protocol.header.BeginRetryBranchMessage;
+import io.dts.common.protocol.header.BeginRetryBranchResultMessage;
 import io.dts.common.protocol.header.QueryLockMessage;
 import io.dts.common.protocol.header.RegisterMessage;
 import io.dts.common.protocol.header.ReportStatusMessage;
+import io.dts.common.protocol.header.ReportUdataMessage;
 import io.dts.server.exception.DtsBizException;
 import io.dts.server.model.BranchLog;
 import io.dts.server.model.BranchLogState;
 import io.dts.server.model.GlobalLog;
 import io.dts.server.model.GlobalTransactionState;
+import io.dts.server.resultcode.CommitingResultCode;
+import io.dts.server.resultcode.RollbackingResultCode;
 import io.dts.server.store.DtsLogDao;
 import io.dts.server.store.DtsTransStatusDao;
 
@@ -39,6 +47,10 @@ public interface ResourceManagerMessageHandler {
   void processMessage(ReportStatusMessage reportStatusMessage, String clientIp);
 
   void processMessage(QueryLockMessage queryLockMessage, String clientIp);
+
+  void processMessage(ReportUdataMessage reportUdataMessage, String clientIp);
+
+  void processMessage(BeginRetryBranchMessage beginRetryBranchMessage, String clientIp);
 
   public static ResourceManagerMessageHandler createResourceManagerMessageProcessor(
       DtsTransStatusDao dtsTransStatusDao, DtsLogDao dtsLogDao) {
@@ -84,13 +96,117 @@ public interface ResourceManagerMessageHandler {
 
       @Override
       public void processMessage(ReportStatusMessage reportStatusMessage, String clientIp) {
-
+        BranchLog branchLog = dtsTransStatusDao.queryBranchLog(reportStatusMessage.getBranchId());
+        if (branchLog == null) {
+          throw new DtsBizException("branch doesn't exist.");
+        }
+        int state = (reportStatusMessage.isSuccess()) ? BranchLogState.Success.getValue()
+            : BranchLogState.Failed.getValue();
+        branchLog.setState(state);
+        branchLog.setUdata(reportStatusMessage.getUdata());
+        dtsLogDao.updateBranchLog(branchLog, 1);
+        /**
+         * 如果事务因为超时而回滚，事务在rollbacking状态，需要把这个分支放入rollbackingMap
+         */
+        GlobalLog globalLog = dtsTransStatusDao.queryGlobalLog(branchLog.getTxId());
+        if (globalLog == null) {
+          throw new DtsBizException("global log doesn't exist.");
+        }
+        if (globalLog.getState() == GlobalTransactionState.Rollbacking.getValue()) {
+          dtsTransStatusDao.insertRollbackBranchLog(branchLog.getBranchId(),
+              RollbackingResultCode.TIMEOUT.getValue());
+        }
       }
 
       @Override
       public void processMessage(QueryLockMessage queryLockMessage, String clientIp) {
 
+        // TODO
       }
+
+      @Override
+      public void processMessage(ReportUdataMessage reportUdataMessage, String clientIp) {
+        Long branchId = reportUdataMessage.getBranchId();
+        BranchLog branchLog = dtsTransStatusDao.queryBranchLog(branchId);
+        if (branchLog == null) {
+          throw new DtsBizException("branch doesn't exist.");
+        }
+        if (reportUdataMessage.getUdata() != null) {
+          branchLog.setUdata(reportUdataMessage.getUdata());
+          try {
+            dtsLogDao.updateBranchLog(branchLog, 1);
+          } catch (Exception e) {
+            throw new DtsBizException("update branchlog usedata failed");
+          }
+        }
+      }
+
+      @Override
+      public void processMessage(BeginRetryBranchMessage beginRetryBranchMessage, String clientIp) {
+        BeginRetryBranchResultMessage resultMessage = new BeginRetryBranchResultMessage();
+        if (retryGlobalLog == null) {
+          retryGlobalLog = new GlobalLog();
+          retryGlobalLog.setState(GlobalTransactionState.Committing.getValue());
+          if (this.clusterWorker != null) {
+            retryGlobalLog.setTxId(generateGlobalId());
+            retryGlobalLog.setGmtCreated(Calendar.getInstance().getTime());
+            retryGlobalLog.setGmtModified(retryGlobalLog.getGmtCreated());
+            retryGlobalLog.setRecvTime(System.currentTimeMillis());
+          }
+          try {
+            this.insertGlobalLog(retryGlobalLog);
+          } catch (Exception e) {
+            resultMessage.setResult(ResultCode.SYSTEMERROR.getValue());
+            resultMessage.setMsg(e.getMessage());
+            results[idx] = resultMessage;
+            return;
+          }
+          retryGlobalLog.setLeftBranches(1);
+          retryGlobalLog.setTimeout(0);
+          retryGlobalLog.setClientAppName(clientAppName);
+          retryGlobalLog.setContainPhase2CommitBranch(false);
+          activeTranMap.put(retryGlobalLog.getTxId(), retryGlobalLog);
+        }
+
+        long tranId = retryGlobalLog.getTxId();
+        String xid = TxcXID.generateXID(tranId);
+        resultMessage.setXid(xid);
+        BranchLog branchLog = new BranchLog();
+        branchLog.setTxId(tranId);
+        branchLog.setWaitPeriods(0);
+        branchLog.setClientAppName(clientAppName);
+        branchLog.setClientInfo(message.getDbName());
+        branchLog.setClientIp(clientIp);
+        branchLog.setState(BranchLogState.Success.getValue());
+        branchLog.setCommitMode(CommitMode.COMMIT_RETRY_MODE.getValue());
+        branchLog.setUdata(Long.toString(message.getEffectiveTime()));
+        branchLog.setRetrySql(message.getSql());
+        if (this.clusterWorker != null) {
+          branchLog.setBranchId(generateBranchId());
+          branchLog.setGmtCreated(Calendar.getInstance().getTime());
+          branchLog.setGmtModified(branchLog.getGmtCreated());
+          branchLog.setRecvTime(System.currentTimeMillis());
+        }
+
+        try {
+          this.insertBranchLog(branchLog);
+        } catch (Exception e) {
+          resultMessage.setResult(ResultCode.SYSTEMERROR.getValue());
+          resultMessage.setMsg(e.getMessage());
+          results[idx] = resultMessage;
+          return;
+        }
+
+        activeTranBranchMap.put(branchLog.getBranchId(), branchLog);
+        retryGlobalLog.getBranchIds().add(branchLog.getBranchId());
+        resultMessage.setBranchId(branchLog.getBranchId());
+        resultMessage.setResult(ResultCode.OK.getValue());
+        retryGlobalLog.increaseLeftBranches();
+        committingMap.put(branchLog.getBranchId(), CommitingResultCode.BEGIN.getValue());
+        results[idx] = resultMessage;
+        return;
+      }
+
 
       private String getStateString(Class<?> cl, int value) {
         if (cl.equals(GlobalTransactionState.class)) {

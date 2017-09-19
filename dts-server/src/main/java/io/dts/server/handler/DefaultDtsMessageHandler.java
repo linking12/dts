@@ -15,13 +15,13 @@ package io.dts.server.handler;
 
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import io.dts.common.api.DtsServerMessageHandler;
+import io.dts.common.protocol.RequestHeaderMessage;
+import io.dts.common.protocol.ResponseMessage;
 import io.dts.common.protocol.body.BranchCommitResultMessage;
 import io.dts.common.protocol.body.DtsMultipleRequestMessage;
 import io.dts.common.protocol.body.DtsMultipleResonseMessage;
@@ -42,12 +42,8 @@ import io.dts.common.protocol.header.ReportStatusMessage;
 import io.dts.common.protocol.header.ReportStatusResultMessage;
 import io.dts.common.protocol.header.ReportUdataMessage;
 import io.dts.common.protocol.header.ReportUdataResultMessage;
-import io.dts.server.exception.DtsBizException;
 import io.dts.server.model.BranchLog;
-import io.dts.server.model.BranchLogState;
 import io.dts.server.model.GlobalLog;
-import io.dts.server.model.GlobalTransactionState;
-import io.dts.server.resultcode.RollbackingResultCode;
 import io.dts.server.store.DtsLogDao;
 import io.dts.server.store.DtsTransStatusDao;
 
@@ -58,8 +54,6 @@ import io.dts.server.store.DtsTransStatusDao;
 @Component
 @Scope("prototype")
 public class DefaultDtsMessageHandler implements DtsServerMessageHandler {
-
-  private static final Logger logger = LoggerFactory.getLogger(DtsServerMessageHandler.class);
 
   @Autowired
   private DtsTransStatusDao dtsTransStatusDao;
@@ -125,57 +119,70 @@ public class DefaultDtsMessageHandler implements DtsServerMessageHandler {
         .createResourceManagerMessageProcessor(dtsTransStatusDao, dtsLogDao);
     Long branchId = proccessor.processMessage(registerMessage, clientIp);
     resultMessage.setBranchId(branchId);
-    resultMessage.setTranId((int) tranId);
+    resultMessage.setTranId(tranId);
     return;
   }
 
   @Override
-  public void handleMessage(String clientIp, ReportStatusMessage message,
+  public void handleMessage(String clientIp, ReportStatusMessage reportStatusMessage,
       ReportStatusResultMessage resultMessage) {
-    resultMessage.setBranchId(message.getBranchId());
-    BranchLog branchLog = dtsTransStatusDao.queryBranchLog(message.getBranchId());
-    if (branchLog == null) {
-      throw new DtsBizException("branch doesn't exist.");
-    }
-    int state = (message.isSuccess()) ? BranchLogState.Success.getValue()
-        : BranchLogState.Failed.getValue();
-    branchLog.setState(state);
-    branchLog.setUdata(message.getUdata());
-    dtsLogDao.updateBranchLog(branchLog, 1);
-    /**
-     * 如果事务因为超时而回滚，事务在rollbacking状态，需要把这个分支放入rollbackingMap
-     */
-    GlobalLog globalLog = dtsTransStatusDao.queryGlobalLog(branchLog.getTxId());
-    if (globalLog == null) {
-      throw new DtsBizException("global log doesn't exist.");
-    }
-    if (globalLog.getState() == GlobalTransactionState.Rollbacking.getValue()) {
-      dtsTransStatusDao.insertRollbackBranchLog(branchLog.getBranchId(),
-          RollbackingResultCode.TIMEOUT.getValue());
-    }
+    resultMessage.setBranchId(reportStatusMessage.getBranchId());
+    ResourceManagerMessageHandler proccessor = ResourceManagerMessageHandler
+        .createResourceManagerMessageProcessor(dtsTransStatusDao, dtsLogDao);
+    proccessor.processMessage(reportStatusMessage, clientIp);
+    return;
   }
+
+  @Override
+  public void handleMessage(String clientIp, QueryLockMessage queryLockMessage,
+      QueryLockResultMessage resultMessage) {
+    resultMessage.setTranId(queryLockMessage.getTranId());
+    resultMessage.setTranId(queryLockMessage.getTranId());
+    ResourceManagerMessageHandler proccessor = ResourceManagerMessageHandler
+        .createResourceManagerMessageProcessor(dtsTransStatusDao, dtsLogDao);
+    proccessor.processMessage(queryLockMessage, clientIp);
+    return;
+  }
+
 
   @Override
   public void handleMessage(String clientIp, BeginRetryBranchMessage message,
       BeginRetryBranchResultMessage resultMessage) {
-
+    // TODO
   }
 
   @Override
-  public void handleMessage(String clientIp, ReportUdataMessage message,
+  public void handleMessage(String clientIp, ReportUdataMessage reportUdataMessage,
       ReportUdataResultMessage resultMessage) {
-
+    ResourceManagerMessageHandler proccessor = ResourceManagerMessageHandler
+        .createResourceManagerMessageProcessor(dtsTransStatusDao, dtsLogDao);
+    proccessor.processMessage(reportUdataMessage, clientIp);
   }
 
   @Override
   public void handleMessage(String clientIp, DtsMultipleRequestMessage message,
       DtsMultipleResonseMessage resultMessage) {
-
-  }
-
-  @Override
-  public void handleMessage(String clientIp, QueryLockMessage message,
-      QueryLockResultMessage resultMessage) {
+    List<RequestHeaderMessage> headerMessages = message.getMsgs();
+    for (int i = 0; i < headerMessages.size(); i++) {
+      final RequestHeaderMessage msg = headerMessages.get(i);
+      ResponseMessage responseMessage = null;
+      if (msg instanceof RegisterMessage) {
+        responseMessage = new RegisterResultMessage();
+        this.handleMessage(clientIp, (RegisterMessage) msg,
+            (RegisterResultMessage) responseMessage);
+      } else if (msg instanceof ReportStatusMessage) {
+        responseMessage = new ReportStatusResultMessage();
+        this.handleMessage(clientIp, (ReportStatusMessage) msg,
+            (ReportStatusResultMessage) responseMessage);
+      } else if (msg instanceof ReportUdataMessage) {
+        responseMessage = new ReportUdataResultMessage();
+        this.handleMessage(clientIp, (ReportUdataMessage) msg,
+            (ReportUdataResultMessage) responseMessage);
+      }
+      if (responseMessage != null) {
+        resultMessage.getMsgs()[i] = responseMessage;
+      }
+    }
 
   }
 
