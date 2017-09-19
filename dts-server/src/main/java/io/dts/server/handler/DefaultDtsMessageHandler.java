@@ -146,9 +146,11 @@ public class DefaultDtsMessageHandler implements DtsServerMessageHandler {
 
 
   @Override
-  public void handleMessage(String clientIp, BeginRetryBranchMessage message,
-      BeginRetryBranchResultMessage resultMessage) {
-    // TODO
+  public void handleMessage(String clientIp, BeginRetryBranchMessage beginRetryBranchMessage,
+      BeginRetryBranchResultMessage beginRetryBranchResultMessage) {
+    ResourceManagerMessageHandler proccessor = ResourceManagerMessageHandler
+        .createResourceManagerMessageProcessor(dtsTransStatusDao, dtsLogDao);
+    proccessor.processMessage(beginRetryBranchMessage, beginRetryBranchResultMessage, clientIp);
   }
 
   @Override

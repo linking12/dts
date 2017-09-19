@@ -14,6 +14,7 @@
 package io.dts.server.store;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 import io.dts.server.model.BranchLog;
 import io.dts.server.model.GlobalLog;
@@ -47,4 +48,17 @@ public interface DtsTransStatusDao {
 
   public boolean removeTimeOut(Long transId);
 
+  public GlobalLog getRetryGlobalLog();
+
+  public void setRetryGlobalLog(GlobalLog retryGlobalLog);
+
+  static final AtomicLong txcid = new AtomicLong(1000);
+
+  default long generateGlobalId() {
+    return txcid.incrementAndGet();
+  }
+
+  default long generateBranchId() {
+    return txcid.incrementAndGet();
+  }
 }

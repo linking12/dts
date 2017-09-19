@@ -55,6 +55,11 @@ public class DtsTransStatusDaoImpl implements DtsTransStatusDao {
   private static final List<Long> timeoutTranList =
       Collections.synchronizedList(Lists.newArrayList());
 
+  /**
+   * 对于可重试分支，没有必要建立多个事务，这些分支对应同一个global log即可
+   */
+  private GlobalLog retryGlobalLog = null;
+
   @Override
   public void insertGlobalLog(Long tranId, GlobalLog globalLog) {
     activeTranMap.put(tranId, globalLog);
@@ -141,5 +146,14 @@ public class DtsTransStatusDaoImpl implements DtsTransStatusDao {
     return true;
   }
 
+  @Override
+  public GlobalLog getRetryGlobalLog() {
+    return retryGlobalLog;
+  }
+
+  @Override
+  public void setRetryGlobalLog(GlobalLog retryGlobalLog) {
+    this.retryGlobalLog = retryGlobalLog;
+  }
 
 }
