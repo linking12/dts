@@ -118,32 +118,13 @@ public class DefaultDtsMessageHandler implements DtsServerMessageHandler {
   }
 
   @Override
-  public void handleMessage(String clientIp, RegisterMessage message,
+  public void handleMessage(String clientIp, RegisterMessage registerMessage,
       RegisterResultMessage resultMessage) {
-    long tranId = message.getTranId();
-    byte commitMode = message.getCommitMode();
-    GlobalLog globalLog = dtsTransStatusDao.queryGlobalLog(tranId);
-    if (globalLog == null || globalLog.getState() != GlobalTransactionState.Begin.getValue()) {
-      if (globalLog == null) {
-        throw new DtsBizException("Transaction " + tranId + " doesn't exist");
-      } else {
-        throw new DtsBizException("Transaction " + tranId + " is in state:"
-            + this.getStateString(GlobalTransactionState.class, globalLog.getState()));
-      }
-    }
-    BranchLog branchLog = new BranchLog();
-    branchLog.setTxId(tranId);
-    branchLog.setWaitPeriods(0);
-    branchLog.setClientAppName(clientIp);
-    branchLog.setClientInfo(message.getKey());
-    branchLog.setBusinessKey(message.getBusinessKey());
-    branchLog.setClientIp(clientIp);
-    branchLog.setState(BranchLogState.Begin.getValue());
-    branchLog.setCommitMode(commitMode);
-    dtsLogDao.insertBranchLog(branchLog, 1);
-    dtsTransStatusDao.insertBranchLog(branchLog.getBranchId(), branchLog);
-    globalLog.getBranchIds().add(branchLog.getBranchId());
-    resultMessage.setBranchId(branchLog.getBranchId());
+    long tranId = registerMessage.getTranId();
+    ResourceManagerMessageHandler proccessor = ResourceManagerMessageHandler
+        .createResourceManagerMessageProcessor(dtsTransStatusDao, dtsLogDao);
+    Long branchId = proccessor.processMessage(registerMessage, clientIp);
+    resultMessage.setBranchId(branchId);
     resultMessage.setTranId((int) tranId);
     return;
   }
@@ -206,26 +187,6 @@ public class DefaultDtsMessageHandler implements DtsServerMessageHandler {
   @Override
   public void handleMessage(String clientIp, BranchRollbackResultMessage message) {
 
-  }
-
-  public String getStateString(Class<?> cl, int value) {
-    if (cl.equals(GlobalTransactionState.class)) {
-      switch (value) {
-        case 1:
-          return "begin";
-        case 2:
-          return "committed";
-        case 3:
-          return "rollbacked";
-        case 4:
-          return "committing";
-        case 5:
-          return "rollbacking";
-        default:
-          return "unknown";
-      }
-    }
-    return "unknown";
   }
 
 

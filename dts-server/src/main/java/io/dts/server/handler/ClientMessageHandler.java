@@ -17,6 +17,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.dts.common.common.TxcXID;
 import io.dts.common.protocol.header.BeginMessage;
 import io.dts.common.protocol.header.GlobalCommitMessage;
@@ -50,7 +53,7 @@ public interface ClientMessageHandler {
       DtsTransStatusDao dtsTransStatusDao, DtsLogDao dtsLogDao) {
 
     return new ClientMessageHandler() {
-
+      private final Logger logger = LoggerFactory.getLogger(ResourceManagerMessageHandler.class);
 
       // 开始一个事务
       @Override
@@ -116,6 +119,7 @@ public interface ClientMessageHandler {
               try {
                 dtsLogDao.updateGlobalLog(globalLog, 1);
               } catch (Exception e) {
+                logger.error(e.getMessage(), e);
                 // 状态设置为提交未决
                 globalLog.setState(GlobalTransactionState.CommitHeuristic.getValue());
                 throw new DtsBizException("update global status fail.");
@@ -125,7 +129,12 @@ public interface ClientMessageHandler {
               if (!globalLog.isContainPhase2CommitBranch()) {
                 commitGlobalTransaction.doInsert(dtsTransStatusDao);
               } else {
-                commitGlobalTransaction.doNotify(globalLog, handler);
+                try {
+                  commitGlobalTransaction.doNotify(globalLog, handler);
+                } catch (Exception e) {
+                  logger.error(e.getMessage(), e);
+                  throw new DtsBizException("notify resourcemanager to commit failed");
+                }
               }
               return;
             default:
@@ -176,7 +185,8 @@ public interface ClientMessageHandler {
               handler.syncGlobalRollback(branchLogs, globalLog, tranId);
             // handler.globalRollbackForPrevNode(branchLogs, globalLog, tranId, clusterNode);
           } catch (Exception e) {
-            throw new DtsBizException("Catch Exception:" + e.getMessage());
+            logger.error(e.getMessage(), e);
+            throw new DtsBizException("notify resourcemanager to rollback failed");
           }
         } else {
           throw new DtsBizException("Unknown state " + globalLog.getState());
@@ -185,6 +195,7 @@ public interface ClientMessageHandler {
 
     };
   }
+
 
   static class CommitGlobalTransaction {
     private final List<BranchLog> branchLogs;
