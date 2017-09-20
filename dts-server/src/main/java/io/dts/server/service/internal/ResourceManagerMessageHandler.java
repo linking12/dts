@@ -31,8 +31,8 @@ import io.dts.server.model.BranchLog;
 import io.dts.server.model.BranchLogState;
 import io.dts.server.model.GlobalLog;
 import io.dts.server.model.GlobalTransactionState;
-import io.dts.server.resultcode.CommitingResultCode;
-import io.dts.server.resultcode.RollbackingResultCode;
+import io.dts.server.service.CommitingResultCode;
+import io.dts.server.service.RollbackingResultCode;
 import io.dts.server.store.DtsLogDao;
 import io.dts.server.store.DtsTransStatusDao;
 
