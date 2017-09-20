@@ -15,6 +15,8 @@ package io.dts.server.service;
 
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -65,15 +67,26 @@ public class DefaultDtsServerMessageHandler implements DtsServerMessageHandler {
   @Autowired
   private DtsServerMessageSender serverMessageServer;
 
+
+  private ClientMessageHandler clientHandler;
+
+  private ResourceManagerMessageHandler resourceHandler;
+
+  @PostConstruct
+  public void init() {
+    clientHandler = ClientMessageHandler.createClientMessageProcessor(dtsTransStatusDao, dtsLogDao,
+        serverMessageServer, this);
+    resourceHandler = ResourceManagerMessageHandler
+        .createResourceManagerMessageProcessor(dtsTransStatusDao, dtsLogDao);
+  }
+
   /**
    * 开始一个分布式事务
    */
   @Override
   public void handleMessage(String clientIp, BeginMessage message,
       BeginResultMessage resultMessage) {
-    ClientMessageHandler processor = ClientMessageHandler
-        .createClientMessageProcessor(dtsTransStatusDao, dtsLogDao, serverMessageServer, this);
-    String xid = processor.processMessage(message, clientIp);
+    String xid = clientHandler.processMessage(message, clientIp);
     resultMessage.setXid(xid);
     return;
   }
@@ -85,9 +98,8 @@ public class DefaultDtsServerMessageHandler implements DtsServerMessageHandler {
   public void handleMessage(String clientIp, GlobalCommitMessage message,
       GlobalCommitResultMessage resultMessage) {
     resultMessage.setTranId(message.getTranId());
-    ClientMessageHandler processor = ClientMessageHandler
-        .createClientMessageProcessor(dtsTransStatusDao, dtsLogDao, serverMessageServer, this);
-    processor.processMessage(message, clientIp);
+    clientHandler.processMessage(message, clientIp);
+    return;
   }
 
 
@@ -98,9 +110,8 @@ public class DefaultDtsServerMessageHandler implements DtsServerMessageHandler {
   public void handleMessage(String clientIp, GlobalRollbackMessage message,
       GlobalRollbackResultMessage resultMessage) {
     resultMessage.setTranId(message.getTranId());
-    ClientMessageHandler processor = ClientMessageHandler
-        .createClientMessageProcessor(dtsTransStatusDao, dtsLogDao, serverMessageServer, this);
-    processor.processMessage(message, clientIp);
+    clientHandler.processMessage(message, clientIp);
+    return;
   }
 
 
@@ -108,9 +119,7 @@ public class DefaultDtsServerMessageHandler implements DtsServerMessageHandler {
   public void handleMessage(String clientIp, RegisterMessage registerMessage,
       RegisterResultMessage resultMessage) {
     long tranId = registerMessage.getTranId();
-    ResourceManagerMessageHandler proccessor = ResourceManagerMessageHandler
-        .createResourceManagerMessageProcessor(dtsTransStatusDao, dtsLogDao);
-    Long branchId = proccessor.processMessage(registerMessage, clientIp);
+    Long branchId = resourceHandler.processMessage(registerMessage, clientIp);
     resultMessage.setBranchId(branchId);
     resultMessage.setTranId(tranId);
     return;
@@ -120,9 +129,7 @@ public class DefaultDtsServerMessageHandler implements DtsServerMessageHandler {
   public void handleMessage(String clientIp, ReportStatusMessage reportStatusMessage,
       ReportStatusResultMessage resultMessage) {
     resultMessage.setBranchId(reportStatusMessage.getBranchId());
-    ResourceManagerMessageHandler proccessor = ResourceManagerMessageHandler
-        .createResourceManagerMessageProcessor(dtsTransStatusDao, dtsLogDao);
-    proccessor.processMessage(reportStatusMessage, clientIp);
+    resourceHandler.processMessage(reportStatusMessage, clientIp);
     return;
   }
 
@@ -131,9 +138,7 @@ public class DefaultDtsServerMessageHandler implements DtsServerMessageHandler {
       QueryLockResultMessage resultMessage) {
     resultMessage.setTranId(queryLockMessage.getTranId());
     resultMessage.setTranId(queryLockMessage.getTranId());
-    ResourceManagerMessageHandler proccessor = ResourceManagerMessageHandler
-        .createResourceManagerMessageProcessor(dtsTransStatusDao, dtsLogDao);
-    proccessor.processMessage(queryLockMessage, clientIp);
+    resourceHandler.processMessage(queryLockMessage, clientIp);
     return;
   }
 
@@ -141,17 +146,15 @@ public class DefaultDtsServerMessageHandler implements DtsServerMessageHandler {
   @Override
   public void handleMessage(String clientIp, BeginRetryBranchMessage beginRetryBranchMessage,
       BeginRetryBranchResultMessage beginRetryBranchResultMessage) {
-    ResourceManagerMessageHandler proccessor = ResourceManagerMessageHandler
-        .createResourceManagerMessageProcessor(dtsTransStatusDao, dtsLogDao);
-    proccessor.processMessage(beginRetryBranchMessage, beginRetryBranchResultMessage, clientIp);
+    resourceHandler.processMessage(beginRetryBranchMessage, beginRetryBranchResultMessage,
+        clientIp);
+    return;
   }
 
   @Override
   public void handleMessage(String clientIp, ReportUdataMessage reportUdataMessage,
       ReportUdataResultMessage resultMessage) {
-    ResourceManagerMessageHandler proccessor = ResourceManagerMessageHandler
-        .createResourceManagerMessageProcessor(dtsTransStatusDao, dtsLogDao);
-    proccessor.processMessage(reportUdataMessage, clientIp);
+    resourceHandler.processMessage(reportUdataMessage, clientIp);
   }
 
   @Override
