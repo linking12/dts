@@ -6,8 +6,8 @@ import java.util.Map;
 
 import io.dts.common.serviceloader.LoadLevel;
 
-@LoadLevel(name = "TxcContextOperateByThreadLocal", order = 1)
-public class DtsContextOperateByThreadLocal implements IDtsContextOperate {
+@LoadLevel(name = "DtsContextOperateThreadLocal", order = 1)
+public class DtsContextOperateThreadLocal implements IDtsContextOperate {
 
   private final static ThreadLocal<Map<Object, Object>> threadContext = new MapThreadLocal();
 

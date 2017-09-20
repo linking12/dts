@@ -1,7 +1,6 @@
 package io.dts.client;
 
 import io.dts.client.exception.DtsTransactionException;
-import io.dts.client.transport.DtsClientMessageSenderImpl;
 import io.dts.common.api.DtsClientMessageSender;
 import io.dts.common.common.TxcXID;
 import io.dts.common.context.DtsContext;
@@ -14,6 +13,8 @@ import io.dts.common.protocol.header.GlobalCommitResultMessage;
 import io.dts.common.protocol.header.GlobalRollbackMessage;
 import io.dts.common.protocol.header.GlobalRollbackResultMessage;
 import io.dts.remoting.netty.NettyClientConfig;
+import io.dts.resourcemanager.remoting.DtsRemotingClient;
+import io.dts.resourcemanager.remoting.sender.DtsClientMessageSenderImpl;
 
 /**
  * Created by guoyubo on 2017/8/24.
@@ -91,13 +92,15 @@ public class DefaultDtsTransactionManager implements DtsTransactionManager {
   public static void main(String[] args) {
     NettyClientConfig nettyClientConfig = new NettyClientConfig();
     nettyClientConfig.setConnectTimeoutMillis(3000);
-    DtsClientMessageSenderImpl dtsClient = new DtsClientMessageSenderImpl(nettyClientConfig);
+    DtsRemotingClient dtsClient = new DtsRemotingClient(nettyClientConfig);
 //    dtsClient.setAddressManager(new ZookeeperAddressManager("localhost:2181", "/dts"));
 //    dtsClient.setGroup("Default");
 //    dtsClient.setAppName("Demo");
     dtsClient.init();
+    DtsClientMessageSenderImpl clientMessageSender = new DtsClientMessageSenderImpl(dtsClient);
+
     try {
-      DefaultDtsTransactionManager transactionManager = new DefaultDtsTransactionManager(dtsClient);
+      DefaultDtsTransactionManager transactionManager = new DefaultDtsTransactionManager(clientMessageSender);
       transactionManager.begin(3000L);
       System.out.println(DtsContext.getCurrentXid());
     } catch (DtsTransactionException e) {

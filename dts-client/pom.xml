@@ -23,7 +23,7 @@
     </dependency>
     <dependency>
       <groupId>io.dts</groupId>
-      <artifactId>dts-remoting</artifactId>
+      <artifactId>dts-resourcemanager</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
