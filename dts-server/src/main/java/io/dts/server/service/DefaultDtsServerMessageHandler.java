@@ -11,7 +11,7 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-package io.dts.server.handler;
+package io.dts.server.service;
 
 import java.util.List;
 
@@ -53,7 +53,7 @@ import io.dts.server.store.DtsTransStatusDao;
  */
 @Component
 @Scope("prototype")
-public class DefaultDtsMessageHandler implements DtsServerMessageHandler {
+public class DefaultDtsServerMessageHandler implements DtsServerMessageHandler {
 
   @Autowired
   private DtsTransStatusDao dtsTransStatusDao;

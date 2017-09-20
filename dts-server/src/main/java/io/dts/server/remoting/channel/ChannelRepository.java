@@ -26,6 +26,7 @@ import org.springframework.stereotype.Component;
 
 import io.dts.remoting.common.RemotingHelper;
 import io.dts.remoting.common.RemotingUtil;
+import io.dts.util.NetUtil;
 import io.netty.channel.Channel;
 
 /**
@@ -43,7 +44,7 @@ public class ChannelRepository {
 
   private final Lock groupChannelLock = new ReentrantLock();
 
-  private final HashMap<String /* group name */, HashMap<Channel, ChannelInfo>> groupChannelTable =
+  private final HashMap<String, HashMap<Channel, ChannelInfo>> groupChannelTable =
       new HashMap<String, HashMap<Channel, ChannelInfo>>();
 
   public HashMap<String, HashMap<Channel, ChannelInfo>> getGroupChannelTable() {
@@ -110,6 +111,24 @@ public class ChannelRepository {
         log.error(e.getMessage(), e);
       }
     }
+  }
+
+  public Channel getChannelByAddress(String address) {
+    for (final Map.Entry<String, HashMap<Channel, ChannelInfo>> entry : this.groupChannelTable
+        .entrySet()) {
+      final HashMap<Channel, ChannelInfo> chlMap = entry.getValue();
+      Iterator<Map.Entry<Channel, ChannelInfo>> it = chlMap.entrySet().iterator();
+      while (it.hasNext()) {
+        Map.Entry<Channel, ChannelInfo> item = it.next();
+        final Channel channel = item.getKey();
+        final String clientIp = NetUtil.toStringAddress(channel.remoteAddress());
+        if (clientIp.equals(address)) {
+          return channel;
+        }
+      }
+    }
+    return null;
+
   }
 
 

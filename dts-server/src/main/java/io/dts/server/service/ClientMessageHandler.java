@@ -11,7 +11,7 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-package io.dts.server.handler;
+package io.dts.server.service;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -43,10 +43,10 @@ public interface ClientMessageHandler {
   String processMessage(BeginMessage beginMessage, String clientIp);
 
   void processMessage(GlobalCommitMessage globalCommitMessage, String clientIp,
-      DefaultDtsMessageHandler handler);
+      DefaultDtsServerMessageHandler handler);
 
   void processMessage(GlobalRollbackMessage globalRollbackMessage, String clientIp,
-      DefaultDtsMessageHandler handler);
+      DefaultDtsServerMessageHandler handler);
 
 
   public static ClientMessageHandler createClientMessageProcessor(
@@ -73,7 +73,7 @@ public interface ClientMessageHandler {
       // 事务提交
       @Override
       public void processMessage(GlobalCommitMessage globalCommitMessage, String clientIp,
-          DefaultDtsMessageHandler handler) {
+          DefaultDtsServerMessageHandler handler) {
         Long tranId = globalCommitMessage.getTranId();
         GlobalLog globalLog = dtsTransStatusDao.queryGlobalLog(tranId);
         if (globalLog == null) {
@@ -147,7 +147,7 @@ public interface ClientMessageHandler {
       // 事务回滚
       @Override
       public void processMessage(GlobalRollbackMessage globalRollbackMessage, String clientIp,
-          DefaultDtsMessageHandler handler) {
+          DefaultDtsServerMessageHandler handler) {
         long tranId = globalRollbackMessage.getTranId();
         GlobalLog globalLog = dtsTransStatusDao.queryGlobalLog(tranId);
         if (globalLog == null) {
@@ -211,7 +211,7 @@ public interface ClientMessageHandler {
       }
     }
 
-    private void doNotify(GlobalLog globalLog, DefaultDtsMessageHandler handler) {
+    private void doNotify(GlobalLog globalLog, DefaultDtsServerMessageHandler handler) {
       Collections.sort(branchLogs, new Comparator<BranchLog>() {
         @Override
         public int compare(BranchLog o1, BranchLog o2) {

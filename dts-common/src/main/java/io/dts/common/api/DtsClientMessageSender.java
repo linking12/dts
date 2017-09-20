@@ -13,9 +13,9 @@ public interface DtsClientMessageSender {
 
   public <T> T invoke(int requestCode, DtsMessage msg, long timeout) throws DtsException;
 
-  public <T> T invoke(String serverAddress, int requestCode, DtsMessage msg, long timeout) throws DtsException;
+  public <T> T invoke(String serverAddress, int requestCode, DtsMessage msg, long timeout)
+      throws DtsException;
 
   public <T> T invoke(int requestCode, DtsMessage msg) throws DtsException;
 
-  public void sendResponse(long msgId, String serverAddress, Object msg);
 }

@@ -47,22 +47,25 @@ public class DtsClientMessageSenderImpl implements DtsClientMessageSender {
   }
 
   @Override
-  public <T> T invoke(int requestCode, final DtsMessage msg, final long timeout) throws DtsException {
+  public <T> T invoke(int requestCode, final DtsMessage msg, final long timeout)
+      throws DtsException {
     if (DtsContext.getCurrentXid() != null) {
-      return this.invoke(TxcXID.getServerAddress(DtsContext.getCurrentXid()), requestCode, msg, timeout);
+      return this.invoke(TxcXID.getServerAddress(DtsContext.getCurrentXid()), requestCode, msg,
+          timeout);
     } else {
       return this.invoke(null, requestCode, msg, timeout);
     }
   }
 
   @Override
-  public <T> T invoke(final String serverAddress, int requestCode, final DtsMessage msg, final long timeout)
-      throws DtsException {
+  public <T> T invoke(final String serverAddress, int requestCode, final DtsMessage msg,
+      final long timeout) throws DtsException {
     try {
       RemotingCommand request;
       switch (requestCode) {
         case RequestCode.HEADER_REQUEST:
-          request = RemotingCommand.createRequestCommand(RequestCode.HEADER_REQUEST, (RequestHeaderMessage)msg);
+          request = RemotingCommand.createRequestCommand(RequestCode.HEADER_REQUEST,
+              (RequestHeaderMessage) msg);
           break;
         case RequestCode.BODY_REQUEST:
           request = RemotingCommand.createRequestCommand(RequestCode.HEADER_REQUEST, null);
@@ -82,7 +85,7 @@ public class DtsClientMessageSenderImpl implements DtsClientMessageSender {
         case RequestCode.BODY_REQUEST:
           final byte[] body = remotingCommand.getBody();
           if (remotingCommand.getCode() == RemotingSysResponseCode.SUCCESS) {
-            return  (T) RemotingSerializable.decode(body, DtsMessage.class);
+            return (T) RemotingSerializable.decode(body, DtsMessage.class);
           }
           break;
         default:
@@ -107,7 +110,4 @@ public class DtsClientMessageSenderImpl implements DtsClientMessageSender {
     return this.invoke(requestCode, msg, 3000l);
   }
 
-  @Override
-  public void sendResponse(final long msgId, final String serverAddress, final Object msg) {
-  }
 }
