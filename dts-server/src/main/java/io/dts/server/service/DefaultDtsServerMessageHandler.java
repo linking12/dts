@@ -20,6 +20,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import io.dts.common.api.DtsServerMessageHandler;
+import io.dts.common.api.DtsServerMessageSender;
 import io.dts.common.protocol.RequestHeaderMessage;
 import io.dts.common.protocol.ResponseMessage;
 import io.dts.common.protocol.body.BranchCommitResultMessage;
@@ -61,14 +62,17 @@ public class DefaultDtsServerMessageHandler implements DtsServerMessageHandler {
   @Autowired
   private DtsLogDao dtsLogDao;
 
+  @Autowired
+  private DtsServerMessageSender serverMessageServer;
+
   /**
    * 开始一个分布式事务
    */
   @Override
   public void handleMessage(String clientIp, BeginMessage message,
       BeginResultMessage resultMessage) {
-    ClientMessageHandler processor =
-        ClientMessageHandler.createClientMessageProcessor(dtsTransStatusDao, dtsLogDao, this);
+    ClientMessageHandler processor = ClientMessageHandler
+        .createClientMessageProcessor(dtsTransStatusDao, dtsLogDao, serverMessageServer, this);
     String xid = processor.processMessage(message, clientIp);
     resultMessage.setXid(xid);
     return;
@@ -81,8 +85,8 @@ public class DefaultDtsServerMessageHandler implements DtsServerMessageHandler {
   public void handleMessage(String clientIp, GlobalCommitMessage message,
       GlobalCommitResultMessage resultMessage) {
     resultMessage.setTranId(message.getTranId());
-    ClientMessageHandler processor =
-        ClientMessageHandler.createClientMessageProcessor(dtsTransStatusDao, dtsLogDao, this);
+    ClientMessageHandler processor = ClientMessageHandler
+        .createClientMessageProcessor(dtsTransStatusDao, dtsLogDao, serverMessageServer, this);
     processor.processMessage(message, clientIp);
   }
 
@@ -94,8 +98,8 @@ public class DefaultDtsServerMessageHandler implements DtsServerMessageHandler {
   public void handleMessage(String clientIp, GlobalRollbackMessage message,
       GlobalRollbackResultMessage resultMessage) {
     resultMessage.setTranId(message.getTranId());
-    ClientMessageHandler processor =
-        ClientMessageHandler.createClientMessageProcessor(dtsTransStatusDao, dtsLogDao, this);
+    ClientMessageHandler processor = ClientMessageHandler
+        .createClientMessageProcessor(dtsTransStatusDao, dtsLogDao, serverMessageServer, this);
     processor.processMessage(message, clientIp);
   }
 

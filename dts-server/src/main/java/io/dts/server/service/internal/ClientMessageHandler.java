@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.dts.common.api.DtsServerMessageHandler;
+import io.dts.common.api.DtsServerMessageSender;
 import io.dts.common.common.TxcXID;
 import io.dts.common.protocol.header.BeginMessage;
 import io.dts.common.protocol.header.GlobalCommitMessage;
@@ -49,7 +50,8 @@ public interface ClientMessageHandler {
 
 
   public static ClientMessageHandler createClientMessageProcessor(
-      DtsTransStatusDao dtsTransStatusDao, DtsLogDao dtsLogDao, DtsServerMessageHandler handler) {
+      DtsTransStatusDao dtsTransStatusDao, DtsLogDao dtsLogDao,
+      DtsServerMessageSender serverMessageServer, DtsServerMessageHandler handler) {
 
     return new ClientMessageHandler() {
       private final Logger logger = LoggerFactory.getLogger(ResourceManagerMessageHandler.class);
