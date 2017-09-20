@@ -29,7 +29,6 @@ import io.dts.server.model.BranchLog;
 import io.dts.server.model.BranchTransactionState;
 import io.dts.server.model.GlobalLog;
 import io.dts.server.model.GlobalTransactionState;
-import io.dts.server.service.DefaultDtsServerMessageHandler;
 import io.dts.server.store.DtsLogDao;
 import io.dts.server.store.DtsTransStatusDao;
 import io.dts.server.store.impl.DtsServerRestorer;
@@ -43,11 +42,9 @@ public interface ClientMessageHandler {
 
   String processMessage(BeginMessage beginMessage, String clientIp);
 
-  void processMessage(GlobalCommitMessage globalCommitMessage, String clientIp,
-      DefaultDtsServerMessageHandler handler);
+  void processMessage(GlobalCommitMessage globalCommitMessage, String clientIp);
 
-  void processMessage(GlobalRollbackMessage globalRollbackMessage, String clientIp,
-      DefaultDtsServerMessageHandler handler);
+  void processMessage(GlobalRollbackMessage globalRollbackMessage, String clientIp);
 
 
   public static ClientMessageHandler createClientMessageProcessor(
@@ -73,8 +70,7 @@ public interface ClientMessageHandler {
 
       // 事务提交
       @Override
-      public void processMessage(GlobalCommitMessage globalCommitMessage, String clientIp,
-          DefaultDtsServerMessageHandler handler) {
+      public void processMessage(GlobalCommitMessage globalCommitMessage, String clientIp) {
         Long tranId = globalCommitMessage.getTranId();
         GlobalLog globalLog = dtsTransStatusDao.queryGlobalLog(tranId);
         if (globalLog == null) {
@@ -125,13 +121,20 @@ public interface ClientMessageHandler {
                 globalLog.setState(GlobalTransactionState.CommitHeuristic.getValue());
                 throw new DtsBizException("update global status fail.");
               }
-              CommitGlobalTransaction commitGlobalTransaction =
-                  new CommitGlobalTransaction(branchLogs);
               if (!globalLog.isContainPhase2CommitBranch()) {
-                commitGlobalTransaction.doInsert(dtsTransStatusDao);
+                for (BranchLog branchLog : branchLogs) {
+                  dtsTransStatusDao.insertCommitedBranchLog(branchLog.getBranchId(),
+                      BranchTransactionState.BEGIN.getValue());
+                }
               } else {
                 try {
-                  commitGlobalTransaction.doNotify(globalLog, handler);
+                  Collections.sort(branchLogs, new Comparator<BranchLog>() {
+                    @Override
+                    public int compare(BranchLog o1, BranchLog o2) {
+                      return (int) (o1.getBranchId() - o2.getBranchId());
+                    }
+                  });
+                  this.syncGlobalCommit(branchLogs, globalLog, globalLog.getTxId());
                 } catch (Exception e) {
                   logger.error(e.getMessage(), e);
                   throw new DtsBizException("notify resourcemanager to commit failed");
@@ -147,8 +150,7 @@ public interface ClientMessageHandler {
 
       // 事务回滚
       @Override
-      public void processMessage(GlobalRollbackMessage globalRollbackMessage, String clientIp,
-          DefaultDtsServerMessageHandler handler) {
+      public void processMessage(GlobalRollbackMessage globalRollbackMessage, String clientIp) {
         long tranId = globalRollbackMessage.getTranId();
         GlobalLog globalLog = dtsTransStatusDao.queryGlobalLog(tranId);
         if (globalLog == null) {
@@ -183,7 +185,7 @@ public interface ClientMessageHandler {
           try {
             String clusterNode = globalRollbackMessage.getRealSvrAddr();
             if (clusterNode == null)
-              handler.syncGlobalRollback(branchLogs, globalLog, tranId);
+              this.syncGlobalRollback(branchLogs, globalLog, tranId);
             // handler.globalRollbackForPrevNode(branchLogs, globalLog, tranId, clusterNode);
           } catch (Exception e) {
             logger.error(e.getMessage(), e);
@@ -194,33 +196,17 @@ public interface ClientMessageHandler {
         }
       }
 
+      protected void syncGlobalCommit(List<BranchLog> branchLogs, GlobalLog globalLog,
+          long tranId) {
+
+      }
+
+      protected void syncGlobalRollback(List<BranchLog> branchLogs, GlobalLog globalLog,
+          long tranId) {
+
+      }
+
     };
   }
 
-
-  static class CommitGlobalTransaction {
-    private final List<BranchLog> branchLogs;
-
-    CommitGlobalTransaction(List<BranchLog> branchLogs) {
-      this.branchLogs = branchLogs;
-    }
-
-    private void doInsert(DtsTransStatusDao dtsTransStatusDao) {
-      for (BranchLog branchLog : branchLogs) {
-        dtsTransStatusDao.insertCommitedBranchLog(branchLog.getBranchId(),
-            BranchTransactionState.BEGIN.getValue());
-      }
-    }
-
-    private void doNotify(GlobalLog globalLog, DefaultDtsServerMessageHandler handler) {
-      Collections.sort(branchLogs, new Comparator<BranchLog>() {
-        @Override
-        public int compare(BranchLog o1, BranchLog o2) {
-          return (int) (o1.getBranchId() - o2.getBranchId());
-        }
-      });
-      handler.syncGlobalCommit(branchLogs, globalLog, globalLog.getTxId());
-    }
-
-  }
 }

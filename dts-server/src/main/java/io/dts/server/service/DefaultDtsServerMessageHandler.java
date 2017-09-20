@@ -42,8 +42,6 @@ import io.dts.common.protocol.header.ReportStatusMessage;
 import io.dts.common.protocol.header.ReportStatusResultMessage;
 import io.dts.common.protocol.header.ReportUdataMessage;
 import io.dts.common.protocol.header.ReportUdataResultMessage;
-import io.dts.server.model.BranchLog;
-import io.dts.server.model.GlobalLog;
 import io.dts.server.service.internal.ClientMessageHandler;
 import io.dts.server.service.internal.ResourceManagerMessageHandler;
 import io.dts.server.store.DtsLogDao;
@@ -85,7 +83,7 @@ public class DefaultDtsServerMessageHandler implements DtsServerMessageHandler {
     resultMessage.setTranId(message.getTranId());
     ClientMessageHandler processor =
         ClientMessageHandler.createClientMessageProcessor(dtsTransStatusDao, dtsLogDao);
-    processor.processMessage(message, clientIp, this);
+    processor.processMessage(message, clientIp);
   }
 
 
@@ -98,20 +96,9 @@ public class DefaultDtsServerMessageHandler implements DtsServerMessageHandler {
     resultMessage.setTranId(message.getTranId());
     ClientMessageHandler processor =
         ClientMessageHandler.createClientMessageProcessor(dtsTransStatusDao, dtsLogDao);
-    processor.processMessage(message, clientIp, this);
+    processor.processMessage(message, clientIp);
   }
 
-  // 往resourceManager发送提交信息消息
-  // TODO
-  protected void syncGlobalCommit(List<BranchLog> branchLogs, GlobalLog globalLog, long tranId) {
-
-  }
-
-  // 往resourceManager发送全局回滚消息
-  // TODO
-  protected void syncGlobalRollback(List<BranchLog> branchLogs, GlobalLog globalLog, long tranId) {
-
-  }
 
   @Override
   public void handleMessage(String clientIp, RegisterMessage registerMessage,
