@@ -1,9 +1,4 @@
-package io.dts.resourcemanager.transport;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-
-import java.util.Collections;
+package io.dts.resourcemanager.remoting.sender;
 
 import io.dts.common.api.DtsClientMessageSender;
 import io.dts.common.common.TxcXID;
@@ -13,37 +8,21 @@ import io.dts.common.protocol.DtsMessage;
 import io.dts.common.protocol.RequestCode;
 import io.dts.common.protocol.RequestHeaderMessage;
 import io.dts.remoting.CommandCustomHeader;
-import io.dts.remoting.RemotingClient;
 import io.dts.remoting.exception.RemotingCommandException;
-import io.dts.remoting.exception.RemotingConnectException;
-import io.dts.remoting.exception.RemotingSendRequestException;
-import io.dts.remoting.exception.RemotingTimeoutException;
-import io.dts.remoting.netty.NettyClientConfig;
-import io.dts.remoting.netty.NettyRemotingClient;
 import io.dts.remoting.protocol.RemotingCommand;
 import io.dts.remoting.protocol.RemotingSerializable;
 import io.dts.remoting.protocol.RemotingSysResponseCode;
+import io.dts.resourcemanager.remoting.DtsRemotingClient;
 
 /**
  * Created by guoyubo on 2017/9/13.
  */
 public class DtsClientMessageSenderImpl implements DtsClientMessageSender {
 
-  private RemotingClient remotingClient;
+  private DtsRemotingClient dtsRemotingClient;
 
-  public DtsClientMessageSenderImpl(NettyClientConfig nettyClientConfig) {
-    this.remotingClient = new NettyRemotingClient(nettyClientConfig);
-    this.remotingClient.updateNameServerAddressList(Collections.singletonList("127.0.0.1:10086"));
-  }
-
-  @PostConstruct
-  public void init() {
-    remotingClient.start();
-  }
-
-  @PreDestroy
-  public void destroy() {
-    remotingClient.shutdown();
+  public DtsClientMessageSenderImpl(final DtsRemotingClient dtsRemotingClient) {
+    this.dtsRemotingClient = dtsRemotingClient;
   }
 
   @Override
@@ -62,7 +41,7 @@ public class DtsClientMessageSenderImpl implements DtsClientMessageSender {
       RemotingCommand request;
       switch (requestCode) {
         case RequestCode.HEADER_REQUEST:
-          request = RemotingCommand.createRequestCommand(RequestCode.HEADER_REQUEST, (RequestHeaderMessage)msg);
+          request = RemotingCommand.createRequestCommand(RequestCode.HEADER_REQUEST, (RequestHeaderMessage) msg);
           break;
         case RequestCode.BODY_REQUEST:
           request = RemotingCommand.createRequestCommand(RequestCode.HEADER_REQUEST, null);
@@ -72,7 +51,7 @@ public class DtsClientMessageSenderImpl implements DtsClientMessageSender {
           throw new DtsException("unsupport request code " + requestCode);
       }
 
-      RemotingCommand remotingCommand = remotingClient.invokeSync(serverAddress, request, timeout);
+      RemotingCommand remotingCommand = dtsRemotingClient.invokeSync(serverAddress, request, timeout);
       switch (((RemotingCommand) msg).getCode()) {
         case RequestCode.HEADER_REQUEST:
           if (remotingCommand.getCode() == RemotingSysResponseCode.SUCCESS) {
@@ -82,27 +61,19 @@ public class DtsClientMessageSenderImpl implements DtsClientMessageSender {
         case RequestCode.BODY_REQUEST:
           final byte[] body = remotingCommand.getBody();
           if (remotingCommand.getCode() == RemotingSysResponseCode.SUCCESS) {
-            return  (T) RemotingSerializable.decode(body, DtsMessage.class);
+            return (T) RemotingSerializable.decode(body, DtsMessage.class);
           }
           break;
         default:
           break;
       }
       return null;
-    } catch (InterruptedException e) {
-      throw new DtsException(e, "internal error");
-    } catch (RemotingConnectException e) {
-      throw new DtsException(e, "connect remote server error");
-    } catch (RemotingSendRequestException e) {
-      throw new DtsException(e, "send request error");
-    } catch (RemotingTimeoutException e) {
-      throw new DtsException(e, "remote timeout");
     } catch (RemotingCommandException e) {
-      throw new DtsException(e, "decode response error");
+      throw new DtsException(e, "decode header error");
     }
   }
 
-  @Override
+    @Override
   public <T> T invoke(int requestCode, final DtsMessage msg) throws DtsException {
     return this.invoke(requestCode, msg, 3000l);
   }
