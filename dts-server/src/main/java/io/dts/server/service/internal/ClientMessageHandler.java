@@ -11,7 +11,7 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-package io.dts.server.service;
+package io.dts.server.service.internal;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -29,6 +29,7 @@ import io.dts.server.model.BranchLog;
 import io.dts.server.model.BranchTransactionState;
 import io.dts.server.model.GlobalLog;
 import io.dts.server.model.GlobalTransactionState;
+import io.dts.server.service.DefaultDtsServerMessageHandler;
 import io.dts.server.store.DtsLogDao;
 import io.dts.server.store.DtsTransStatusDao;
 import io.dts.server.store.impl.DtsServerRestorer;
