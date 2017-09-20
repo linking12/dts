@@ -23,10 +23,10 @@ import org.slf4j.LoggerFactory;
 import io.dts.common.api.DtsServerMessageHandler;
 import io.dts.common.api.DtsServerMessageSender;
 import io.dts.common.common.TxcXID;
+import io.dts.common.exception.DtsException;
 import io.dts.common.protocol.header.BeginMessage;
 import io.dts.common.protocol.header.GlobalCommitMessage;
 import io.dts.common.protocol.header.GlobalRollbackMessage;
-import io.dts.server.exception.DtsBizException;
 import io.dts.server.model.BranchLog;
 import io.dts.server.model.BranchTransactionState;
 import io.dts.server.model.GlobalLog;
@@ -80,14 +80,14 @@ public interface ClientMessageHandler {
           // 事务已超时
           if (dtsTransStatusDao.queryTimeOut(tranId)) {
             dtsTransStatusDao.removeTimeOut(tranId);
-            throw new DtsBizException(
+            throw new DtsException(
                 "transaction doesn't exist. It has been rollbacked because of timeout.");
           } // 事务已提交
           else if (DtsServerRestorer.restoredCommittingTransactions.contains(tranId)) {
             return;
           } // 在本地缓存未查到事务
           else {
-            throw new DtsBizException("transaction doesn't exist.");
+            throw new DtsException("transaction doesn't exist.");
           }
         } else {
           switch (GlobalTransactionState.parse(globalLog.getState())) {
@@ -95,14 +95,14 @@ public interface ClientMessageHandler {
               if (!globalLog.isContainPhase2CommitBranch()) {
                 return;
               } else {
-                throw new DtsBizException("transaction is committing.");
+                throw new DtsException("transaction is committing.");
               }
             case Rollbacking:
               if (dtsTransStatusDao.queryTimeOut(tranId)) {
                 dtsTransStatusDao.removeTimeOut(tranId);
-                throw new DtsBizException("transaction is rollbacking because of timeout.");
+                throw new DtsException("transaction is rollbacking because of timeout.");
               } else {
-                throw new DtsBizException("transaction is rollbacking.");
+                throw new DtsException("transaction is rollbacking.");
               }
             case Begin:
             case CommitHeuristic:
@@ -122,7 +122,7 @@ public interface ClientMessageHandler {
                 logger.error(e.getMessage(), e);
                 // 状态设置为提交未决
                 globalLog.setState(GlobalTransactionState.CommitHeuristic.getValue());
-                throw new DtsBizException("update global status fail.");
+                throw new DtsException("update global status fail.");
               }
               if (!globalLog.isContainPhase2CommitBranch()) {
                 for (BranchLog branchLog : branchLogs) {
@@ -140,12 +140,12 @@ public interface ClientMessageHandler {
                   this.syncGlobalCommit(branchLogs, globalLog, globalLog.getTxId());
                 } catch (Exception e) {
                   logger.error(e.getMessage(), e);
-                  throw new DtsBizException("notify resourcemanager to commit failed");
+                  throw new DtsException("notify resourcemanager to commit failed");
                 }
               }
               return;
             default:
-              throw new DtsBizException("Unknown state " + globalLog.getState());
+              throw new DtsException("Unknown state " + globalLog.getState());
           }
 
         }
@@ -159,19 +159,19 @@ public interface ClientMessageHandler {
         if (globalLog == null) {
           if (dtsTransStatusDao.queryTimeOut(tranId)) {
             dtsTransStatusDao.removeTimeOut(tranId);
-            throw new DtsBizException(
+            throw new DtsException(
                 "transaction doesn't exist. It has been rollbacked because of timeout.");
           } else {
-            throw new DtsBizException("transaction doesn't exist.");
+            throw new DtsException("transaction doesn't exist.");
           }
         } else if (globalLog.getState() == GlobalTransactionState.Committing.getValue()) {
-          throw new DtsBizException("transaction is committing.");
+          throw new DtsException("transaction is committing.");
         } else if (globalLog.getState() == GlobalTransactionState.Rollbacking.getValue()) {
           if (dtsTransStatusDao.queryTimeOut(tranId)) {
             dtsTransStatusDao.removeTimeOut(tranId);
-            throw new DtsBizException("transaction has been rollbacking because of timeout.");
+            throw new DtsException("transaction has been rollbacking because of timeout.");
           } else {
-            throw new DtsBizException("transaction has been rollbacking.");
+            throw new DtsException("transaction has been rollbacking.");
           }
         } else if (globalLog.getState() == GlobalTransactionState.Begin.getValue()) {
           List<BranchLog> branchLogs =
@@ -183,7 +183,7 @@ public interface ClientMessageHandler {
               dtsLogDao.updateGlobalLog(globalLog, 1);
           } catch (Exception e) {
             globalLog.setState(GlobalTransactionState.Begin.getValue());
-            throw new DtsBizException("update global status fail.");
+            throw new DtsException("update global status fail.");
           }
           try {
             String clusterNode = globalRollbackMessage.getRealSvrAddr();
@@ -192,10 +192,10 @@ public interface ClientMessageHandler {
             // handler.globalRollbackForPrevNode(branchLogs, globalLog, tranId, clusterNode);
           } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            throw new DtsBizException("notify resourcemanager to rollback failed");
+            throw new DtsException("notify resourcemanager to rollback failed");
           }
         } else {
-          throw new DtsBizException("Unknown state " + globalLog.getState());
+          throw new DtsException("Unknown state " + globalLog.getState());
         }
       }
 

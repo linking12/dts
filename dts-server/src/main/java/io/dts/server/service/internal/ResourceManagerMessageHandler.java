@@ -20,13 +20,13 @@ import org.slf4j.LoggerFactory;
 
 import io.dts.common.common.CommitMode;
 import io.dts.common.common.TxcXID;
+import io.dts.common.exception.DtsException;
 import io.dts.common.protocol.header.BeginRetryBranchMessage;
 import io.dts.common.protocol.header.BeginRetryBranchResultMessage;
 import io.dts.common.protocol.header.QueryLockMessage;
 import io.dts.common.protocol.header.RegisterMessage;
 import io.dts.common.protocol.header.ReportStatusMessage;
 import io.dts.common.protocol.header.ReportUdataMessage;
-import io.dts.server.exception.DtsBizException;
 import io.dts.server.model.BranchLog;
 import io.dts.server.model.BranchLogState;
 import io.dts.server.model.GlobalLog;
@@ -66,9 +66,9 @@ public interface ResourceManagerMessageHandler {
         GlobalLog globalLog = dtsTransStatusDao.queryGlobalLog(tranId);
         if (globalLog == null || globalLog.getState() != GlobalTransactionState.Begin.getValue()) {
           if (globalLog == null) {
-            throw new DtsBizException("Transaction " + tranId + " doesn't exist");
+            throw new DtsException("Transaction " + tranId + " doesn't exist");
           } else {
-            throw new DtsBizException("Transaction " + tranId + " is in state:"
+            throw new DtsException("Transaction " + tranId + " is in state:"
                 + this.getStateString(GlobalTransactionState.class, globalLog.getState()));
           }
         }
@@ -87,7 +87,7 @@ public interface ResourceManagerMessageHandler {
           dtsLogDao.insertBranchLog(branchLog, 1);
         } catch (Exception e) {
           logger.error(e.getMessage(), e);
-          throw new DtsBizException("insert branch log failed");
+          throw new DtsException("insert branch log failed");
         }
         Long branchId = branchLog.getBranchId();
         dtsTransStatusDao.insertBranchLog(branchId, branchLog);
@@ -99,7 +99,7 @@ public interface ResourceManagerMessageHandler {
       public void processMessage(ReportStatusMessage reportStatusMessage, String clientIp) {
         BranchLog branchLog = dtsTransStatusDao.queryBranchLog(reportStatusMessage.getBranchId());
         if (branchLog == null) {
-          throw new DtsBizException("branch doesn't exist.");
+          throw new DtsException("branch doesn't exist.");
         }
         int state = (reportStatusMessage.isSuccess()) ? BranchLogState.Success.getValue()
             : BranchLogState.Failed.getValue();
@@ -111,7 +111,7 @@ public interface ResourceManagerMessageHandler {
          */
         GlobalLog globalLog = dtsTransStatusDao.queryGlobalLog(branchLog.getTxId());
         if (globalLog == null) {
-          throw new DtsBizException("global log doesn't exist.");
+          throw new DtsException("global log doesn't exist.");
         }
         if (globalLog.getState() == GlobalTransactionState.Rollbacking.getValue()) {
           dtsTransStatusDao.insertRollbackBranchLog(branchLog.getBranchId(),
@@ -130,14 +130,14 @@ public interface ResourceManagerMessageHandler {
         Long branchId = reportUdataMessage.getBranchId();
         BranchLog branchLog = dtsTransStatusDao.queryBranchLog(branchId);
         if (branchLog == null) {
-          throw new DtsBizException("branch doesn't exist.");
+          throw new DtsException("branch doesn't exist.");
         }
         if (reportUdataMessage.getUdata() != null) {
           branchLog.setUdata(reportUdataMessage.getUdata());
           try {
             dtsLogDao.updateBranchLog(branchLog, 1);
           } catch (Exception e) {
-            throw new DtsBizException("update branchlog usedata failed");
+            throw new DtsException("update branchlog usedata failed");
           }
         }
       }
@@ -158,7 +158,7 @@ public interface ResourceManagerMessageHandler {
           try {
             dtsLogDao.insertGlobalLog(retryGlobalLog, 1);
           } catch (Exception e) {
-            throw new DtsBizException("insert global retry log failed");
+            throw new DtsException("insert global retry log failed");
           }
           retryGlobalLog.setLeftBranches(1);
           retryGlobalLog.setTimeout(0);
@@ -187,7 +187,7 @@ public interface ResourceManagerMessageHandler {
         try {
           dtsLogDao.insertBranchLog(branchLog, 1);
         } catch (Exception e) {
-          throw new DtsBizException("insert branch retry log failed");
+          throw new DtsException("insert branch retry log failed");
         }
         dtsTransStatusDao.insertBranchLog(branchLog.getBranchId(), branchLog);
         retryGlobalLog.getBranchIds().add(branchLog.getBranchId());
