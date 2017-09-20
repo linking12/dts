@@ -38,7 +38,7 @@ import io.dts.server.DtsServerProperties;
 import io.dts.server.common.AbstractLifecycleComponent;
 import io.dts.server.remoting.channel.ChannelkeepingComponent;
 import io.dts.server.remoting.latency.ServerFixedThreadPoolExecutor;
-import io.dts.server.remoting.processor.BizMessageProcessor;
+import io.dts.server.remoting.processor.DtsMessageProcessor;
 import io.dts.server.remoting.processor.HeatBeatProcessor;
 import io.dts.util.NetUtil;
 
@@ -72,7 +72,7 @@ public class DtsServerContainer extends AbstractLifecycleComponent {
   }
 
   private void registerHeaderRequest() {
-    BizMessageProcessor messageProcessor = createMessageProcessor();
+    DtsMessageProcessor messageProcessor = createMessageProcessor();
     BlockingQueue<Runnable> clientThreadPoolQueue =
         Queues.newLinkedBlockingDeque(serverProperties.getClientThreadPoolQueueSize());
     ExecutorService clientMessageExecutor =
@@ -84,7 +84,7 @@ public class DtsServerContainer extends AbstractLifecycleComponent {
   }
 
   private void registerBodyRequest() {
-    BizMessageProcessor messageProcessor = createMessageProcessor();
+    DtsMessageProcessor messageProcessor = createMessageProcessor();
     BlockingQueue<Runnable> resourceThreadPoolQueue =
         Queues.newLinkedBlockingDeque(serverProperties.getResourceThreadPoolQueueSize());
     ExecutorService resourceMessageExecutor =
@@ -103,8 +103,8 @@ public class DtsServerContainer extends AbstractLifecycleComponent {
         heatBeatProcessorExecutor);
   }
 
-  @Lookup(value = "bizMessageProcessor")
-  protected BizMessageProcessor createMessageProcessor() {
+  @Lookup(value = "dtsMessageProcessor")
+  protected DtsMessageProcessor createMessageProcessor() {
     return null;
   }
 

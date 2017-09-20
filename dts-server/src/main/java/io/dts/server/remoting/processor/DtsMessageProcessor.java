@@ -23,7 +23,6 @@ import io.dts.common.protocol.DtsMessage;
 import io.dts.common.protocol.RequestCode;
 import io.dts.common.protocol.RequestHeaderMessage;
 import io.dts.common.protocol.ResponseCode;
-import io.dts.common.protocol.body.BranchCommitResultMessage;
 import io.dts.common.protocol.body.DtsMultipleRequestMessage;
 import io.dts.common.protocol.body.DtsMultipleResonseMessage;
 import io.dts.common.protocol.header.BeginMessage;
@@ -55,9 +54,9 @@ import io.netty.channel.ChannelHandlerContext;
  * @version MessageProcessorComponent.java, v 0.0.1 2017年9月13日 下午2:00:41 liushiming
  */
 @Component
-@Qualifier("bizMessageProcessor")
+@Qualifier("dtsMessageProcessor")
 @Scope("prototype")
-public class BizMessageProcessor implements NettyRequestProcessor {
+public class DtsMessageProcessor implements NettyRequestProcessor {
 
   @Lookup
   protected DtsServerMessageHandler createMessageHandler() {
@@ -160,16 +159,6 @@ public class BizMessageProcessor implements NettyRequestProcessor {
           responseHeader = response.readCustomHeader();
           createMessageHandler().handleMessage(clientIp, (QueryLockMessage) dtsMessage,
               (QueryLockResultMessage) responseHeader);
-          response.setCode(ResponseCode.SUCCESS);
-          return response;
-        // 处理事务分支提交的反馈结果
-        case DtsMessage.TYPE_BRANCH_COMMIT_RESULT:
-          createMessageHandler().handleMessage(clientIp, (BranchCommitResultMessage) dtsMessage);
-          response.setCode(ResponseCode.SUCCESS);
-          return response;
-        // 处理事务分支回滚的反馈结果
-        case DtsMessage.TYPE_BRANCH_ROLLBACK_RESULT:
-          createMessageHandler().handleMessage(clientIp, (BranchRollbackResultMessage) dtsMessage);
           response.setCode(ResponseCode.SUCCESS);
           return response;
         default:
