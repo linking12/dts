@@ -11,9 +11,7 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-package io.dts.common.protocol.body;
-
-import java.util.List;
+package io.dts.common.protocol.header;
 
 import io.dts.common.protocol.ResponseMessage;
 import io.dts.remoting.protocol.RemotingSerializable;
@@ -30,7 +28,7 @@ public class BranchCommitResultMessage extends RemotingSerializable implements R
   /**
    * 分支IDs
    */
-  private List<Long> branchIds;
+  private Long branchId;
 
 
   private int result;
@@ -44,12 +42,12 @@ public class BranchCommitResultMessage extends RemotingSerializable implements R
     this.tranId = tranId;
   }
 
-  public List<Long> getBranchIds() {
-    return branchIds;
+  public Long getBranchId() {
+    return branchId;
   }
 
-  public void setBranchIds(List<Long> branchIds) {
-    this.branchIds = branchIds;
+  public void setBranchId(Long branchId) {
+    this.branchId = branchId;
   }
 
   @Override

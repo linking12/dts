@@ -11,24 +11,22 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-package io.dts.common.protocol.body;
+package io.dts.common.protocol.header;
 
-import java.util.List;
-
-import io.dts.common.protocol.DtsMessage;
-import io.dts.remoting.protocol.RemotingSerializable;
+import io.dts.common.protocol.RequestHeaderMessage;
+import io.dts.remoting.exception.RemotingCommandException;
 
 /**
  * @author liushiming
  * @version BranchCommitMessage.java, v 0.0.1 2017年9月1日 下午5:46:22 liushiming
  */
-public class BranchCommitMessage extends RemotingSerializable implements DtsMessage {
+public class BranchCommitMessage implements RequestHeaderMessage {
 
   private String serverAddr;
 
-  private List<Long> tranIds;
+  private Long tranId;
 
-  private List<Long> branchIds;
+  private Long branchId;
 
   private String clientIp;
 
@@ -50,20 +48,20 @@ public class BranchCommitMessage extends RemotingSerializable implements DtsMess
     this.serverAddr = serverAddr;
   }
 
-  public List<Long> getTranIds() {
-    return tranIds;
+  public Long getTranId() {
+    return tranId;
   }
 
-  public void setTranIds(List<Long> tranIds) {
-    this.tranIds = tranIds;
+  public void setTranId(Long tranId) {
+    this.tranId = tranId;
   }
 
-  public List<Long> getBranchIds() {
-    return branchIds;
+  public Long getBranchId() {
+    return branchId;
   }
 
-  public void setBranchIds(List<Long> branchIds) {
-    this.branchIds = branchIds;
+  public void setBranchId(Long branchId) {
+    this.branchId = branchId;
   }
 
   public String getClientIp() {
@@ -117,6 +115,11 @@ public class BranchCommitMessage extends RemotingSerializable implements DtsMess
   @Override
   public short getTypeCode() {
     return TYPE_BRANCH_COMMIT;
+  }
+
+  @Override
+  public void checkFields() throws RemotingCommandException {
+
   }
 
 

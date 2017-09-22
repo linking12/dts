@@ -25,12 +25,16 @@ public class BranchRollbackResultMessage implements CommandCustomHeader, Respons
   /**
    * 事务ID
    */
-  long tranId;
-
+  private long tranId;
   /**
    * 分支ID
    */
-  long branchId;
+  private long branchId;
+
+  /**
+   * 回滚结果
+   */
+  private int result;
 
   public long getTranId() {
     return tranId;
@@ -46,6 +50,14 @@ public class BranchRollbackResultMessage implements CommandCustomHeader, Respons
 
   public void setBranchId(long branchId) {
     this.branchId = branchId;
+  }
+
+  public int getResult() {
+    return result;
+  }
+
+  public void setResult(int result) {
+    this.result = result;
   }
 
   @Override

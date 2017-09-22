@@ -13,13 +13,11 @@
  */
 package io.dts.server.service.internal;
 
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.dts.common.protocol.ResultCode;
-import io.dts.common.protocol.body.BranchCommitResultMessage;
+import io.dts.common.protocol.header.BranchCommitResultMessage;
 import io.dts.common.protocol.header.BranchRollbackResultMessage;
 import io.dts.server.model.BranchLog;
 import io.dts.server.model.GlobalLog;
@@ -49,65 +47,98 @@ public interface SyncGlobalResultMessagHandler {
       public void processMessage(String clientIp, BranchCommitResultMessage message) {
         // 如果该resourceManager下面的branch提交成功
         Long tranId = message.getTranId();
-        List<Long> branchIds = message.getBranchIds();
+        Long branchId = message.getBranchId();
         if (message.getResult() == ResultCode.OK.getValue()) {
-          branchIds.forEach(branchId -> {
-            if (dtsTransStatusDao.clearCommitedBranchLog(branchId)) {
-              return;
+          if (!dtsTransStatusDao.clearCommitedBranchLog(branchId)) {
+            return;
+          }
+          BranchLog branchLog = dtsTransStatusDao.clearBranchLog(branchId);
+          if (branchLog != null) {
+            dtsLogDao.deleteBranchLog(branchLog, 1);
+          }
+          GlobalLog globalLog = dtsTransStatusDao.queryGlobalLog(tranId);
+          synchronized (globalLog) {
+            globalLog.getBranchIds().remove(branchId);
+            int leftBranches = globalLog.getLeftBranches();
+            if (leftBranches == 0) {
+              dtsTransStatusDao.clearGlobalLog(tranId);
+              dtsLogDao.deleteGlobalLog(tranId, 1);
             }
-            BranchLog branchLog = dtsTransStatusDao.clearBranchLog(branchId);
-            if (branchLog != null) {
-              dtsLogDao.deleteBranchLog(branchLog, 1);
-            }
-            GlobalLog globalLog = dtsTransStatusDao.queryGlobalLog(tranId);
-            synchronized (globalLog) {
-              globalLog.getBranchIds().removeAll(branchIds);
-              int leftBranches = globalLog.getLeftBranches();
-              if (leftBranches == 0) {
-                dtsTransStatusDao.clearGlobalLog(tranId);
-                dtsLogDao.deleteGlobalLog(tranId, 1);
-              }
-            }
-          });
+          }
+
           // 如果出现了逻辑错误，需要发出告警
         } else if (message.getResult() == ResultCode.LOGICERROR.getValue()) {
-          branchIds.forEach(branchId -> {
-            if (dtsTransStatusDao.clearCommitedBranchLog(branchId)) {
-              return;
-            }
-            BranchLog branchLog = dtsTransStatusDao.clearBranchLog(branchId);
-            if (branchLog != null) {
-              dtsLogDao.insertBranchErrorLog(branchLog, 1);
-              dtsLogDao.deleteBranchLog(branchLog, 1);
-              logger.error("Logic error occurs while commit branch:" + branchId
-                  + ". Please check server table:txc_branch_error_log.");
-            }
-            GlobalLog globalLog = dtsTransStatusDao.queryGlobalLog(tranId);
-            synchronized (globalLog) {
-              globalLog.getBranchIds().removeAll(branchIds);
-              int leftBranches = globalLog.getLeftBranches();
-              if (leftBranches == 0) {
-                dtsTransStatusDao.clearGlobalLog(tranId);
-                dtsLogDao.deleteGlobalLog(tranId, 1);
+          if (!dtsTransStatusDao.clearCommitedBranchLog(branchId)) {
+            return;
+          }
+          BranchLog branchLog = dtsTransStatusDao.clearBranchLog(branchId);
+          if (branchLog != null) {
+            dtsLogDao.insertBranchErrorLog(branchLog, 1);
+            dtsLogDao.deleteBranchLog(branchLog, 1);
+            logger.error("Logic error occurs while commit branch:" + branchId
+                + ". Please check server table:txc_branch_error_log.");
+          }
+          GlobalLog globalLog = dtsTransStatusDao.queryGlobalLog(tranId);
+          synchronized (globalLog) {
+            globalLog.getBranchIds().remove(branchId);
+            int leftBranches = globalLog.getLeftBranches();
+            if (leftBranches == 0) {
+              dtsTransStatusDao.clearGlobalLog(tranId);
+              dtsLogDao.deleteGlobalLog(tranId, 1);
 
-              }
             }
-          });
+          }
           // 提交失败，可以重复提交
         } else {
-          branchIds.forEach(branchId -> {
-            dtsTransStatusDao.insertCommitedBranchLog(branchId,
-                CommitingResultCode.FAILED.getValue());
-
-          });
+          dtsTransStatusDao.insertCommitedBranchLog(branchId,
+              CommitingResultCode.FAILED.getValue());
 
         }
       }
 
       @Override
       public void processMessage(String clientIp, BranchRollbackResultMessage message) {
-        // TODO Auto-generated method stub
+        Long tranId = message.getTranId();
+        Long branchId = message.getBranchId();
+        if (message.getResult() == ResultCode.OK.getValue()) {
+          if (!dtsTransStatusDao.clearRollbackBranchLog(branchId)) {
+            return;
+          }
+          BranchLog branchLog = dtsTransStatusDao.clearBranchLog(branchId);
+          if (branchLog != null) {
+            dtsLogDao.deleteBranchLog(branchLog, 1);
+          }
+          GlobalLog globalLog = dtsTransStatusDao.queryGlobalLog(tranId);
+          synchronized (globalLog) {
+            globalLog.getBranchIds().remove(branchId);
+            int leftBranches = globalLog.getLeftBranches();
+            if (leftBranches == 0) {
+              dtsTransStatusDao.clearGlobalLog(tranId);
+              dtsLogDao.deleteGlobalLog(tranId, 1);
+            }
+          }
+        } else if (message.getResult() == ResultCode.LOGICERROR.getValue()) {
+          if (!dtsTransStatusDao.clearRollbackBranchLog(branchId)) {
+            return;
+          }
+          BranchLog branchLog = dtsTransStatusDao.clearBranchLog(branchId);
+          if (branchLog != null) {
+            dtsLogDao.insertBranchErrorLog(branchLog, 1);
+            dtsLogDao.deleteBranchLog(branchLog, 1);
+            logger.error("Logic error occurs while rollback branch:" + message.getBranchId()
+                + ". Please check server table:txc_branch_error_log.");
+          }
+          GlobalLog globalLog = dtsTransStatusDao.queryGlobalLog(tranId);
+          synchronized (globalLog) {
+            globalLog.getBranchIds().remove(branchId);
+            int leftBranches = globalLog.getLeftBranches();
+            if (leftBranches == 0) {
+              dtsTransStatusDao.clearGlobalLog(tranId);
+              dtsLogDao.deleteGlobalLog(tranId, 1);
 
+            }
+          }
+        }
       }
 
     };
