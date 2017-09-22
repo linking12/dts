@@ -24,13 +24,7 @@ import io.dts.remoting.exception.RemotingCommandException;
 public class ReportUdataResultMessage implements CommandCustomHeader, ResponseMessage {
 
   @Override
-  public short getTypeCode() {
-    return TYPE_REPORT_UDATA;
-  }
-
-  @Override
   public void checkFields() throws RemotingCommandException {
-    // TODO Auto-generated method stub
 
   }
 

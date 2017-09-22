@@ -13,31 +13,36 @@
  */
 package io.dts.common.protocol.header;
 
-import io.dts.common.protocol.RequestHeaderMessage;
+import io.dts.common.protocol.RequestMessage;
+import io.dts.remoting.CommandCustomHeader;
+import io.dts.remoting.annotation.CFNotNull;
 import io.dts.remoting.exception.RemotingCommandException;
 
 /**
  * @author liushiming
  * @version ReportUdataMessage.java, v 0.0.1 2017年9月1日 下午6:26:45 liushiming
  */
-public class ReportUdataMessage implements RequestHeaderMessage {
+public class ReportUdataMessage implements CommandCustomHeader, RequestMessage {
 
   /**
    * 事务ID
    */
-  long tranId;
+  @CFNotNull
+  private long tranId;
 
   /**
    * 分支ID
    */
-  long branchId;
+  @CFNotNull
+  private long branchId;
 
-  String key;
+  @CFNotNull
+  private String key;
 
   /**
    * 用户自定义信息，MT服务可以把一阶段的一些用户数据上报给Server，Server在二阶段把这个信息再传下来； 这样MT服务二阶段可以节省一次查询
    */
-  String udata = null;
+  private String udata = null;
 
   public long getTranId() {
     return tranId;
@@ -71,14 +76,9 @@ public class ReportUdataMessage implements RequestHeaderMessage {
     this.udata = udata;
   }
 
-  @Override
-  public short getTypeCode() {
-    return TYPE_REPORT_UDATA_RESULT;
-  }
 
   @Override
   public void checkFields() throws RemotingCommandException {
-    // TODO Auto-generated method stub
 
   }
 

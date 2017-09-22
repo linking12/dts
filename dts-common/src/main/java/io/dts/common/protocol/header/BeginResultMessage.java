@@ -53,11 +53,6 @@ public class BeginResultMessage implements CommandCustomHeader, ResponseMessage 
   }
 
   @Override
-  public short getTypeCode() {
-    return TYPE_BEGIN_RESULT;
-  }
-
-  @Override
   public void checkFields() throws RemotingCommandException {
 
   }

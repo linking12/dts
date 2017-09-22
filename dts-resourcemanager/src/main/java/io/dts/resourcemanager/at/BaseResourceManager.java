@@ -40,10 +40,10 @@ public class BaseResourceManager implements ResourceManager {
       try {
 
         final String serverAddress = TxcXID.getServerAddress(DtsContext.getCurrentXid());
-        RegisterResultMessage resultMessage = clientMessageSender.invoke(serverAddress, RequestCode.HEADER_REQUEST, registerMessage, 3000l);
-
+        RegisterResultMessage resultMessage =
+            clientMessageSender.invoke(serverAddress, registerMessage, 3000l);
         if (resultMessage.getResult() != RemotingSysResponseCode.SUCCESS) {
-          throw new DtsException(resultMessage.getResult(), resultMessage.getMsg());
+          throw new DtsException(resultMessage.getResult(), "error");
         } else {
           return resultMessage.getBranchId();
         }
@@ -59,8 +59,8 @@ public class BaseResourceManager implements ResourceManager {
   }
 
   @Override
-  public void reportStatus(final long branchId, final boolean success, final String key, final String udata)
-      throws DtsException {
+  public void reportStatus(final long branchId, final boolean success, final String key,
+      final String udata) throws DtsException {
     if (DtsContext.inTxcTransaction()) {
       ReportStatusMessage reportStatusMessage = new ReportStatusMessage();
       reportStatusMessage.setBranchId(branchId);
@@ -69,7 +69,8 @@ public class BaseResourceManager implements ResourceManager {
       reportStatusMessage.setSuccess(success);
       reportStatusMessage.setUdata(udata);
       final String serverAddress = TxcXID.getServerAddress(DtsContext.getCurrentXid());
-      ReportStatusResultMessage resultMessage = clientMessageSender.invoke(serverAddress, RequestCode.HEADER_REQUEST, reportStatusMessage, 3000l);
+      ReportStatusResultMessage resultMessage =
+          clientMessageSender.invoke(serverAddress, reportStatusMessage, 3000l);
     } else {
       throw new IllegalStateException("current thread is not bind to dts transaction.");
     }

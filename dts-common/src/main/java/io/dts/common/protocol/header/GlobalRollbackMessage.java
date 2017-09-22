@@ -13,23 +13,26 @@
  */
 package io.dts.common.protocol.header;
 
-import io.dts.common.protocol.RequestHeaderMessage;
+import io.dts.common.protocol.RequestMessage;
+import io.dts.remoting.CommandCustomHeader;
+import io.dts.remoting.annotation.CFNotNull;
 import io.dts.remoting.exception.RemotingCommandException;
 
 /**
  * @author liushiming
  * @version GlobalRollbackMessage.java, v 0.0.1 2017年9月1日 下午6:27:32 liushiming
  */
-public class GlobalRollbackMessage implements RequestHeaderMessage {
+public class GlobalRollbackMessage implements CommandCustomHeader, RequestMessage {
   /**
    * 事务ID
    */
-  long tranId;
+  @CFNotNull
+  private long tranId;
 
   /**
    * 当server采用cluster mode，有可能消息接收svr并不是发起事务的svr，这个属性指示发起事务的svr地址
    */
-  String realSvrAddr;
+  private String realSvrAddr;
 
   public long getTranId() {
     return tranId;
@@ -47,14 +50,9 @@ public class GlobalRollbackMessage implements RequestHeaderMessage {
     this.realSvrAddr = realSvrAddr;
   }
 
-  @Override
-  public short getTypeCode() {
-    return TYPE_GLOBAL_ROLLBACK;
-  }
 
   @Override
   public void checkFields() throws RemotingCommandException {
-    // TODO Auto-generated method stub
 
   }
 

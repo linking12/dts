@@ -13,7 +13,8 @@
  */
 package io.dts.common.protocol.header;
 
-import io.dts.common.protocol.RequestHeaderMessage;
+import io.dts.common.protocol.RequestMessage;
+import io.dts.remoting.CommandCustomHeader;
 import io.dts.remoting.annotation.CFNotNull;
 import io.dts.remoting.exception.RemotingCommandException;
 
@@ -21,7 +22,7 @@ import io.dts.remoting.exception.RemotingCommandException;
  * @author liushiming
  * @version BeginRetryBranchMessage.java, v 0.0.1 2017年9月1日 下午5:46:06 liushiming
  */
-public class BeginRetryBranchMessage implements RequestHeaderMessage {
+public class BeginRetryBranchMessage implements CommandCustomHeader, RequestMessage {
   /**
    * 有效时长；超出这个时长，转为告警通知用户。 缺省半小时
    */
@@ -76,14 +77,9 @@ public class BeginRetryBranchMessage implements RequestHeaderMessage {
     this.sql = sql;
   }
 
-  @Override
-  public short getTypeCode() {
-    return TYPE_BEGIN_RETRY_BRANCH;
-  }
 
   @Override
   public void checkFields() throws RemotingCommandException {
-    // TODO Auto-generated method stub
 
   }
 

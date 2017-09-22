@@ -15,6 +15,7 @@ package io.dts.common.protocol.header;
 
 import io.dts.common.protocol.ResponseMessage;
 import io.dts.remoting.CommandCustomHeader;
+import io.dts.remoting.annotation.CFNotNull;
 import io.dts.remoting.exception.RemotingCommandException;
 
 /**
@@ -25,15 +26,18 @@ public class BranchRollbackResultMessage implements CommandCustomHeader, Respons
   /**
    * 事务ID
    */
+  @CFNotNull
   private long tranId;
   /**
    * 分支ID
    */
+  @CFNotNull
   private long branchId;
 
   /**
    * 回滚结果
    */
+  @CFNotNull
   private int result;
 
   public long getTranId() {
@@ -60,14 +64,10 @@ public class BranchRollbackResultMessage implements CommandCustomHeader, Respons
     this.result = result;
   }
 
-  @Override
-  public short getTypeCode() {
-    return TYPE_BRANCH_ROLLBACK_RESULT;
-  }
+
 
   @Override
   public void checkFields() throws RemotingCommandException {
-    // TODO Auto-generated method stub
 
   }
 

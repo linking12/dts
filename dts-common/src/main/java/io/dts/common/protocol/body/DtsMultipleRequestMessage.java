@@ -16,25 +16,24 @@ package io.dts.common.protocol.body;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.dts.common.protocol.DtsMessage;
-import io.dts.common.protocol.RequestHeaderMessage;
+import io.dts.common.protocol.RequestMessage;
 import io.dts.remoting.protocol.RemotingSerializable;
 
 /**
  * @author liushiming
  * @version DtsMergeMessage.java, v 0.0.1 2017年9月4日 下午4:27:31 liushiming
  */
-public class DtsMultipleRequestMessage extends RemotingSerializable implements DtsMessage {
+public class DtsMultipleRequestMessage extends RemotingSerializable implements RequestMessage {
 
-  public List<RequestHeaderMessage> msgs = new ArrayList<RequestHeaderMessage>();
+  public List<RequestMessage> msgs = new ArrayList<RequestMessage>();
 
   public List<Long> msgIds = new ArrayList<Long>();
 
-  public List<RequestHeaderMessage> getMsgs() {
+  public List<RequestMessage> getMsgs() {
     return msgs;
   }
 
-  public void setMsgs(List<RequestHeaderMessage> msgs) {
+  public void setMsgs(List<RequestMessage> msgs) {
     this.msgs = msgs;
   }
 
@@ -45,10 +44,4 @@ public class DtsMultipleRequestMessage extends RemotingSerializable implements D
   public void setMsgIds(List<Long> msgIds) {
     this.msgIds = msgIds;
   }
-
-  @Override
-  public short getTypeCode() {
-    return TYPE_DTS_MERGE;
-  }
-
 }

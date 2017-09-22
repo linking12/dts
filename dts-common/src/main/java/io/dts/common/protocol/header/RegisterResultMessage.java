@@ -13,24 +13,32 @@
  */
 package io.dts.common.protocol.header;
 
-import io.dts.common.protocol.AbstractResultMessage;
 import io.dts.common.protocol.ResponseMessage;
 import io.dts.remoting.CommandCustomHeader;
+import io.dts.remoting.annotation.CFNotNull;
 import io.dts.remoting.exception.RemotingCommandException;
 
 /**
  * @author liushiming
  * @version RegisterResultMessage.java, v 0.0.1 2017年9月4日 下午2:43:44 liushiming
  */
-public class RegisterResultMessage extends AbstractResultMessage implements CommandCustomHeader, ResponseMessage {
+public class RegisterResultMessage implements CommandCustomHeader, ResponseMessage {
   /**
    * 事务ID
    */
-  long tranId;
+  @CFNotNull
+  private long tranId;
   /**
    * 分支ID
    */
-  long branchId;
+  @CFNotNull
+  private long branchId;
+
+  /**
+   * 结果
+   */
+  @CFNotNull
+  private int result;
 
   public long getTranId() {
     return tranId;
@@ -48,14 +56,17 @@ public class RegisterResultMessage extends AbstractResultMessage implements Comm
     this.branchId = branchId;
   }
 
-  @Override
-  public short getTypeCode() {
-    return TYPE_REGIST_RESULT;
+
+  public int getResult() {
+    return result;
+  }
+
+  public void setResult(int result) {
+    this.result = result;
   }
 
   @Override
   public void checkFields() throws RemotingCommandException {
-    // TODO Auto-generated method stub
 
   }
 

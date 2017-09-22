@@ -15,6 +15,7 @@ package io.dts.common.protocol.header;
 
 import io.dts.common.protocol.ResponseMessage;
 import io.dts.remoting.CommandCustomHeader;
+import io.dts.remoting.annotation.CFNotNull;
 import io.dts.remoting.exception.RemotingCommandException;
 
 /**
@@ -25,12 +26,13 @@ public class QueryLockResultMessage implements CommandCustomHeader, ResponseMess
   /**
    * 事务ID
    */
-  long tranId;
+  @CFNotNull
+  private long tranId;
 
   /**
    * 业务主键，用于强隔离。分支上报给server，自己修改了哪些表的哪些行的主键。格式如下： "tableName1:key1,key2,key3;tableName2:key1,key2"
    */
-  String businessKey;
+  private String businessKey;
 
   public long getTranId() {
     return tranId;
@@ -49,13 +51,7 @@ public class QueryLockResultMessage implements CommandCustomHeader, ResponseMess
   }
 
   @Override
-  public short getTypeCode() {
-    return TYPE_QUERY_LOCK_RESULT;
-  }
-
-  @Override
   public void checkFields() throws RemotingCommandException {
-    // TODO Auto-generated method stub
 
   }
 

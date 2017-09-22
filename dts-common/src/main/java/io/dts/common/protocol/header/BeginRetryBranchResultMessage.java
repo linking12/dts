@@ -50,14 +50,9 @@ public class BeginRetryBranchResultMessage implements CommandCustomHeader, Respo
     this.branchId = branchId;
   }
 
-  @Override
-  public short getTypeCode() {
-    return TYPE_BEGIN_RETRY_BRANCH_RESULT;
-  }
 
   @Override
   public void checkFields() throws RemotingCommandException {
-    // TODO Auto-generated method stub
 
   }
 

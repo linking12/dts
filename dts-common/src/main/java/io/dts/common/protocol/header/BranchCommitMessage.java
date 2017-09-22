@@ -13,21 +13,26 @@
  */
 package io.dts.common.protocol.header;
 
-import io.dts.common.protocol.RequestHeaderMessage;
+import io.dts.common.protocol.RequestMessage;
+import io.dts.remoting.CommandCustomHeader;
+import io.dts.remoting.annotation.CFNotNull;
 import io.dts.remoting.exception.RemotingCommandException;
 
 /**
  * @author liushiming
  * @version BranchCommitMessage.java, v 0.0.1 2017年9月1日 下午5:46:22 liushiming
  */
-public class BranchCommitMessage implements RequestHeaderMessage {
+public class BranchCommitMessage implements CommandCustomHeader, RequestMessage {
 
   private String serverAddr;
 
+  @CFNotNull
   private Long tranId;
 
+  @CFNotNull
   private Long branchId;
 
+  @CFNotNull
   private String clientIp;
 
   private String appName;
@@ -110,11 +115,6 @@ public class BranchCommitMessage implements RequestHeaderMessage {
 
   public void setUdata(String udata) {
     this.udata = udata;
-  }
-
-  @Override
-  public short getTypeCode() {
-    return TYPE_BRANCH_COMMIT;
   }
 
   @Override

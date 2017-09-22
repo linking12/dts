@@ -14,23 +14,30 @@
 package io.dts.common.protocol.header;
 
 import io.dts.common.protocol.ResponseMessage;
-import io.dts.remoting.protocol.RemotingSerializable;
+import io.dts.remoting.CommandCustomHeader;
+import io.dts.remoting.annotation.CFNotNull;
+import io.dts.remoting.exception.RemotingCommandException;
 
 /**
  * @author liushiming
  * @version BranchCommitResultMessage.java, v 0.0.1 2017年9月4日 下午2:20:45 liushiming
  */
-public class BranchCommitResultMessage extends RemotingSerializable implements ResponseMessage {
+public class BranchCommitResultMessage implements CommandCustomHeader, ResponseMessage {
   /**
    * 事务IDs
    */
+  @CFNotNull
   private Long tranId;
   /**
    * 分支IDs
    */
+  @CFNotNull
   private Long branchId;
 
-
+  /**
+   * 提交结果
+   */
+  @CFNotNull
   private int result;
 
 
@@ -50,17 +57,17 @@ public class BranchCommitResultMessage extends RemotingSerializable implements R
     this.branchId = branchId;
   }
 
-  @Override
-  public short getTypeCode() {
-    return TYPE_BRANCH_COMMIT_RESULT;
-  }
-
   public int getResult() {
     return result;
   }
 
   public void setResult(int result) {
     this.result = result;
+  }
+
+  @Override
+  public void checkFields() throws RemotingCommandException {
+
   }
 
 

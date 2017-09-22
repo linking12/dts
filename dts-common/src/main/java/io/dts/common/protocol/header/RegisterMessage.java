@@ -13,33 +13,37 @@
  */
 package io.dts.common.protocol.header;
 
-import io.dts.common.protocol.RequestHeaderMessage;
+import io.dts.common.protocol.RequestMessage;
+import io.dts.remoting.CommandCustomHeader;
+import io.dts.remoting.annotation.CFNotNull;
 import io.dts.remoting.exception.RemotingCommandException;
 
 /**
  * @author liushiming
  * @version RegisterMessage.java, v 0.0.1 2017年9月1日 下午6:29:38 liushiming
  */
-public class RegisterMessage implements RequestHeaderMessage {
+public class RegisterMessage implements CommandCustomHeader, RequestMessage {
   /**
    * 事务ID
    */
-  long tranId;
+  @CFNotNull
+  private long tranId;
 
   /**
    * 对于缺省模式（TXC Atom为数据源），这个域为dbKey；对于MT模式，这是用户自定义key
    */
-  String key;
+  private String key;
 
   /**
    * 业务主键，用于强隔离。分支上报给server，自己修改了哪些表的哪些行的主键。格式如下： "tableName1:key1,key2,key3;tableName2:key1,key2"
    */
-  String businessKey;
+  private String businessKey;
 
   /**
    * 提交模式
    */
-  byte commitMode;
+  @CFNotNull
+  private byte commitMode;
 
   public long getTranId() {
     return tranId;
@@ -73,14 +77,10 @@ public class RegisterMessage implements RequestHeaderMessage {
     this.commitMode = commitMode;
   }
 
-  @Override
-  public short getTypeCode() {
-    return TYPE_REGIST;
-  }
+
 
   @Override
   public void checkFields() throws RemotingCommandException {
-    // TODO Auto-generated method stub
 
   }
 

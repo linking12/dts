@@ -19,9 +19,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import io.dts.common.api.DtsServerMessageHandler;
-import io.dts.common.protocol.DtsMessage;
 import io.dts.common.protocol.RequestCode;
-import io.dts.common.protocol.RequestHeaderMessage;
+import io.dts.common.protocol.RequestMessage;
 import io.dts.common.protocol.ResponseCode;
 import io.dts.common.protocol.body.DtsMultipleRequestMessage;
 import io.dts.common.protocol.body.DtsMultipleResonseMessage;
@@ -69,12 +68,12 @@ public class DtsMessageProcessor implements NettyRequestProcessor {
     final String clientIp = NetUtil.toStringAddress(ctx.channel().remoteAddress());
     switch (request.getCode()) {
       case RequestCode.HEADER_REQUEST:
-        final RequestHeaderMessage headerMessage =
-            (RequestHeaderMessage) request.decodeCommandCustomHeader(RequestHeaderMessage.class);
+        final RequestMessage headerMessage =
+            (RequestMessage) request.decodeCommandCustomHeader(CommandCustomHeader.class);
         return processDtsMessage(clientIp, headerMessage);
       case RequestCode.BODY_REQUEST:
         final byte[] body = request.getBody();
-        DtsMessage bodyMessage = RemotingSerializable.decode(body, DtsMessage.class);
+        RequestMessage bodyMessage = RemotingSerializable.decode(body, RequestMessage.class);
         return processDtsMessage(clientIp, bodyMessage);
       default:
         break;
@@ -84,85 +83,81 @@ public class DtsMessageProcessor implements NettyRequestProcessor {
     return response;
   }
 
-  private RemotingCommand processDtsMessage(String clientIp, DtsMessage dtsMessage) {
-    short typeCode = dtsMessage.getTypeCode();
+  private RemotingCommand processDtsMessage(String clientIp, RequestMessage dtsMessage) {
     RemotingCommand response = RemotingCommand.createResponseCommand(null);
     CommandCustomHeader responseHeader;
     try {
-      switch (typeCode) {
+      if (dtsMessage instanceof BeginMessage) {
         // 开始一个分布式事务
-        case DtsMessage.TYPE_BEGIN:
-          response = RemotingCommand.createResponseCommand(BeginResultMessage.class);
-          responseHeader = response.readCustomHeader();
-          createMessageHandler().handleMessage(clientIp, (BeginMessage) dtsMessage,
-              (BeginResultMessage) responseHeader);
-          response.setCode(ResponseCode.SUCCESS);
-          return response;
+        response = RemotingCommand.createResponseCommand(BeginResultMessage.class);
+        responseHeader = response.readCustomHeader();
+        createMessageHandler().handleMessage(clientIp, (BeginMessage) dtsMessage,
+            (BeginResultMessage) responseHeader);
+        response.setCode(ResponseCode.SUCCESS);
+        return response;
+      } else if (dtsMessage instanceof GlobalCommitMessage) {
         // 处理全局事务提交
-        case DtsMessage.TYPE_GLOBAL_COMMIT:
-          response = RemotingCommand.createResponseCommand(GlobalCommitResultMessage.class);
-          responseHeader = response.readCustomHeader();
-          createMessageHandler().handleMessage(clientIp, (GlobalCommitMessage) dtsMessage,
-              (GlobalCommitResultMessage) responseHeader);
-          return response;
+        response = RemotingCommand.createResponseCommand(GlobalCommitResultMessage.class);
+        responseHeader = response.readCustomHeader();
+        createMessageHandler().handleMessage(clientIp, (GlobalCommitMessage) dtsMessage,
+            (GlobalCommitResultMessage) responseHeader);
+        return response;
+      } else if (dtsMessage instanceof GlobalRollbackMessage) {
         // 处理全局事务回滚
-        case DtsMessage.TYPE_GLOBAL_ROLLBACK:
-          response = RemotingCommand.createResponseCommand(BranchRollbackResultMessage.class);
-          responseHeader = response.readCustomHeader();
-          createMessageHandler().handleMessage(clientIp, (GlobalRollbackMessage) dtsMessage,
-              (GlobalRollbackResultMessage) responseHeader);
-          response.setCode(ResponseCode.SUCCESS);
-          return response;
+        response = RemotingCommand.createResponseCommand(BranchRollbackResultMessage.class);
+        responseHeader = response.readCustomHeader();
+        createMessageHandler().handleMessage(clientIp, (GlobalRollbackMessage) dtsMessage,
+            (GlobalRollbackResultMessage) responseHeader);
+        response.setCode(ResponseCode.SUCCESS);
+        return response;
+      } else if (dtsMessage instanceof RegisterMessage) {
         // 处理事务分支注册
-        case DtsMessage.TYPE_REGIST:
-          response = RemotingCommand.createResponseCommand(RegisterResultMessage.class);
-          responseHeader = response.readCustomHeader();
-          createMessageHandler().handleMessage(clientIp, (RegisterMessage) dtsMessage,
-              (RegisterResultMessage) responseHeader);
-          response.setCode(ResponseCode.SUCCESS);
-          return response;
+        response = RemotingCommand.createResponseCommand(RegisterResultMessage.class);
+        responseHeader = response.readCustomHeader();
+        createMessageHandler().handleMessage(clientIp, (RegisterMessage) dtsMessage,
+            (RegisterResultMessage) responseHeader);
+        response.setCode(ResponseCode.SUCCESS);
+        return response;
+      } else if (dtsMessage instanceof ReportStatusMessage) {
         // 事务分支上报状态消息处理
-        case DtsMessage.TYPE_REPORT_STATUS:
-          response = RemotingCommand.createResponseCommand(ReportStatusResultMessage.class);
-          responseHeader = response.readCustomHeader();
-          createMessageHandler().handleMessage(clientIp, (ReportStatusMessage) dtsMessage,
-              (ReportStatusResultMessage) responseHeader);
-          response.setCode(ResponseCode.SUCCESS);
-          return response;
+        response = RemotingCommand.createResponseCommand(ReportStatusResultMessage.class);
+        responseHeader = response.readCustomHeader();
+        createMessageHandler().handleMessage(clientIp, (ReportStatusMessage) dtsMessage,
+            (ReportStatusResultMessage) responseHeader);
+        response.setCode(ResponseCode.SUCCESS);
+        return response;
+      } else if (dtsMessage instanceof BeginRetryBranchMessage) {
         // 可重试事务分支处理
-        case DtsMessage.TYPE_BEGIN_RETRY_BRANCH_RESULT:
-          response = RemotingCommand.createResponseCommand(BeginRetryBranchResultMessage.class);
-          responseHeader = response.readCustomHeader();
-          createMessageHandler().handleMessage(clientIp, (BeginRetryBranchMessage) dtsMessage,
-              (BeginRetryBranchResultMessage) responseHeader);
-          response.setCode(ResponseCode.SUCCESS);
-          return response;
+        response = RemotingCommand.createResponseCommand(BeginRetryBranchResultMessage.class);
+        responseHeader = response.readCustomHeader();
+        createMessageHandler().handleMessage(clientIp, (BeginRetryBranchMessage) dtsMessage,
+            (BeginRetryBranchResultMessage) responseHeader);
+        response.setCode(ResponseCode.SUCCESS);
+        return response;
+      } else if (dtsMessage instanceof ReportUdataMessage) {
         // 事务分支上报用户数据（udata）消息处理
-        case DtsMessage.TYPE_REPORT_UDATA_RESULT:
-          response = RemotingCommand.createResponseCommand(ReportUdataResultMessage.class);
-          responseHeader = response.readCustomHeader();
-          createMessageHandler().handleMessage(clientIp, (ReportUdataMessage) dtsMessage,
-              (ReportUdataResultMessage) responseHeader);
-          response.setCode(ResponseCode.SUCCESS);
-          return response;
+        response = RemotingCommand.createResponseCommand(ReportUdataResultMessage.class);
+        responseHeader = response.readCustomHeader();
+        createMessageHandler().handleMessage(clientIp, (ReportUdataMessage) dtsMessage,
+            (ReportUdataResultMessage) responseHeader);
+        response.setCode(ResponseCode.SUCCESS);
+        return response;
+      } else if (dtsMessage instanceof DtsMultipleRequestMessage) {
         // 合并消息的处理
-        case DtsMessage.TYPE_DTS_MERGE:
-          DtsMultipleResonseMessage responseMessage = new DtsMultipleResonseMessage();
-          createMessageHandler().handleMessage(clientIp, (DtsMultipleRequestMessage) dtsMessage,
-              responseMessage);
-          response.setCode(ResponseCode.SUCCESS);
-          response.setBody(responseMessage.encode());
-          return response;
+        DtsMultipleResonseMessage responseMessage = new DtsMultipleResonseMessage();
+        createMessageHandler().handleMessage(clientIp, (DtsMultipleRequestMessage) dtsMessage,
+            responseMessage);
+        response.setCode(ResponseCode.SUCCESS);
+        response.setBody(responseMessage.encode());
+        return response;
+      } else if (dtsMessage instanceof QueryLockMessage) {
         // 查询锁是否占用消息处理
-        case DtsMessage.TYPE_QUERY_LOCK:
-          response = RemotingCommand.createResponseCommand(QueryLockResultMessage.class);
-          responseHeader = response.readCustomHeader();
-          createMessageHandler().handleMessage(clientIp, (QueryLockMessage) dtsMessage,
-              (QueryLockResultMessage) responseHeader);
-          response.setCode(ResponseCode.SUCCESS);
-          return response;
-        default:
-          break;
+        response = RemotingCommand.createResponseCommand(QueryLockResultMessage.class);
+        responseHeader = response.readCustomHeader();
+        createMessageHandler().handleMessage(clientIp, (QueryLockMessage) dtsMessage,
+            (QueryLockResultMessage) responseHeader);
+        response.setCode(ResponseCode.SUCCESS);
+        return response;
       }
     } catch (Throwable e) {
       response.setCode(ResponseCode.SYSTEM_ERROR);

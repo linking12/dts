@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
 
 import io.dts.common.api.DtsServerMessageHandler;
 import io.dts.common.api.DtsServerMessageSender;
-import io.dts.common.protocol.RequestHeaderMessage;
+import io.dts.common.protocol.RequestMessage;
 import io.dts.common.protocol.ResponseMessage;
 import io.dts.common.protocol.body.DtsMultipleRequestMessage;
 import io.dts.common.protocol.body.DtsMultipleResonseMessage;
@@ -158,9 +158,9 @@ public class DefaultDtsServerMessageHandler implements DtsServerMessageHandler {
   @Override
   public void handleMessage(String clientIp, DtsMultipleRequestMessage message,
       DtsMultipleResonseMessage resultMessage) {
-    List<RequestHeaderMessage> headerMessages = message.getMsgs();
+    List<RequestMessage> headerMessages = message.getMsgs();
     for (int i = 0; i < headerMessages.size(); i++) {
-      final RequestHeaderMessage msg = headerMessages.get(i);
+      final RequestMessage msg = headerMessages.get(i);
       ResponseMessage responseMessage = null;
       if (msg instanceof RegisterMessage) {
         responseMessage = new RegisterResultMessage();

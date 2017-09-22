@@ -1,7 +1,7 @@
 package io.dts.common.api;
 
 import io.dts.common.exception.DtsException;
-import io.dts.common.protocol.DtsMessage;
+import io.dts.common.protocol.RequestMessage;
 
 /**
  * client同步调用server端接口
@@ -9,13 +9,12 @@ import io.dts.common.protocol.DtsMessage;
  * @author hanjie
  *
  */
-public interface DtsClientMessageSender {
+public interface DtsClientMessageSender extends BaseMessageSender {
 
-  public <T> T invoke(int requestCode, DtsMessage msg, long timeout) throws DtsException;
+  public <T> T invoke(RequestMessage msg, long timeout) throws DtsException;
 
-  public <T> T invoke(String serverAddress, int requestCode, DtsMessage msg, long timeout)
-      throws DtsException;
+  public <T> T invoke(String serverAddress, RequestMessage msg, long timeout) throws DtsException;
 
-  public <T> T invoke(int requestCode, DtsMessage msg) throws DtsException;
+  public <T> T invoke(RequestMessage msg) throws DtsException;
 
 }

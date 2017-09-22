@@ -20,7 +20,7 @@ import io.dts.remoting.protocol.RemotingSerializable;
  * @author liushiming
  * @version DtsMergeResultMessage.java, v 0.0.1 2017年9月4日 下午4:31:11 liushiming
  */
-public class DtsMultipleResonseMessage extends RemotingSerializable {
+public class DtsMultipleResonseMessage extends RemotingSerializable implements ResponseMessage {
 
   public ResponseMessage[] msgs;
 

@@ -13,14 +13,16 @@
  */
 package io.dts.common.protocol.header;
 
-import io.dts.common.protocol.RequestHeaderMessage;
+import io.dts.common.protocol.RequestMessage;
+import io.dts.remoting.CommandCustomHeader;
+import io.dts.remoting.annotation.CFNotNull;
 import io.dts.remoting.exception.RemotingCommandException;
 
 /**
  * @author liushiming
  * @version BranchRollBackMessage.java, v 0.0.1 2017年9月1日 下午5:47:51 liushiming
  */
-public class BranchRollBackMessage implements RequestHeaderMessage {
+public class BranchRollBackMessage implements CommandCustomHeader, RequestMessage {
   /**
    * 服务端地址
    */
@@ -28,10 +30,12 @@ public class BranchRollBackMessage implements RequestHeaderMessage {
   /**
    * 事务ID
    */
+  @CFNotNull
   private long tranId;
   /**
    * 分支ID
    */
+  @CFNotNull
   private long branchId;
 
   private String appName;
@@ -40,10 +44,12 @@ public class BranchRollBackMessage implements RequestHeaderMessage {
   /**
    * 提交模式
    */
+  @CFNotNull
   private byte commitMode;
   /**
    * 删锁标记 0:不删锁 1:删锁
    */
+  @CFNotNull
   private byte isDelLock;
   /**
    * 用户自定义信息，MT服务可以把一阶段的一些用户数据上报给Server，Server在二阶段把这个信息再传下来； 这样MT服务二阶段可以节省一次查询
@@ -114,14 +120,10 @@ public class BranchRollBackMessage implements RequestHeaderMessage {
     this.udata = udata;
   }
 
-  @Override
-  public short getTypeCode() {
-    return TYPE_BRANCH_ROLLBACK;
-  }
+
 
   @Override
   public void checkFields() throws RemotingCommandException {
-    // TODO Auto-generated method stub
 
   }
 

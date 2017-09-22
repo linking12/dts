@@ -44,13 +44,7 @@ public class ClusterDumpResultMessage implements CommandCustomHeader, ResponseMe
   }
 
   @Override
-  public short getTypeCode() {
-    return TYPE_CLUSTER_DUMP_RESULT;
-  }
-
-  @Override
   public void checkFields() throws RemotingCommandException {
-    // TODO Auto-generated method stub
 
   }
 

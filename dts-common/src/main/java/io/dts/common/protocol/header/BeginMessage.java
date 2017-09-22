@@ -13,7 +13,8 @@
  */
 package io.dts.common.protocol.header;
 
-import io.dts.common.protocol.RequestHeaderMessage;
+import io.dts.common.protocol.RequestMessage;
+import io.dts.remoting.CommandCustomHeader;
 import io.dts.remoting.annotation.CFNotNull;
 import io.dts.remoting.exception.RemotingCommandException;
 
@@ -23,11 +24,10 @@ import io.dts.remoting.exception.RemotingCommandException;
  * @author liushiming
  * @version BeginMessage.java, v 0.0.1 2017年9月1日 下午5:45:54 liushiming
  */
-public class BeginMessage implements RequestHeaderMessage {
+public class BeginMessage implements CommandCustomHeader, RequestMessage {
 
   @CFNotNull
   public long timeout = 60000;
-
 
   public long getTimeout() {
     return timeout;
@@ -37,14 +37,9 @@ public class BeginMessage implements RequestHeaderMessage {
     this.timeout = timeout;
   }
 
-  @Override
-  public short getTypeCode() {
-    return TYPE_BEGIN;
-  }
 
   @Override
   public void checkFields() throws RemotingCommandException {
-    // TODO Auto-generated method stub
 
   }
 

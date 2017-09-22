@@ -18,17 +18,13 @@ import org.springframework.stereotype.Component;
 
 import io.dts.common.api.DtsServerMessageSender;
 import io.dts.common.exception.DtsException;
-import io.dts.common.protocol.DtsMessage;
-import io.dts.common.protocol.RequestCode;
-import io.dts.remoting.CommandCustomHeader;
+import io.dts.common.protocol.RequestMessage;
 import io.dts.remoting.RemotingServer;
 import io.dts.remoting.exception.RemotingCommandException;
 import io.dts.remoting.exception.RemotingSendRequestException;
 import io.dts.remoting.exception.RemotingTimeoutException;
 import io.dts.remoting.exception.RemotingTooMuchRequestException;
 import io.dts.remoting.protocol.RemotingCommand;
-import io.dts.remoting.protocol.RemotingSerializable;
-import io.dts.remoting.protocol.RemotingSysResponseCode;
 import io.dts.server.remoting.channel.ChannelRepository;
 import io.netty.channel.Channel;
 
@@ -38,7 +34,6 @@ import io.netty.channel.Channel;
  */
 @Component
 public class DefaultDtsServerMessageSender implements DtsServerMessageSender {
-
 
   @Autowired
   private ChannelRepository channelRepository;
@@ -53,35 +48,9 @@ public class DefaultDtsServerMessageSender implements DtsServerMessageSender {
     this.remoteServer = remoteServer;
   }
 
-  private RemotingCommand buildRequest(DtsMessage dtsMessage) throws DtsException {
-    RemotingCommand request = null;
-    if (dtsMessage instanceof CommandCustomHeader) {
-      request = RemotingCommand.createRequestCommand(RequestCode.HEADER_REQUEST,
-          (CommandCustomHeader) dtsMessage);
-    } else if (dtsMessage instanceof RemotingSerializable) {
-      request = RemotingCommand.createRequestCommand(RequestCode.BODY_REQUEST, null);
-      request.setBody(RemotingSerializable.encode(dtsMessage));
-    }
-    return request;
-  }
-
-  @SuppressWarnings("unchecked")
-  private <T> T buildResponse(RemotingCommand response) throws RemotingCommandException {
-    if (response.getCode() == RemotingSysResponseCode.SUCCESS) {
-      if (response.getExtFields().isEmpty()) {
-        return (T) response.decodeCommandCustomHeader(CommandCustomHeader.class);
-      } else if (response.getBody() != null) {
-        return (T) RemotingSerializable.decode(response.getBody(), DtsMessage.class);
-      }
-    } else {
-      throw new DtsException(response.getRemark());
-    }
-    return null;
-  }
-
-
   @Override
-  public <T> T invokeSync(String clientAddress, DtsMessage msg, long timeout) throws DtsException {
+  public <T> T invokeSync(String clientAddress, RequestMessage msg, long timeout)
+      throws DtsException {
     Channel channel = channelRepository.getChannelByAddress(clientAddress);
     if (channel != null) {
       RemotingCommand request = this.buildRequest(msg);
@@ -97,7 +66,8 @@ public class DefaultDtsServerMessageSender implements DtsServerMessageSender {
   }
 
   @Override
-  public void invokeAsync(String clientAddress, DtsMessage msg, long timeout) throws DtsException {
+  public void invokeAsync(String clientAddress, RequestMessage msg, long timeout)
+      throws DtsException {
     Channel channel = channelRepository.getChannelByAddress(clientAddress);
     if (channel != null) {
       RemotingCommand request = this.buildRequest(msg);

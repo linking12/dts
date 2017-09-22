@@ -5,7 +5,6 @@ import io.dts.common.api.DtsClientMessageSender;
 import io.dts.common.common.TxcXID;
 import io.dts.common.context.DtsContext;
 import io.dts.common.exception.DtsException;
-import io.dts.common.protocol.RequestCode;
 import io.dts.common.protocol.header.BeginMessage;
 import io.dts.common.protocol.header.BeginResultMessage;
 import io.dts.common.protocol.header.GlobalCommitMessage;
@@ -32,7 +31,7 @@ public class DefaultDtsTransactionManager implements DtsTransactionManager {
     final BeginMessage beginMessage = new BeginMessage();
     beginMessage.setTimeout(timeout);
     try {
-      BeginResultMessage beginResultMessage = dtsClient.invoke(RequestCode.HEADER_REQUEST, beginMessage, timeout);
+      BeginResultMessage beginResultMessage = dtsClient.invoke(beginMessage, timeout);
       System.out.println(beginResultMessage);
       if (beginResultMessage != null) {
         DtsContext.bind(beginResultMessage.getXid(), beginResultMessage.getNextSvrAddr());
@@ -54,7 +53,7 @@ public class DefaultDtsTransactionManager implements DtsTransactionManager {
     GlobalCommitMessage commitMessage = new GlobalCommitMessage();
     commitMessage.setTranId(TxcXID.getTransactionId(DtsContext.getCurrentXid()));
     try {
-      GlobalCommitResultMessage commitResultMessage = dtsClient.invoke(RequestCode.HEADER_REQUEST, commitMessage, 3000l);
+      GlobalCommitResultMessage commitResultMessage = dtsClient.invoke(commitMessage, 3000l);
       if (commitResultMessage != null) {
         DtsContext.unbind();
       } else {
@@ -77,7 +76,7 @@ public class DefaultDtsTransactionManager implements DtsTransactionManager {
     rollbackMessage.setTranId(TxcXID.getTransactionId(DtsContext.getCurrentXid()));
     rollbackMessage.setRealSvrAddr(TxcXID.getServerAddress(DtsContext.getCurrentXid()));
     try {
-      GlobalRollbackResultMessage rollbackResultMessage = dtsClient.invoke(RequestCode.HEADER_REQUEST, rollbackMessage, 3000l);
+      GlobalRollbackResultMessage rollbackResultMessage = dtsClient.invoke(rollbackMessage, 3000l);
       if (rollbackResultMessage != null) {
         DtsContext.unbind();
       } else {
@@ -93,14 +92,16 @@ public class DefaultDtsTransactionManager implements DtsTransactionManager {
     NettyClientConfig nettyClientConfig = new NettyClientConfig();
     nettyClientConfig.setConnectTimeoutMillis(3000);
     DtsRemotingClient dtsClient = new DtsRemotingClient(nettyClientConfig);
-//    dtsClient.setAddressManager(new ZookeeperAddressManager("localhost:2181", "/dts"));
-//    dtsClient.setGroup("Default");
-//    dtsClient.setAppName("Demo");
+    // dtsClient.setAddressManager(new ZookeeperAddressManager("localhost:2181", "/dts"));
+    // dtsClient.setGroup("Default");
+    // dtsClient.setAppName("Demo");
     dtsClient.init();
-    DtsClientMessageSenderImpl clientMessageSender = new DtsClientMessageSenderImpl(dtsClient);
+    DtsClientMessageSenderImpl clientMessageSender =
+        new DtsClientMessageSenderImpl(nettyClientConfig);
 
     try {
-      DefaultDtsTransactionManager transactionManager = new DefaultDtsTransactionManager(clientMessageSender);
+      DefaultDtsTransactionManager transactionManager =
+          new DefaultDtsTransactionManager(clientMessageSender);
       transactionManager.begin(3000L);
       System.out.println(DtsContext.getCurrentXid());
     } catch (DtsTransactionException e) {
