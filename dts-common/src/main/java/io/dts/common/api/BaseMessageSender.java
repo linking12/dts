@@ -45,7 +45,7 @@ public interface BaseMessageSender {
   @SuppressWarnings("unchecked")
   default <T> T buildResponse(RemotingCommand response) throws RemotingCommandException {
     if (response.getCode() == RemotingSysResponseCode.SUCCESS) {
-      if (response.getExtFields().isEmpty()) {
+      if (!response.getExtFields().isEmpty()) {
         return (T) response.decodeCommandCustomHeader(CommandCustomHeader.class);
       } else if (response.getBody() != null) {
         return (T) RemotingSerializable.decode(response.getBody(), ResponseMessage.class);
