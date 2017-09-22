@@ -35,7 +35,7 @@ public interface BaseMessageSender {
           (CommandCustomHeader) dtsMessage);
     } else if (dtsMessage instanceof RemotingSerializable) {
       request = RemotingCommand.createRequestCommand(RequestCode.BODY_REQUEST, null);
-      request.setBody(RemotingSerializable.encode(dtsMessage));
+      request.setBody(RemotingSerializable.encode1(dtsMessage));
     } else {
       throw new DtsException("request must implements CommandCustomHeader or RemotingSerializable");
     }
