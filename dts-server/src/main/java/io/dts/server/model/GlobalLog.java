@@ -15,7 +15,7 @@ public class GlobalLog {
   /**
    * 事务ID
    */
-  private long txId;
+  private long transId;
 
   /**
    * 事务状态
@@ -36,11 +36,6 @@ public class GlobalLog {
    * 修改时间
    */
   private Date gmtModified;
-
-  /**
-   * 剩下未完成的分支数
-   */
-  private int leftBranches;
 
   /**
    * 应用名称
@@ -81,18 +76,13 @@ public class GlobalLog {
     this.containPhase2CommitBranch = containPhase2CommitBranch;
   }
 
-  /**
-   * @return
-   */
-  public long getTxId() {
-    return txId;
+
+  public long getTransId() {
+    return transId;
   }
 
-  /**
-   * @param txId
-   */
-  public void setTxId(long txId) {
-    this.txId = txId;
+  public void setTransId(long transId) {
+    this.transId = transId;
   }
 
   /**
@@ -155,14 +145,7 @@ public class GlobalLog {
    * @return
    */
   public int getLeftBranches() {
-    return leftBranches;
-  }
-
-  /**
-   * @param leftBranches
-   */
-  public void setLeftBranches(int leftBranches) {
-    this.leftBranches = leftBranches;
+    return branchIds.size();
   }
 
   /**
@@ -179,22 +162,6 @@ public class GlobalLog {
     this.clientAppName = clientAppName;
   }
 
-  /**
-   * 剩下分支数减一
-   */
-  public synchronized void decreaseLeftBranches() {
-    if (this.leftBranches > 0)
-      this.leftBranches--;
-    else
-      this.leftBranches = 0;
-  }
-
-  /**
-   * 剩下分支数加一
-   */
-  public synchronized void increaseLeftBranches() {
-    this.leftBranches++;
-  }
 
   public List<Long> getBranchIds() {
     return branchIds;
@@ -206,7 +173,7 @@ public class GlobalLog {
 
   @Override
   public String toString() {
-    return "tranId:" + this.txId + ",state:" + this.state + ",timeout:" + this.timeout
+    return "tranId:" + this.transId + ",state:" + this.state + ",timeout:" + this.timeout
         + ",create time:" + this.gmtCreated + ",app name:" + this.clientAppName;
   }
 

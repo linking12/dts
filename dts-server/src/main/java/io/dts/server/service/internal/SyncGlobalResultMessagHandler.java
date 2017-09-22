@@ -47,109 +47,61 @@ public interface SyncGlobalResultMessagHandler {
 
       @Override
       public void processMessage(String clientIp, BranchCommitResultMessage message) {
-//        int size = message.getTranIds().size();
-//        if (message.getResult() == ResultCode.OK.getValue()) {
-//          for (int i = 0; i < size; i++) {
-//            long branchId = message.getBranchIds().get(i);
-//            long tranId = message.getTranIds().get(i);
-//            if (committingMap.remove(branchId) == null)
-//              continue;
-//            BranchLog branchLog = activeTranBranchMap.get(branchId);
-//            if (branchLog == null)
-//              continue;
-//            try {
-//              this.deleteBranchLog(branchLog);
-//              activeTranBranchMap.remove(branchLog.getBranchId());
-//              GlobalLog globalLog = activeTranMap.get(branchLog.getTxId());
-//              if (globalLog != null)
-//                globalLog.getBranchIds().remove(branchLog.getBranchId());
-//            } catch (Exception e1) {
-//            }
-//
-//            GlobalLog globalLog = activeTranMap.get(tranId);
-//            if (globalLog == null)
-//              continue;
-//
-//            synchronized (globalLog) {
-//              int leftBranches = globalLog.getLeftBranches();
-//              if (logger.isDebugEnabled())
-//                logger.debug("remove branch:" + branchId + ", left:" + (leftBranches - 1));
-//              if (leftBranches <= 1) {
-//                // It is the last branches, do double check
-//                List<BranchLog> branchLogs = this.getBranchLogs(tranId);
-//                if (branchLogs.size() > 0) {
-//                  if (logger.isDebugEnabled()) {
-//                    logger.debug("There is left branch on transaction " + tranId);
-//                    logger.debug("left branches:" + branchLogs);
-//                  }
-//                } else {
-//                  try {
-//                    this.deleteGlobalLog(globalLog);
-//                    activeTranMap.remove(tranId);
-//                  } catch (Exception e1) {
-//                  }
-//                }
-//              } else {
-//                globalLog.decreaseLeftBranches();
-//              }
-//            }
-//          }
-//        } else if (message.getResult() == ResultCode.LOGICERROR.getValue()) {
-//          for (int i = 0; i < size; i++) {
-//            long branchId = message.getBranchIds().get(i);
-//            long tranId = message.getTranIds().get(i);
-//            if (committingMap.remove(branchId) == null)
-//              return;
-//            try {
-//              BranchLog branchLog = activeTranBranchMap.get(branchId);
-//              if (branchLog == null)
-//                return;
-//
-//              dao.insertBranchErrorLog(branchLog, RpcServer.mid);
-//              try {
-//                this.deleteBranchLog(branchLog);
-//                activeTranBranchMap.remove(branchId);
-//                GlobalLog globalLog = activeTranMap.get(branchLog.getTxId());
-//                if (globalLog != null)
-//                  globalLog.getBranchIds().remove(branchLog.getBranchId());
-//              } catch (Exception e1) {
-//              }
-//
-//              logger.error(TxcErrCode.RollBackLogic.errCode,
-//                  "Logic error occurs while commit branch:" + branchId
-//                      + ". Please check server table:txc_branch_error_log.");
-//              GlobalLog globalLog = TxcServerMessageListener.getActiveTranMap().get(tranId);
-//              if (globalLog == null) {
-//                logger.warn("In branchCommitResultHandle, global log of " + tranId
-//                    + " doesn't exist while branch " + branchId + " exists.");
-//                return;
-//              }
-//
-//              synchronized (globalLog) {
-//                int leftBranches = globalLog.getLeftBranches();
-//                logger.info("remove branch:" + branchId + ", left:" + (leftBranches - 1));
-//
-//                if (leftBranches > 1) {
-//                  globalLog.decreaseLeftBranches();
-//                } else {
-//                  try {
-//                    this.deleteGlobalLog(globalLog);
-//                    activeTranMap.remove(tranId);
-//                  } catch (Exception e1) {
-//                  }
-//                  this.cleanBranches(globalLog);
-//                  logger.info(
-//                      "Transaction:" + tranId + " is committed with error branch:" + branchId);
-//                }
-//              }
-//            } catch (Exception e) {
-//              logger.error("errorCode", e.getMessage(), e);
-//            }
-//          }
-//        } else {
-//          for (long branchId : message.getBranchIds())
-//            committingMap.put(branchId, CommitingResultCode.FAILED.getValue());
-//        }
+        // 如果该resourceManager下面的branch提交成功
+        Long tranId = message.getTranId();
+        List<Long> branchIds = message.getBranchIds();
+        if (message.getResult() == ResultCode.OK.getValue()) {
+          branchIds.forEach(branchId -> {
+            if (dtsTransStatusDao.clearCommitedBranchLog(branchId)) {
+              return;
+            }
+            BranchLog branchLog = dtsTransStatusDao.clearBranchLog(branchId);
+            if (branchLog != null) {
+              dtsLogDao.deleteBranchLog(branchLog, 1);
+            }
+            GlobalLog globalLog = dtsTransStatusDao.queryGlobalLog(tranId);
+            synchronized (globalLog) {
+              globalLog.getBranchIds().removeAll(branchIds);
+              int leftBranches = globalLog.getLeftBranches();
+              if (leftBranches == 0) {
+                dtsTransStatusDao.clearGlobalLog(tranId);
+                dtsLogDao.deleteGlobalLog(tranId, 1);
+              }
+            }
+          });
+          // 如果出现了逻辑错误，需要发出告警
+        } else if (message.getResult() == ResultCode.LOGICERROR.getValue()) {
+          branchIds.forEach(branchId -> {
+            if (dtsTransStatusDao.clearCommitedBranchLog(branchId)) {
+              return;
+            }
+            BranchLog branchLog = dtsTransStatusDao.clearBranchLog(branchId);
+            if (branchLog != null) {
+              dtsLogDao.insertBranchErrorLog(branchLog, 1);
+              dtsLogDao.deleteBranchLog(branchLog, 1);
+              logger.error("Logic error occurs while commit branch:" + branchId
+                  + ". Please check server table:txc_branch_error_log.");
+            }
+            GlobalLog globalLog = dtsTransStatusDao.queryGlobalLog(tranId);
+            synchronized (globalLog) {
+              globalLog.getBranchIds().removeAll(branchIds);
+              int leftBranches = globalLog.getLeftBranches();
+              if (leftBranches == 0) {
+                dtsTransStatusDao.clearGlobalLog(tranId);
+                dtsLogDao.deleteGlobalLog(tranId, 1);
+
+              }
+            }
+          });
+          // 提交失败，可以重复提交
+        } else {
+          branchIds.forEach(branchId -> {
+            dtsTransStatusDao.insertCommitedBranchLog(branchId,
+                CommitingResultCode.FAILED.getValue());
+
+          });
+
+        }
       }
 
       @Override

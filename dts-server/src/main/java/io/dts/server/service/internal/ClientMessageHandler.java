@@ -65,7 +65,7 @@ public interface ClientMessageHandler {
         globalLog.setClientAppName(clientIp);
         globalLog.setContainPhase2CommitBranch(false);
         dtsLogDao.insertGlobalLog(globalLog, 1);;
-        long tranId = globalLog.getTxId();
+        long tranId = globalLog.getTransId();
         dtsTransStatusDao.insertGlobalLog(tranId, globalLog);
         String xid = TxcXID.generateXID(tranId);
         return xid;
@@ -107,15 +107,14 @@ public interface ClientMessageHandler {
             case Begin:
             case CommitHeuristic:
               List<BranchLog> branchLogs = dtsTransStatusDao
-                  .queryBranchLogByTransId(globalLog.getTxId(), false, false, false);
+                  .queryBranchLogByTransId(globalLog.getTransId(), false, false, false);
               BranchLog.setLastBranchDelTrxKey(branchLogs);
               if (branchLogs.size() == 0) {
-                dtsLogDao.deleteGlobalLog(globalLog.getTxId(), 1);
+                dtsLogDao.deleteGlobalLog(globalLog.getTransId(), 1);
                 dtsTransStatusDao.clearGlobalLog(tranId);
                 return;
               }
               globalLog.setState(GlobalTransactionState.Committing.getValue());
-              globalLog.setLeftBranches(branchLogs.size());
               try {
                 dtsLogDao.updateGlobalLog(globalLog, 1);
               } catch (Exception e) {
@@ -137,7 +136,7 @@ public interface ClientMessageHandler {
                       return (int) (o1.getBranchId() - o2.getBranchId());
                     }
                   });
-                  this.syncGlobalCommit(branchLogs, globalLog, globalLog.getTxId());
+                  this.syncGlobalCommit(branchLogs, globalLog, globalLog.getTransId());
                 } catch (Exception e) {
                   logger.error(e.getMessage(), e);
                   throw new DtsException("notify resourcemanager to commit failed");
@@ -175,7 +174,7 @@ public interface ClientMessageHandler {
           }
         } else if (globalLog.getState() == GlobalTransactionState.Begin.getValue()) {
           List<BranchLog> branchLogs =
-              dtsTransStatusDao.queryBranchLogByTransId(globalLog.getTxId(), true, true, false);
+              dtsTransStatusDao.queryBranchLogByTransId(globalLog.getTransId(), true, true, false);
           BranchLog.setLastBranchDelTrxKey(branchLogs);
           globalLog.setState(GlobalTransactionState.Rollbacking.getValue());
           try {

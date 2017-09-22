@@ -92,16 +92,4 @@ public interface DtsServerMessageHandler {
       QueryLockResultMessage resultMessage);
 
 
-  /**
-   * 处理事务分支提交的反馈结果
-   */
-  public void handleMessage(String clientIp, BranchCommitResultMessage message);
-
-  /**
-   * 处理事务分支回滚的反馈结果。
-   */
-  public void handleMessage(String clientIp, BranchRollbackResultMessage message);
-
-
-
 }

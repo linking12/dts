@@ -73,7 +73,7 @@ public interface ResourceManagerMessageHandler {
           }
         }
         BranchLog branchLog = new BranchLog();
-        branchLog.setTxId(tranId);
+        branchLog.setTransId(tranId);
         branchLog.setWaitPeriods(0);
         branchLog.setClientAppName(clientIp);
         branchLog.setClientInfo(registerMessage.getKey());
@@ -109,7 +109,7 @@ public interface ResourceManagerMessageHandler {
         /**
          * 如果事务因为超时而回滚，事务在rollbacking状态，需要把这个分支放入rollbackingMap
          */
-        GlobalLog globalLog = dtsTransStatusDao.queryGlobalLog(branchLog.getTxId());
+        GlobalLog globalLog = dtsTransStatusDao.queryGlobalLog(branchLog.getTransId());
         if (globalLog == null) {
           throw new DtsException("global log doesn't exist.");
         }
@@ -150,7 +150,7 @@ public interface ResourceManagerMessageHandler {
           retryGlobalLog = new GlobalLog();
           retryGlobalLog.setState(GlobalTransactionState.Committing.getValue());
           // if (this.clusterWorker != null) {
-          retryGlobalLog.setTxId(dtsTransStatusDao.generateGlobalId());
+          retryGlobalLog.setTransId(dtsTransStatusDao.generateGlobalId());
           retryGlobalLog.setGmtCreated(Calendar.getInstance().getTime());
           retryGlobalLog.setGmtModified(retryGlobalLog.getGmtCreated());
           retryGlobalLog.setRecvTime(System.currentTimeMillis());
@@ -160,17 +160,16 @@ public interface ResourceManagerMessageHandler {
           } catch (Exception e) {
             throw new DtsException("insert global retry log failed");
           }
-          retryGlobalLog.setLeftBranches(1);
           retryGlobalLog.setTimeout(0);
           retryGlobalLog.setContainPhase2CommitBranch(false);
-          dtsTransStatusDao.insertGlobalLog(retryGlobalLog.getTxId(), retryGlobalLog);
+          dtsTransStatusDao.insertGlobalLog(retryGlobalLog.getTransId(), retryGlobalLog);
           dtsTransStatusDao.setRetryGlobalLog(retryGlobalLog);
         }
-        long tranId = retryGlobalLog.getTxId();
+        long tranId = retryGlobalLog.getTransId();
         String xid = TxcXID.generateXID(tranId);
         resultMessage.setXid(xid);
         BranchLog branchLog = new BranchLog();
-        branchLog.setTxId(tranId);
+        branchLog.setTransId(tranId);
         branchLog.setWaitPeriods(0);
         branchLog.setClientInfo(beginRetryBranchMessage.getDbName());
         branchLog.setClientIp(clientIp);
@@ -191,7 +190,6 @@ public interface ResourceManagerMessageHandler {
         }
         dtsTransStatusDao.insertBranchLog(branchLog.getBranchId(), branchLog);
         retryGlobalLog.getBranchIds().add(branchLog.getBranchId());
-        retryGlobalLog.increaseLeftBranches();
         resultMessage.setBranchId(branchLog.getBranchId());
         dtsTransStatusDao.insertCommitedBranchLog(branchLog.getBranchId(),
             CommitingResultCode.BEGIN.getValue());

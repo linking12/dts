@@ -25,14 +25,12 @@ import io.dts.common.api.DtsServerMessageHandler;
 import io.dts.common.api.DtsServerMessageSender;
 import io.dts.common.protocol.RequestHeaderMessage;
 import io.dts.common.protocol.ResponseMessage;
-import io.dts.common.protocol.body.BranchCommitResultMessage;
 import io.dts.common.protocol.body.DtsMultipleRequestMessage;
 import io.dts.common.protocol.body.DtsMultipleResonseMessage;
 import io.dts.common.protocol.header.BeginMessage;
 import io.dts.common.protocol.header.BeginResultMessage;
 import io.dts.common.protocol.header.BeginRetryBranchMessage;
 import io.dts.common.protocol.header.BeginRetryBranchResultMessage;
-import io.dts.common.protocol.header.BranchRollbackResultMessage;
 import io.dts.common.protocol.header.GlobalCommitMessage;
 import io.dts.common.protocol.header.GlobalCommitResultMessage;
 import io.dts.common.protocol.header.GlobalRollbackMessage;
@@ -183,17 +181,6 @@ public class DefaultDtsServerMessageHandler implements DtsServerMessageHandler {
     }
 
   }
-
-  @Override
-  public void handleMessage(String clientIp, BranchCommitResultMessage message) {
-
-  }
-
-  @Override
-  public void handleMessage(String clientIp, BranchRollbackResultMessage message) {
-
-  }
-
 
 
 }

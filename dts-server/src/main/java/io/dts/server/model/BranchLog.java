@@ -22,7 +22,7 @@ public class BranchLog {
   /**
    * 事务ID
    */
-  private long txId;
+  private long transId;
 
   /**
    * 状态
@@ -159,18 +159,14 @@ public class BranchLog {
     this.branchId = branchId;
   }
 
-  /**
-   * @return
-   */
-  public long getTxId() {
-    return txId;
+
+
+  public long getTransId() {
+    return transId;
   }
 
-  /**
-   * @param txId
-   */
-  public void setTxId(long txId) {
-    this.txId = txId;
+  public void setTransId(long transId) {
+    this.transId = transId;
   }
 
   /**
@@ -307,7 +303,7 @@ public class BranchLog {
    * @see java.lang.Object#toString()
    */
   public String toString() {
-    return "tranId:" + this.txId + ",branchId:" + this.branchId + ",state:" + this.state
+    return "tranId:" + this.transId + ",branchId:" + this.branchId + ",state:" + this.state
         + ",commit mode:" + this.commitMode + ",udata:" + this.udata + ",retrySql:" + this.retrySql
         + ",isDelLock:" + this.isDelLock;
   }

@@ -18,9 +18,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 import io.dts.server.model.BranchLog;
 import io.dts.server.model.GlobalLog;
@@ -34,20 +34,24 @@ public class DtsTransStatusDaoImpl implements DtsTransStatusDao {
   /**
    * 当前活动的所有事务
    */
-  private static final Map<Long, GlobalLog> activeTranMap = Maps.newConcurrentMap();
+  private static final ConcurrentHashMap<Long, GlobalLog> activeTranMap =
+      new ConcurrentHashMap<Long, GlobalLog>();
   /**
    * 当前活动的所有事务分支
    */
-  private static final Map<Long, BranchLog> activeTranBranchMap = Maps.newConcurrentMap();
+  private static final ConcurrentHashMap<Long, BranchLog> activeTranBranchMap =
+      new ConcurrentHashMap<Long, BranchLog>();
   /**
    * 保存已经发送BranchCommitMessage消息，但是还没收到响应或者失败的分支
    */
-  private static final Map<Long, Integer> committingMap = Maps.newConcurrentMap();
+  private static final ConcurrentHashMap<Long, Integer> committingMap =
+      new ConcurrentHashMap<Long, Integer>();
 
   /**
    * 保存已经发送BranchRollbackMessage消息，但是还没收到响应或者失败的分支
    */
-  private static final Map<Long, Integer> rollbackingMap = Maps.newConcurrentMap();
+  private static final ConcurrentHashMap<Long, Integer> rollbackingMap =
+      new ConcurrentHashMap<Long, Integer>();
 
   /**
    * 超时的事务列表
@@ -76,8 +80,8 @@ public class DtsTransStatusDaoImpl implements DtsTransStatusDao {
   }
 
   @Override
-  public void clearBranchLog(Long branchId) {
-    activeTranBranchMap.remove(branchId);
+  public BranchLog clearBranchLog(Long branchId) {
+    return activeTranBranchMap.remove(branchId);
   }
 
   @Override
@@ -86,8 +90,17 @@ public class DtsTransStatusDaoImpl implements DtsTransStatusDao {
   }
 
   @Override
+  public boolean clearCommitedBranchLog(Long branchId) {
+    return committingMap.remove(branchId) != null;
+  }
+
+  @Override
   public void insertRollbackBranchLog(Long branchId, Integer rollbackingResultCode) {
     rollbackingMap.put(branchId, rollbackingResultCode);
+  }
+
+  public boolean clearRollbackBranchLog(Long branchId) {
+    return rollbackingMap.remove(branchId) != null;
   }
 
   @Override

@@ -31,11 +31,15 @@ public interface DtsTransStatusDao {
 
   public void insertBranchLog(Long branchId, BranchLog branchLog);
 
-  public void clearBranchLog(Long branchId);
+  public BranchLog clearBranchLog(Long branchId);
 
   public void insertCommitedBranchLog(Long branchId, Integer commitResultCode);
 
+  public boolean clearCommitedBranchLog(Long branchId);
+
   public void insertRollbackBranchLog(Long branchId, Integer rollbackingResultCode);
+
+  public boolean clearRollbackBranchLog(Long branchId);
 
   public GlobalLog queryGlobalLog(Long transId);
 

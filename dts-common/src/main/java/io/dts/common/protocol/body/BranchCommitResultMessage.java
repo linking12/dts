@@ -26,7 +26,7 @@ public class BranchCommitResultMessage extends RemotingSerializable implements R
   /**
    * 事务IDs
    */
-  private List<Long> tranIds;
+  private Long tranId;
   /**
    * 分支IDs
    */
@@ -35,12 +35,13 @@ public class BranchCommitResultMessage extends RemotingSerializable implements R
 
   private int result;
 
-  public List<Long> getTranIds() {
-    return tranIds;
+
+  public Long getTranId() {
+    return tranId;
   }
 
-  public void setTranIds(List<Long> tranIds) {
-    this.tranIds = tranIds;
+  public void setTranId(Long tranId) {
+    this.tranId = tranId;
   }
 
   public List<Long> getBranchIds() {
