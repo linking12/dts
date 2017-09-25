@@ -37,7 +37,7 @@ public interface DtsTransStatusDao {
 
   public boolean clearCommitedBranchLog(Long branchId);
 
-  public void insertRollbackBranchLog(Long branchId, Integer rollbackingResultCode);
+  public void insertRollbackBranchLog(Long branchId, Integer rollbackResultCode);
 
   public boolean clearRollbackBranchLog(Long branchId);
 

@@ -22,6 +22,7 @@ import io.dts.common.protocol.header.BranchRollbackResultMessage;
 import io.dts.server.model.BranchLog;
 import io.dts.server.model.GlobalLog;
 import io.dts.server.service.CommitingResultCode;
+import io.dts.server.service.RollbackingResultCode;
 import io.dts.server.store.DtsLogDao;
 import io.dts.server.store.DtsTransStatusDao;
 
@@ -66,8 +67,11 @@ public interface SyncGlobalResultMessagHandler {
             }
           }
 
-          // 如果出现了逻辑错误，需要发出告警
-        } else if (message.getResult() == ResultCode.LOGICERROR.getValue()) {
+        } else if (message.getResult() == ResultCode.SYSTEMERROR.getValue()) {
+          dtsTransStatusDao.insertCommitedBranchLog(branchId,
+              CommitingResultCode.FAILED.getValue());
+        } // 如果出现了逻辑错误，需要发出告警
+        else if (message.getResult() == ResultCode.LOGICERROR.getValue()) {
           if (!dtsTransStatusDao.clearCommitedBranchLog(branchId)) {
             return;
           }
@@ -88,7 +92,6 @@ public interface SyncGlobalResultMessagHandler {
 
             }
           }
-          // 提交失败，可以重复提交
         } else {
           dtsTransStatusDao.insertCommitedBranchLog(branchId,
               CommitingResultCode.FAILED.getValue());
@@ -117,6 +120,9 @@ public interface SyncGlobalResultMessagHandler {
               dtsLogDao.deleteGlobalLog(tranId, 1);
             }
           }
+        } else if (message.getResult() == ResultCode.SYSTEMERROR.getValue()) {
+          dtsTransStatusDao.insertRollbackBranchLog(branchId,
+              RollbackingResultCode.FAILED.getValue());
         } else if (message.getResult() == ResultCode.LOGICERROR.getValue()) {
           if (!dtsTransStatusDao.clearRollbackBranchLog(branchId)) {
             return;
@@ -138,6 +144,9 @@ public interface SyncGlobalResultMessagHandler {
 
             }
           }
+        } else {
+          dtsTransStatusDao.insertRollbackBranchLog(branchId,
+              RollbackingResultCode.FAILED.getValue());
         }
       }
 

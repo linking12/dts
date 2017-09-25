@@ -31,7 +31,6 @@ import io.dts.common.protocol.header.BranchRollbackResultMessage;
 import io.dts.common.protocol.header.GlobalCommitMessage;
 import io.dts.common.protocol.header.GlobalRollbackMessage;
 import io.dts.server.model.BranchLog;
-import io.dts.server.model.BranchTransactionState;
 import io.dts.server.model.GlobalLog;
 import io.dts.server.model.GlobalTransactionState;
 import io.dts.server.service.CommitingResultCode;
@@ -130,7 +129,7 @@ public interface ClientMessageHandler {
               if (!globalLog.isContainPhase2CommitBranch()) {
                 for (BranchLog branchLog : branchLogs) {
                   dtsTransStatusDao.insertCommitedBranchLog(branchLog.getBranchId(),
-                      BranchTransactionState.BEGIN.getValue());
+                      CommitingResultCode.BEGIN.getValue());
                 }
               } else {
                 try {
