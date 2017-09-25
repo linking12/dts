@@ -22,18 +22,16 @@ import io.netty.channel.Channel;
  */
 public class ChannelInfo {
   private final Channel channel;
-  private final String clientId;
   private final LanguageCode language;
   private final int version;
   private volatile long lastUpdateTimestamp = System.currentTimeMillis();
 
   public ChannelInfo(Channel channel) {
-    this(channel, null, null, 0);
+    this(channel, null, 0);
   }
 
-  public ChannelInfo(Channel channel, String clientId, LanguageCode language, int version) {
+  public ChannelInfo(Channel channel, LanguageCode language, int version) {
     this.channel = channel;
-    this.clientId = clientId;
     this.language = language;
     this.version = version;
   }
@@ -42,9 +40,6 @@ public class ChannelInfo {
     return channel;
   }
 
-  public String getClientId() {
-    return clientId;
-  }
 
   public LanguageCode getLanguage() {
     return language;
@@ -64,18 +59,18 @@ public class ChannelInfo {
     this.lastUpdateTimestamp = lastUpdateTimestamp;
   }
 
+
+
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;
     result = prime * result + ((channel == null) ? 0 : channel.hashCode());
-    result = prime * result + ((clientId == null) ? 0 : clientId.hashCode());
     result = prime * result + ((language == null) ? 0 : language.hashCode());
     result = prime * result + (int) (lastUpdateTimestamp ^ (lastUpdateTimestamp >>> 32));
     result = prime * result + version;
     return result;
   }
-
 
   @Override
   public boolean equals(Object obj) {
@@ -89,16 +84,22 @@ public class ChannelInfo {
     if (channel == null) {
       if (other.channel != null)
         return false;
-    } else if (this.channel != other.channel) {
+    } else if (!channel.equals(other.channel))
       return false;
-    }
+    if (language != other.language)
+      return false;
+    if (lastUpdateTimestamp != other.lastUpdateTimestamp)
+      return false;
+    if (version != other.version)
+      return false;
     return true;
   }
 
-
   @Override
   public String toString() {
-    return "ChannelInfo [channel=" + channel + ", clientId=" + clientId + ", language=" + language
-        + ", version=" + version + ", lastUpdateTimestamp=" + lastUpdateTimestamp + "]";
+    return "ChannelInfo [channel=" + channel + ", language=" + language + ", version=" + version
+        + ", lastUpdateTimestamp=" + lastUpdateTimestamp + "]";
   }
+
+
 }

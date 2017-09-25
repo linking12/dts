@@ -43,7 +43,7 @@ public class RegisterMessage implements CommandCustomHeader, RequestMessage {
    * 提交模式
    */
   @CFNotNull
-  private byte commitMode;
+  private int commitMode;
 
   public long getTranId() {
     return tranId;
@@ -69,15 +69,15 @@ public class RegisterMessage implements CommandCustomHeader, RequestMessage {
     this.businessKey = businessKey;
   }
 
-  public byte getCommitMode() {
+
+
+  public int getCommitMode() {
     return commitMode;
   }
 
-  public void setCommitMode(byte commitMode) {
+  public void setCommitMode(int commitMode) {
     this.commitMode = commitMode;
   }
-
-
 
   @Override
   public void checkFields() throws RemotingCommandException {

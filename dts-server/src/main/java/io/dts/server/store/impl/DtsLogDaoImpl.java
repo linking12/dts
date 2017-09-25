@@ -10,6 +10,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -29,7 +30,7 @@ import io.dts.server.model.BranchLog;
 import io.dts.server.model.GlobalLog;
 import io.dts.server.store.DtsLogDao;
 
-@Component
+@Repository
 public class DtsLogDaoImpl implements DtsLogDao {
 
   private static final Logger logger = LoggerFactory.getLogger(DtsLogDaoImpl.class);

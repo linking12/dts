@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.springframework.stereotype.Repository;
+
 import com.google.common.collect.Lists;
 
 import io.dts.server.model.BranchLog;
@@ -30,6 +32,7 @@ import io.dts.server.store.DtsTransStatusDao;
  * @author liushiming
  * @version DtsTransStatusDaoImpl.java, v 0.0.1 2017年9月18日 下午4:14:49 liushiming
  */
+@Repository
 public class DtsTransStatusDaoImpl implements DtsTransStatusDao {
   /**
    * 当前活动的所有事务

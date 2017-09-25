@@ -62,7 +62,7 @@ public interface ResourceManagerMessageHandler {
       @Override
       public Long processMessage(RegisterMessage registerMessage, String clientIp) {
         long tranId = registerMessage.getTranId();
-        byte commitMode = registerMessage.getCommitMode();
+        int commitMode = registerMessage.getCommitMode();
         GlobalLog globalLog = dtsTransStatusDao.queryGlobalLog(tranId);
         if (globalLog == null || globalLog.getState() != GlobalTransactionState.Begin.getValue()) {
           if (globalLog == null) {
@@ -76,8 +76,8 @@ public interface ResourceManagerMessageHandler {
         branchLog.setTransId(tranId);
         branchLog.setWaitPeriods(0);
         branchLog.setClientAppName(clientIp);
-        branchLog.setClientInfo(registerMessage.getKey());
-        branchLog.setBusinessKey(registerMessage.getBusinessKey());
+        branchLog.setClientInfo(clientIp);
+        branchLog.setBusinessKey(clientIp);
         branchLog.setClientIp(clientIp);
         branchLog.setState(BranchLogState.Begin.getValue());
         branchLog.setCommitMode(commitMode);
@@ -92,6 +92,7 @@ public interface ResourceManagerMessageHandler {
         Long branchId = branchLog.getBranchId();
         dtsTransStatusDao.insertBranchLog(branchId, branchLog);
         globalLog.getBranchIds().add(branchId);
+        dtsTransStatusDao.insertGlobalLog(tranId, globalLog);
         return branchId;
       }
 
