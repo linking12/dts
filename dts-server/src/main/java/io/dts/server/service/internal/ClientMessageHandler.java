@@ -221,7 +221,12 @@ public interface ClientMessageHandler {
           try {
             BranchCommitResultMessage branchCommitResult =
                 serverMessageServer.invokeSync(clientAddress, branchCommitMessage, 3000);
-            globalResultMessageHandler.processMessage(clientAddress, branchCommitResult);
+            if (branchCommitResult == null) {
+              dtsTransStatusDao.insertCommitedBranchLog(branchId,
+                  CommitingResultCode.TIMEOUT.getValue());
+            } else {
+              globalResultMessageHandler.processMessage(clientAddress, branchCommitResult);
+            }
           } catch (DtsException e) {
             logger.error(e.getMessage(), e);
             dtsTransStatusDao.insertCommitedBranchLog(branchId,
@@ -245,7 +250,12 @@ public interface ClientMessageHandler {
           try {
             BranchRollbackResultMessage branchRollbackResult =
                 serverMessageServer.invokeSync(clientAddress, branchRollbackMessage, 3000);
-            globalResultMessageHandler.processMessage(clientAddress, branchRollbackResult);
+            if (branchRollbackResult == null) {
+              dtsTransStatusDao.insertRollbackBranchLog(branchId,
+                  RollbackingResultCode.TIMEOUT.getValue());
+            } else {
+              globalResultMessageHandler.processMessage(clientAddress, branchRollbackResult);
+            }
           } catch (DtsException e) {
             logger.error(e.getMessage(), e);
             dtsTransStatusDao.insertRollbackBranchLog(branchId,
