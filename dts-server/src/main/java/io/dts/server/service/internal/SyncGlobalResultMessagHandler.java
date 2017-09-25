@@ -50,7 +50,7 @@ public interface SyncGlobalResultMessagHandler {
         Long tranId = message.getTranId();
         Long branchId = message.getBranchId();
         if (message.getResult() == ResultCode.OK.getValue()) {
-          if (!dtsTransStatusDao.clearCommitedBranchLog(branchId)) {
+          if (!dtsTransStatusDao.clearCommitedResult(branchId)) {
             return;
           }
           BranchLog branchLog = dtsTransStatusDao.clearBranchLog(branchId);
@@ -68,11 +68,11 @@ public interface SyncGlobalResultMessagHandler {
           }
 
         } else if (message.getResult() == ResultCode.SYSTEMERROR.getValue()) {
-          dtsTransStatusDao.insertCommitedBranchLog(branchId,
+          dtsTransStatusDao.insertCommitedResult(branchId,
               CommitingResultCode.FAILED.getValue());
         } // 如果出现了逻辑错误，需要发出告警
         else if (message.getResult() == ResultCode.LOGICERROR.getValue()) {
-          if (!dtsTransStatusDao.clearCommitedBranchLog(branchId)) {
+          if (!dtsTransStatusDao.clearCommitedResult(branchId)) {
             return;
           }
           BranchLog branchLog = dtsTransStatusDao.clearBranchLog(branchId);
@@ -93,7 +93,7 @@ public interface SyncGlobalResultMessagHandler {
             }
           }
         } else {
-          dtsTransStatusDao.insertCommitedBranchLog(branchId,
+          dtsTransStatusDao.insertCommitedResult(branchId,
               CommitingResultCode.FAILED.getValue());
 
         }
@@ -104,7 +104,7 @@ public interface SyncGlobalResultMessagHandler {
         Long tranId = message.getTranId();
         Long branchId = message.getBranchId();
         if (message.getResult() == ResultCode.OK.getValue()) {
-          if (!dtsTransStatusDao.clearRollbackBranchLog(branchId)) {
+          if (!dtsTransStatusDao.clearRollbackResult(branchId)) {
             return;
           }
           BranchLog branchLog = dtsTransStatusDao.clearBranchLog(branchId);
@@ -121,10 +121,10 @@ public interface SyncGlobalResultMessagHandler {
             }
           }
         } else if (message.getResult() == ResultCode.SYSTEMERROR.getValue()) {
-          dtsTransStatusDao.insertRollbackBranchLog(branchId,
+          dtsTransStatusDao.insertRollbackResult(branchId,
               RollbackingResultCode.FAILED.getValue());
         } else if (message.getResult() == ResultCode.LOGICERROR.getValue()) {
-          if (!dtsTransStatusDao.clearRollbackBranchLog(branchId)) {
+          if (!dtsTransStatusDao.clearRollbackResult(branchId)) {
             return;
           }
           BranchLog branchLog = dtsTransStatusDao.clearBranchLog(branchId);
@@ -145,7 +145,7 @@ public interface SyncGlobalResultMessagHandler {
             }
           }
         } else {
-          dtsTransStatusDao.insertRollbackBranchLog(branchId,
+          dtsTransStatusDao.insertRollbackResult(branchId,
               RollbackingResultCode.FAILED.getValue());
         }
       }

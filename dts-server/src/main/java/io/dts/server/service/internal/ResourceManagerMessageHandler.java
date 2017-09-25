@@ -115,7 +115,7 @@ public interface ResourceManagerMessageHandler {
           throw new DtsException("global log doesn't exist.");
         }
         if (globalLog.getState() == GlobalTransactionState.Rollbacking.getValue()) {
-          dtsTransStatusDao.insertRollbackBranchLog(branchLog.getBranchId(),
+          dtsTransStatusDao.insertRollbackResult(branchLog.getBranchId(),
               RollbackingResultCode.TIMEOUT.getValue());
         }
       }
@@ -192,7 +192,7 @@ public interface ResourceManagerMessageHandler {
         dtsTransStatusDao.insertBranchLog(branchLog.getBranchId(), branchLog);
         retryGlobalLog.getBranchIds().add(branchLog.getBranchId());
         resultMessage.setBranchId(branchLog.getBranchId());
-        dtsTransStatusDao.insertCommitedBranchLog(branchLog.getBranchId(),
+        dtsTransStatusDao.insertCommitedResult(branchLog.getBranchId(),
             CommitingResultCode.BEGIN.getValue());
       }
 

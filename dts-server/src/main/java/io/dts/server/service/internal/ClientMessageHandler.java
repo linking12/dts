@@ -128,7 +128,7 @@ public interface ClientMessageHandler {
               }
               if (!globalLog.isContainPhase2CommitBranch()) {
                 for (BranchLog branchLog : branchLogs) {
-                  dtsTransStatusDao.insertCommitedBranchLog(branchLog.getBranchId(),
+                  dtsTransStatusDao.insertCommitedResult(branchLog.getBranchId(),
                       CommitingResultCode.BEGIN.getValue());
                 }
               } else {
@@ -217,14 +217,14 @@ public interface ClientMessageHandler {
             BranchCommitResultMessage branchCommitResult =
                 serverMessageServer.invokeSync(clientAddress, branchCommitMessage, 3000);
             if (branchCommitResult == null) {
-              dtsTransStatusDao.insertCommitedBranchLog(branchId,
+              dtsTransStatusDao.insertCommitedResult(branchId,
                   CommitingResultCode.TIMEOUT.getValue());
             } else {
               globalResultMessageHandler.processMessage(clientAddress, branchCommitResult);
             }
           } catch (DtsException e) {
             logger.error(e.getMessage(), e);
-            dtsTransStatusDao.insertCommitedBranchLog(branchId,
+            dtsTransStatusDao.insertCommitedResult(branchId,
                 CommitingResultCode.TIMEOUT.getValue());
           }
 
@@ -246,14 +246,14 @@ public interface ClientMessageHandler {
             BranchRollbackResultMessage branchRollbackResult =
                 serverMessageServer.invokeSync(clientAddress, branchRollbackMessage, 3000);
             if (branchRollbackResult == null) {
-              dtsTransStatusDao.insertRollbackBranchLog(branchId,
+              dtsTransStatusDao.insertRollbackResult(branchId,
                   RollbackingResultCode.TIMEOUT.getValue());
             } else {
               globalResultMessageHandler.processMessage(clientAddress, branchRollbackResult);
             }
           } catch (DtsException e) {
             logger.error(e.getMessage(), e);
-            dtsTransStatusDao.insertRollbackBranchLog(branchId,
+            dtsTransStatusDao.insertRollbackResult(branchId,
                 RollbackingResultCode.TIMEOUT.getValue());
           }
 

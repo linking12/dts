@@ -88,21 +88,21 @@ public class DtsTransStatusDaoImpl implements DtsTransStatusDao {
   }
 
   @Override
-  public void insertCommitedBranchLog(Long branchId, Integer commitResultCode) {
+  public void insertCommitedResult(Long branchId, Integer commitResultCode) {
     committingMap.put(branchId, commitResultCode);
   }
 
   @Override
-  public boolean clearCommitedBranchLog(Long branchId) {
+  public boolean clearCommitedResult(Long branchId) {
     return committingMap.remove(branchId) != null;
   }
 
   @Override
-  public void insertRollbackBranchLog(Long branchId, Integer rollbackingResultCode) {
+  public void insertRollbackResult(Long branchId, Integer rollbackingResultCode) {
     rollbackingMap.put(branchId, rollbackingResultCode);
   }
 
-  public boolean clearRollbackBranchLog(Long branchId) {
+  public boolean clearRollbackResult(Long branchId) {
     return rollbackingMap.remove(branchId) != null;
   }
 
