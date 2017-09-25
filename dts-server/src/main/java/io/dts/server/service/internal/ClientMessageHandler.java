@@ -34,6 +34,8 @@ import io.dts.server.model.BranchLog;
 import io.dts.server.model.BranchTransactionState;
 import io.dts.server.model.GlobalLog;
 import io.dts.server.model.GlobalTransactionState;
+import io.dts.server.service.CommitingResultCode;
+import io.dts.server.service.RollbackingResultCode;
 import io.dts.server.store.DtsLogDao;
 import io.dts.server.store.DtsTransStatusDao;
 import io.dts.server.store.impl.DtsServerRestorer;
@@ -216,9 +218,15 @@ public interface ClientMessageHandler {
           branchCommitMessage.setUdata(branchLog.getUdata());
           branchCommitMessage.setCommitMode((byte) branchLog.getCommitMode());
           branchCommitMessage.setRetrySql(branchLog.getRetrySql());
-          BranchCommitResultMessage branchCommitResult =
-              serverMessageServer.invokeSync(clientAddress, branchCommitMessage, 3000);
-          globalResultMessageHandler.processMessage(clientAddress, branchCommitResult);
+          try {
+            BranchCommitResultMessage branchCommitResult =
+                serverMessageServer.invokeSync(clientAddress, branchCommitMessage, 3000);
+            globalResultMessageHandler.processMessage(clientAddress, branchCommitResult);
+          } catch (DtsException e) {
+            logger.error(e.getMessage(), e);
+            dtsTransStatusDao.insertCommitedBranchLog(branchId,
+                CommitingResultCode.TIMEOUT.getValue());
+          }
 
         });
       }
@@ -234,9 +242,15 @@ public interface ClientMessageHandler {
           branchRollbackMessage.setUdata(branchLog.getUdata());
           branchRollbackMessage.setCommitMode((byte) branchLog.getCommitMode());
           branchRollbackMessage.setIsDelLock((byte) branchLog.getIsDelLock());
-          BranchRollbackResultMessage branchRollbackResult =
-              serverMessageServer.invokeSync(clientAddress, branchRollbackMessage, 3000);
-          globalResultMessageHandler.processMessage(clientAddress, branchRollbackResult);
+          try {
+            BranchRollbackResultMessage branchRollbackResult =
+                serverMessageServer.invokeSync(clientAddress, branchRollbackMessage, 3000);
+            globalResultMessageHandler.processMessage(clientAddress, branchRollbackResult);
+          } catch (DtsException e) {
+            logger.error(e.getMessage(), e);
+            dtsTransStatusDao.insertRollbackBranchLog(branchId,
+                RollbackingResultCode.TIMEOUT.getValue());
+          }
 
         });
       }
