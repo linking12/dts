@@ -73,7 +73,7 @@ public class DefaultDtsServerMessageHandler implements DtsServerMessageHandler {
   @PostConstruct
   public void init() {
     clientHandler = ClientMessageHandler.createClientMessageProcessor(dtsTransStatusDao, dtsLogDao,
-        serverMessageServer, this);
+        serverMessageServer);
     resourceHandler = ResourceManagerMessageHandler
         .createResourceManagerMessageProcessor(dtsTransStatusDao, dtsLogDao);
   }

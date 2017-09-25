@@ -20,11 +20,14 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.dts.common.api.DtsServerMessageHandler;
 import io.dts.common.api.DtsServerMessageSender;
 import io.dts.common.common.TxcXID;
 import io.dts.common.exception.DtsException;
 import io.dts.common.protocol.header.BeginMessage;
+import io.dts.common.protocol.header.BranchCommitMessage;
+import io.dts.common.protocol.header.BranchCommitResultMessage;
+import io.dts.common.protocol.header.BranchRollBackMessage;
+import io.dts.common.protocol.header.BranchRollbackResultMessage;
 import io.dts.common.protocol.header.GlobalCommitMessage;
 import io.dts.common.protocol.header.GlobalRollbackMessage;
 import io.dts.server.model.BranchLog;
@@ -51,10 +54,13 @@ public interface ClientMessageHandler {
 
   public static ClientMessageHandler createClientMessageProcessor(
       DtsTransStatusDao dtsTransStatusDao, DtsLogDao dtsLogDao,
-      DtsServerMessageSender serverMessageServer, DtsServerMessageHandler handler) {
+      DtsServerMessageSender serverMessageServer) {
 
     return new ClientMessageHandler() {
       private final Logger logger = LoggerFactory.getLogger(ResourceManagerMessageHandler.class);
+
+      private final SyncGlobalResultMessagHandler globalResultMessageHandler =
+          SyncGlobalResultMessagHandler.createSyncGlobalResultProcess(dtsTransStatusDao, dtsLogDao);
 
       // 开始一个事务
       @Override
@@ -136,7 +142,7 @@ public interface ClientMessageHandler {
                       return (int) (o1.getBranchId() - o2.getBranchId());
                     }
                   });
-                  this.syncGlobalCommit(branchLogs, globalLog, globalLog.getTransId());
+                  this.syncGlobalCommit(branchLogs, globalLog);
                 } catch (Exception e) {
                   logger.error(e.getMessage(), e);
                   throw new DtsException("notify resourcemanager to commit failed");
@@ -187,7 +193,7 @@ public interface ClientMessageHandler {
           try {
             String clusterNode = globalRollbackMessage.getRealSvrAddr();
             if (clusterNode == null)
-              this.syncGlobalRollback(branchLogs, globalLog, tranId);
+              this.syncGlobalRollback(branchLogs, globalLog);
             // handler.globalRollbackForPrevNode(branchLogs, globalLog, tranId, clusterNode);
           } catch (Exception e) {
             logger.error(e.getMessage(), e);
@@ -198,14 +204,41 @@ public interface ClientMessageHandler {
         }
       }
 
-      protected void syncGlobalCommit(List<BranchLog> branchLogs, GlobalLog globalLog,
-          long tranId) {
+      protected void syncGlobalCommit(List<BranchLog> branchLogs, GlobalLog globalLog) {
 
+        branchLogs.forEach(branchLog -> {
+          String clientAddress = branchLog.getClientIp();
+          Long branchId = branchLog.getBranchId();
+          BranchCommitMessage branchCommitMessage = new BranchCommitMessage();
+          branchCommitMessage.setServerAddr(TxcXID.getSvrAddr());
+          branchCommitMessage.setTranId(globalLog.getTransId());
+          branchCommitMessage.setBranchId(branchId);
+          branchCommitMessage.setUdata(branchLog.getUdata());
+          branchCommitMessage.setCommitMode((byte) branchLog.getCommitMode());
+          branchCommitMessage.setRetrySql(branchLog.getRetrySql());
+          BranchCommitResultMessage branchCommitResult =
+              serverMessageServer.invokeSync(clientAddress, branchCommitMessage, 3000);
+          globalResultMessageHandler.processMessage(clientAddress, branchCommitResult);
+
+        });
       }
 
-      protected void syncGlobalRollback(List<BranchLog> branchLogs, GlobalLog globalLog,
-          long tranId) {
+      protected void syncGlobalRollback(List<BranchLog> branchLogs, GlobalLog globalLog) {
+        branchLogs.forEach(branchLog -> {
+          String clientAddress = branchLog.getClientIp();
+          Long branchId = branchLog.getBranchId();
+          BranchRollBackMessage branchRollbackMessage = new BranchRollBackMessage();
+          branchRollbackMessage.setServerAddr(TxcXID.getSvrAddr());
+          branchRollbackMessage.setTranId(globalLog.getTransId());
+          branchRollbackMessage.setBranchId(branchId);
+          branchRollbackMessage.setUdata(branchLog.getUdata());
+          branchRollbackMessage.setCommitMode((byte) branchLog.getCommitMode());
+          branchRollbackMessage.setIsDelLock((byte) branchLog.getIsDelLock());
+          BranchRollbackResultMessage branchRollbackResult =
+              serverMessageServer.invokeSync(clientAddress, branchRollbackMessage, 3000);
+          globalResultMessageHandler.processMessage(clientAddress, branchRollbackResult);
 
+        });
       }
 
     };
