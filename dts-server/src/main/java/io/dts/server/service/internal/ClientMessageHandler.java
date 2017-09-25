@@ -38,7 +38,6 @@ import io.dts.server.service.CommitingResultCode;
 import io.dts.server.service.RollbackingResultCode;
 import io.dts.server.store.DtsLogDao;
 import io.dts.server.store.DtsTransStatusDao;
-import io.dts.server.store.impl.DtsServerRestorer;
 
 /**
  * @author liushiming
@@ -90,9 +89,6 @@ public interface ClientMessageHandler {
             dtsTransStatusDao.removeTimeOut(tranId);
             throw new DtsException(
                 "transaction doesn't exist. It has been rollbacked because of timeout.");
-          } // 事务已提交
-          else if (DtsServerRestorer.restoredCommittingTransactions.contains(tranId)) {
-            return;
           } // 在本地缓存未查到事务
           else {
             throw new DtsException("transaction doesn't exist.");
