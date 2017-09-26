@@ -47,12 +47,14 @@ public abstract class TxcBaseVisitor implements ITxcVisitor {
 	public TxcBaseVisitor(final Connection connection, ISQLStatement stmt) throws SQLException {
 		this.connection = connection;
 		this.node = stmt;
-		this.tableMeta = buildTableMeta();
 	}
 
 
+	@Override
 	public  TxcTableMeta buildTableMeta() throws SQLException {
-		TxcTableMeta tableMeta = null;
+		if (tableMeta != null) {
+			return tableMeta;
+		}
 		try {
 			String tablename = node.getTableName();
 
@@ -103,7 +105,7 @@ public abstract class TxcBaseVisitor implements ITxcVisitor {
 	@Override
 	public String getWhereCondition(Statement st) {
 		if (whereCondition == null) {
-			whereCondition = parseWhereCondition(st);
+			whereCondition = " WHERE " + parseWhereCondition(st);
 		}
 		return whereCondition;
 	}

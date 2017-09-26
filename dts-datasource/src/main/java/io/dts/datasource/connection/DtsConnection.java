@@ -66,7 +66,7 @@ public class DtsConnection extends AbstractDtsConnection {
     }
 
     if (getAutoCommit() == true) {
-      throw new SQLException("should 'set autocommit false' first.");
+      throw new SQLException("should set autocommit false first.");
     }
     long branchId = dtsDataSource.getResourceManager().register(dtsDataSource.getDbName(), CommitMode.COMMIT_IN_PHASE1);
     txcContext = new TxcRuntimeContext();

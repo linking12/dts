@@ -51,7 +51,7 @@ public final class PreparedStatementExecutor {
             
             @Override
             public ResultSet execute(final BaseStatementUnit baseStatementUnit) throws Exception {
-                return ((PreparedStatement) baseStatementUnit.getStatement()).executeQuery();
+                return ((PreparedStatement) baseStatementUnit.getStatement().getRawStatement()).executeQuery();
             }
         });
     }
@@ -66,7 +66,7 @@ public final class PreparedStatementExecutor {
             
             @Override
             public Integer execute(final BaseStatementUnit baseStatementUnit) throws Exception {
-                return ((PreparedStatement) baseStatementUnit.getStatement()).executeUpdate();
+                return ((PreparedStatement) baseStatementUnit.getStatement().getRawStatement()).executeUpdate();
             }
         });
         return results;
@@ -82,7 +82,7 @@ public final class PreparedStatementExecutor {
             
             @Override
             public Boolean execute(final BaseStatementUnit baseStatementUnit) throws Exception {
-                return ((PreparedStatement) baseStatementUnit.getStatement()).execute();
+                return ((PreparedStatement) baseStatementUnit.getStatement().getRawStatement()).execute();
             }
         });
         if (null == result) {

@@ -33,14 +33,18 @@ import io.dts.parser.vistor.support.PlaceHolderManager;
  * @author zhangliang
  */
 public interface ITxcVisitor {
-    /**
-     * 获取前置镜像
-     *
-     * @throws SQLException
-     */
-    TxcTable executeAndGetFrontImage(Statement st) throws SQLException;
 
-    TxcTable getTableOriginalValue() throws SQLException;
+  TxcTableMeta buildTableMeta() throws SQLException;
+
+  /**
+   * 获取前置镜像
+   *
+   * @throws SQLException
+   */
+  TxcTable executeAndGetFrontImage(Statement st) throws SQLException;
+
+
+  TxcTable getTableOriginalValue() throws SQLException;
 
     /**
      * 获取后置镜像

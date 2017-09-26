@@ -2,6 +2,7 @@ package io.dts.parser.vistor.support;
 
 import java.io.StringReader;
 import java.sql.SQLException;
+import java.util.List;
 
 import io.dts.common.exception.DtsException;
 import io.dts.parser.constant.SqlType;
@@ -12,6 +13,7 @@ import net.sf.jsqlparser.parser.CCJSqlParserManager;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.delete.Delete;
+import net.sf.jsqlparser.statement.insert.Insert;
 import net.sf.jsqlparser.statement.select.FromItem;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
@@ -56,20 +58,21 @@ public class DtsSQLStatement implements ISQLStatement {
       case SELECT:
         FromItem fromItem = ((PlainSelect) ((Select) getStatement()).getSelectBody()).getFromItem();
         if (!(fromItem instanceof Table)) {
-          throw new DtsException("support complex sql");
+          throw new DtsException("can't support complex sql");
         }
         return fromItem.getAlias() != null ? fromItem.getAlias().getName() : null;
       case UPDATE:
-        FromItem fromItem1 = ((Update) getStatement()).getFromItem();
-        if (!(fromItem1 instanceof Table)) {
-          throw new DtsException("support complex sql");
+        List<Table> tables = ((Update) getStatement()).getTables();
+        if (tables.size() > 1) {
+          throw new DtsException("can't support multi table for update");
         }
-        return fromItem1.getAlias() != null ? fromItem1.getAlias().getName() : null;
+        return tables.get(0).getAlias() != null ? tables.get(0).getAlias().getName() : null;
       case DELETE:
         Alias alias = ((Delete) getStatement()).getTable().getAlias();
         return  alias != null ? alias.getName() : null;
       case INSERT:
-        break;
+        Alias alias2 = ((Insert) getStatement()).getTable().getAlias();
+        return  alias2 != null ? alias2.getName() : null;
       default:
         break;
     }
@@ -84,19 +87,20 @@ public class DtsSQLStatement implements ISQLStatement {
       case SELECT:
         FromItem fromItem = ((PlainSelect) ((Select) getStatement()).getSelectBody()).getFromItem();
         if (!(fromItem instanceof Table)) {
-          throw new DtsException("support complex sql");
+          throw new DtsException("can't support complex sql");
         }
         return  ((Table) fromItem).getName();
       case UPDATE:
-        FromItem fromItem1 = ((Update) getStatement()).getFromItem();
-        if (!(fromItem1 instanceof Table)) {
-          throw new DtsException("support complex sql");
+        List<Table> tables = ((Update) getStatement()).getTables();
+        if (tables.size() > 1) {
+          throw new DtsException("can't support multi table for update");
         }
-        return ((Table) fromItem1).getName();
+        return tables.get(0) != null ? tables.get(0).getName() : null;
       case DELETE:
         return  ((Delete) getStatement()).getTable().getName();
       case INSERT:
-        break;
+        Table table = ((Insert) getStatement()).getTable();
+        return  table != null ? table.getName() : null;
       default:
         break;
     }
