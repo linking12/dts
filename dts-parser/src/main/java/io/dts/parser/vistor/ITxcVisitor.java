@@ -59,13 +59,6 @@ public interface ITxcVisitor {
     String getInputSql();
 
     /**
-     * 获取目标Sql
-     *
-     * @return
-     */
-    String getUserSql() throws SQLException;
-
-    /**
      * 查询SQL，用于取得DB行变更前后镜像
      *
      * @return

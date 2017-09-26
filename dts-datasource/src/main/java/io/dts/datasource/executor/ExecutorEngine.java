@@ -7,7 +7,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import io.dts.common.context.DtsContext;
 import io.dts.common.util.EventBusInstance;
 import io.dts.datasource.executor.commiter.AtExecutorRUnCommiter;
 import io.dts.datasource.executor.event.AbstractExecutionEvent;
@@ -16,11 +15,7 @@ import io.dts.datasource.executor.event.DQLExecutionEvent;
 import io.dts.datasource.executor.event.EventExecutionType;
 import io.dts.datasource.executor.prepared.PreparedStatementUnit;
 import io.dts.datasource.executor.statement.StatementUnit;
-import io.dts.datasource.statement.ITxcStatement;
 import io.dts.parser.constant.SqlType;
-import io.dts.parser.model.TxcTable;
-import io.dts.parser.vistor.ITxcVisitor;
-import io.dts.parser.vistor.TxcVisitorFactory;
 
 /**
  * Created by guoyubo on 2017/9/21.

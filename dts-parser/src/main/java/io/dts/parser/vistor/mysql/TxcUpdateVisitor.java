@@ -31,16 +31,6 @@ public class TxcUpdateVisitor extends TxcBaseVisitor {
 	}
 
 	@Override
-	public String parseUserSql() {
-		return getsql(null);
-	}
-
-	@Override
-	public String parseUserSql0() {
-		return getUserSql();
-	}
-
-	@Override
 	public String parseSelectSql() {
 		StringBuilder selectSqlAppender = getNullSqlAppenderBuilder();
 		selectSqlAppender.append("SELECT ");
@@ -102,7 +92,7 @@ public class TxcUpdateVisitor extends TxcBaseVisitor {
 		}
 
 		if (tableOriginalValue.getLinesNum() == 0) {
-			throw new DtsException(2222, "null result:" + getUserSql());
+			throw new DtsException(2222, "null result for" + getInputSql());
 		}
 		return tableOriginalValue;
 	}

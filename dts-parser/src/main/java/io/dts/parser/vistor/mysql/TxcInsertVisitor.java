@@ -41,17 +41,6 @@ public class TxcInsertVisitor extends TxcBaseVisitor {
 	}
 
 	@Override
-	protected String parseUserSql() {
-		return null;
-	}
-
-	@Override
-	protected String parseUserSql0() {
-		return null;
-	}
-
-
-	@Override
 	public TxcTable executeAndGetFrontImage(Statement st) throws SQLException {
 		// insert前不需进行任何操作
 		TxcTableMeta tableMeta = getTableMeta();

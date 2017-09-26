@@ -28,8 +28,6 @@ import io.dts.parser.vistor.support.TxcTableMetaTools;
  * @author xiaoyan
  */
 public abstract class TxcBaseVisitor implements ITxcVisitor {
-	private String userSql = null; // 输入SQL，经过解析
-	private String userSql0 = null; // 输入SQL，经过解析，替换占位符
 	private String selectSql = null;
 	private String whereCondition = null;
 
@@ -91,19 +89,6 @@ public abstract class TxcBaseVisitor implements ITxcVisitor {
 	public TxcTableMeta getTableMeta() {
 		return tableMeta;
 	}
-
-	@Override
-	public String getUserSql() {
-		if (userSql == null) {
-			userSql = parseUserSql();
-		}
-		return userSql;
-	}
-
-	protected abstract String parseUserSql();
-
-
-	protected abstract String parseUserSql0();
 
 	@Override
 	public String getSelectSql() {

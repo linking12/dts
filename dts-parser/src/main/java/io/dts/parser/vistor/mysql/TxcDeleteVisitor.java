@@ -31,21 +31,6 @@ public class TxcDeleteVisitor extends TxcBaseVisitor {
 		super(connection, stmt);
 	}
 
-	/**
-	 * delete from t1 where 条件 支持 DELETE t1 FROM t1,t2 WHERE t1.id=t2.id 不支持
-	 * DELETE FROM t1 USING t1,t2 WHERE t1.id=t2.id 不支持
-	 * 
-	 */
-	@Override
-	public String parseUserSql() {
-		return getsql(null);
-	}
-
-	@Override
-	public String parseUserSql0() {
-		return getUserSql();
-	}
-
 
 	@Override
 	public String parseSelectSql() {
@@ -128,6 +113,7 @@ public class TxcDeleteVisitor extends TxcBaseVisitor {
 		tablePresentValue.setSchemaName(tableMeta.getSchemaName());
 		return tablePresentValue;
 	}
+
 
 	@Override
 	public String getsql(final String extraWhereCondition) {

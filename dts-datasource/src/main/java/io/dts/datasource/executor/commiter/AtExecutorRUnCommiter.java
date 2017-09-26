@@ -35,14 +35,10 @@ public class AtExecutorRUnCommiter {
   }
 
 
-  public TxcTable beforeExecute()
-
-      throws SQLException {
+  public TxcTable beforeExecute() throws SQLException {
     if (!DtsContext.inTxcTransaction()) {
       return null;
     }
-
-    baseStatementUnit.getStatement().getTxcConnection().setAutoCommit(false);
 
     TxcTable nRet = null;
     switch (baseStatementUnit.getSqlExecutionUnit().getSqlType()) {
