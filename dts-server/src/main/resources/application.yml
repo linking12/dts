@@ -3,8 +3,8 @@ tcp:
 
 datasource:
     driverClassName: com.mysql.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/dts
+    url: jdbc:mysql://127.0.0.1:3306/dts
     username: root
-    password: 123
+    password: 123456
     maxActive: 15
     minIdle: 5

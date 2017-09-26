@@ -5,7 +5,7 @@ import com.google.common.collect.Queues;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -31,9 +31,9 @@ public class DtsRemotingClient {
 
   private RemotingClient remotingClient;
 
-  public DtsRemotingClient(NettyClientConfig nettyClientConfig) {
+  public DtsRemotingClient(NettyClientConfig nettyClientConfig, final List<String> serverAddressList) {
     this.remotingClient = new NettyRemotingClient(nettyClientConfig);
-    this.remotingClient.updateNameServerAddressList(Collections.singletonList("127.0.0.1:10086"));
+    this.remotingClient.updateNameServerAddressList(serverAddressList);
     NettyRequestProcessor messageProcessor = new ResourceManagerMessageProcessor();
     BlockingQueue<Runnable> clientThreadPoolQueue =
         Queues.newLinkedBlockingDeque(100);
@@ -46,12 +46,12 @@ public class DtsRemotingClient {
   }
 
   @PostConstruct
-  public void init() {
+  public void start() {
     remotingClient.start();
   }
 
   @PreDestroy
-  public void destroy() {
+  public void shutdown() {
     remotingClient.shutdown();
   }
 
