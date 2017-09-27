@@ -33,7 +33,7 @@ public class DtsRTTransactionTemplate implements DtsTransactionOperations {
    * @since 1.1.0
    */
   @Override
-  public <T> T execute(DtsTransactionCallback<T> callback, int timeout) throws DtsTransactionException {
+  public <T> T execute(DtsTransactionCallback<T> callback, long timeout) throws DtsTransactionException {
     try {
       DtsContext.startRetryBranch(timeout);
       return callback.doInTransaction();

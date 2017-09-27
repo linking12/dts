@@ -76,24 +76,6 @@ public class TxcInsertVisitor extends TxcBaseVisitor {
 		return tablePresentValue;
 	}
 
-	@Override
-	public String parseSelectSql() {
-		StringBuilder selectSqlAppender = new StringBuilder();
-		selectSqlAppender.append("SELECT ");
-
-		Insert statement = (Insert) getSQLStatement().getStatement();
-
-		List<Column> columns = statement.getColumns();
-		if (columns != null) {
-			for (Column column : columns) {
-				selectSqlAppender.append(column.getColumnName()).append(",");
-			}
-			selectSqlAppender.deleteCharAt(selectSqlAppender.length() - 1);
-		}
-		selectSqlAppender.append(getTableName());
-
-		return selectSqlAppender.toString();
-	}
 
 	/**
 	 * 根据insert是否显式指定主键。<br>

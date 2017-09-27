@@ -50,16 +50,19 @@ public class DefaultDtsTransactionManager implements DtsTransactionManager {
     GlobalCommitMessage commitMessage = new GlobalCommitMessage();
     commitMessage.setTranId(TxcXID.getTransactionId(DtsContext.getCurrentXid()));
     try {
-      GlobalCommitResultMessage commitResultMessage = dtsClient.invoke(commitMessage, 3000l);
+      GlobalCommitResultMessage commitResultMessage = dtsClient.invoke(commitMessage, getTimeout());
       if (commitResultMessage != null) {
         DtsContext.unbind();
       } else {
         throw new DtsTransactionException("commit response is null");
       }
-      throw new DtsTransactionException("transaction commit fail");
     } catch (DtsException e) {
       throw new DtsTransactionException("transaction commit fail", e);
     }
+  }
+
+  private long getTimeout() {
+    return 30000l;
   }
 
   @Override
@@ -73,13 +76,12 @@ public class DefaultDtsTransactionManager implements DtsTransactionManager {
     rollbackMessage.setTranId(TxcXID.getTransactionId(DtsContext.getCurrentXid()));
     rollbackMessage.setRealSvrAddr(TxcXID.getServerAddress(DtsContext.getCurrentXid()));
     try {
-      GlobalRollbackResultMessage rollbackResultMessage = dtsClient.invoke(rollbackMessage, 3000l);
+      GlobalRollbackResultMessage rollbackResultMessage = dtsClient.invoke(rollbackMessage, getTimeout());
       if (rollbackResultMessage != null) {
         DtsContext.unbind();
       } else {
         throw new DtsTransactionException("rollback response is null");
       }
-      throw new DtsTransactionException("transaction rollback fail");
     } catch (DtsException e) {
       throw new DtsTransactionException("transaction rollback fail", e);
     }

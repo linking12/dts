@@ -6,6 +6,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -100,7 +101,36 @@ public abstract class TxcBaseVisitor implements ITxcVisitor {
 		return selectSql;
 	}
 
-	protected abstract String parseSelectSql();
+	public String parseSelectSql() {
+		StringBuilder appendable = getNullSqlAppenderBuilder();
+		appendable.append("SELECT ");
+		appendable.append(printColumns());
+		appendable.append(" FROM ");
+		appendable.append(getTableName());
+		return appendable.toString();
+	}
+
+	public String printColumns() {
+		StringBuilder appender = new StringBuilder();
+
+		Collection<TxcColumnMeta> list = (Collection<TxcColumnMeta>) getTableMeta().getAllColumns().values();
+
+		boolean isFst = true;
+		for (Object obj : list) {
+			if (isFst) {
+				isFst = false;
+			} else if (obj instanceof TxcColumnMeta) {
+				appender.append(",");
+			}
+			appender.append(getTableName());
+			appender.append(".");
+
+			appender.append(((TxcColumnMeta) obj).getColumnName());
+		}
+
+		return appender.toString();
+	}
+
 
 	@Override
 	public String getWhereCondition(Statement st) {
@@ -209,7 +239,13 @@ public abstract class TxcBaseVisitor implements ITxcVisitor {
 			TxcField field = new TxcField();
 			field.setFieldName(rsmd.getColumnName(i));
 			field.setFieldType(rsmd.getColumnType(i));
-			field.setFieldValue(rs.getObject(i));
+			if (rsmd.getColumnTypeName(i).equals("TINYINT")) {
+				field.setFieldValue(rs.getInt(i));
+			} else {
+				field.setFieldValue(rs.getObject(i));
+			}
+
+
 			fields.add(field);
 		}
 

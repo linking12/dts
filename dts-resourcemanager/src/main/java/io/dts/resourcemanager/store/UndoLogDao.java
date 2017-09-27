@@ -38,7 +38,7 @@ public class UndoLogDao {
     insertSql.append("?,"); // branch_id
     insertSql.append("?,"); // rollback_info
     insertSql.append("?,"); // gmt_create
-    insertSql.append("?"); // gmt_modified
+    insertSql.append("?,"); // gmt_modified
     insertSql.append(txcLog.getStatus()); // status
     insertSql.append(",?)"); // server
 

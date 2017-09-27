@@ -23,7 +23,7 @@ public class DtsATTransactionTemplate implements DtsTransactionOperations {
   }
 
   @Override
-  public <T> T execute(DtsTransactionCallback<T> action, int timeout) throws DtsTransactionException {
+  public <T> T execute(DtsTransactionCallback<T> action, long timeout) throws DtsTransactionException {
 
     T result = null;
     try {

@@ -35,8 +35,7 @@ public class TxcSelectVisitor extends TxcBaseVisitor {
 		return null;
 	}
 
-	@Override
-	protected String parseSelectSql() {
+	public String parseSelectSql() {
 		PlainSelect ps = getPlainSelect();
 
 		StringBuilder selectSb = new StringBuilder("select ");

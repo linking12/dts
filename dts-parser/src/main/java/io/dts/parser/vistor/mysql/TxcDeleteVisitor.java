@@ -31,45 +31,6 @@ public class TxcDeleteVisitor extends TxcBaseVisitor {
 		super(connection, stmt);
 	}
 
-
-	@Override
-	public String parseSelectSql() {
-		StringBuilder selectSqlAppender = getNullSqlAppenderBuilder();
-		selectSqlAppender.append("SELECT ");
-		appendable.append(printColumns());
-		selectSqlAppender.append(" FROM ");
-		Delete sqlStatement = getSqlStatement();
-		if (sqlStatement.getTables().size() > 1) {
-			throw  new DtsException("support only one table");
-		}
-		Table table = sqlStatement.getTables().get(0);
-		selectSqlAppender.append(table.getName());
-
-		return selectSqlAppender.toString();
-	}
-
-
-	public String printColumns() {
-		StringBuilder appender = new StringBuilder();
-
-		Collection<TxcColumnMeta> list = (Collection<TxcColumnMeta>) getTableMeta().getAllColumns().values();
-
-		boolean isFst = true;
-		for (Object obj : list) {
-			if (isFst) {
-				isFst = false;
-			} else if (obj instanceof TxcColumnMeta) {
-				appender.append(",");
-			}
-			appender.append(getTableName());
-			appender.append(".");
-
-			appender.append(((TxcColumnMeta) obj).getColumnName());
-		}
-
-		return appender.toString();
-	}
-
 	private Delete getSqlStatement() {
 		return (Delete) getSQLStatement().getStatement();
 	}

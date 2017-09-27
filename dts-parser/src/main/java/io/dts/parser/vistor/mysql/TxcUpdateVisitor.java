@@ -6,10 +6,12 @@ import org.slf4j.LoggerFactory;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Collection;
 import java.util.List;
 
 import io.dts.common.exception.DtsException;
 import io.dts.parser.hint.TxcHint;
+import io.dts.parser.model.TxcColumnMeta;
 import io.dts.parser.model.TxcTable;
 import io.dts.parser.model.TxcTableMeta;
 import io.dts.parser.vistor.support.ISQLStatement;
@@ -28,30 +30,6 @@ public class TxcUpdateVisitor extends TxcBaseVisitor {
 
 	public TxcUpdateVisitor(Connection connection, ISQLStatement stmt) throws SQLException {
 		super(connection, stmt);
-	}
-
-	@Override
-	public String parseSelectSql() {
-		StringBuilder selectSqlAppender = getNullSqlAppenderBuilder();
-		selectSqlAppender.append("SELECT ");
-		appendable.append(printColumns());
-		selectSqlAppender.append(" FROM ");
-		Update sqlStatement = getSqlStatement();
-		for (Table table : sqlStatement.getTables()) {
-			selectSqlAppender.append(table.toString()).append(",");
-		}
-
-		return selectSqlAppender.deleteCharAt(selectSqlAppender.length() - 1).toString();
-	}
-
-	private StringBuilder printColumns() {
-		StringBuilder sb = new StringBuilder();
-		Update sqlStatement = getSqlStatement();
-		List<Column> columns = sqlStatement.getColumns();
-		for (Column column : columns) {
-			sb.append(column.getColumnName()).append(",");
-		}
-		return sb.deleteCharAt(sb.length() - 1);
 	}
 
 	private Update getSqlStatement() {
@@ -79,13 +57,13 @@ public class TxcUpdateVisitor extends TxcBaseVisitor {
 		TxcTable tableOriginalValue;
 		String sql = null;
 		try {
-			sql = getSelectSql() + getWhereCondition(st) + " FOR UPDATE";
 			TxcTableMeta tableMeta = getTableMeta();
 			tableOriginalValue = getTableOriginalValue();
 			tableOriginalValue.setTableMeta(tableMeta);
 			tableOriginalValue.setTableName(tableMeta.getTableName());
 			tableOriginalValue.setAlias(tableMeta.getAlias());
 			tableOriginalValue.setSchemaName(tableMeta.getSchemaName());
+			sql = getSelectSql() + getWhereCondition(st) + " FOR UPDATE";
 			tableOriginalValue.setLines(addLines(sql));
 		} finally {
 			logger.info("beforeSqlExecute:" + sql);
@@ -109,7 +87,6 @@ public class TxcUpdateVisitor extends TxcBaseVisitor {
 		try {
 			tableOriginalValue = getTableOriginalValue();
 			tablePresentValue = getTablePresentValue();
-			sql = getSelectSql() + getWhereCondition(tableOriginalValue);
 			TxcTableMeta tableMeta = getTableMeta();
 
 			// SQL执行后查询DB行现值，用户脏读检查
@@ -119,6 +96,7 @@ public class TxcUpdateVisitor extends TxcBaseVisitor {
 			tablePresentValue.setTableName(tableMeta.getTableName());
 			tablePresentValue.setAlias(tableMeta.getAlias());
 			tablePresentValue.setSchemaName(tableMeta.getSchemaName());
+			sql = getSelectSql() + getWhereCondition(tableOriginalValue);
 			tablePresentValue.setLines(addLines(sql));
 		} finally {
 			logger.info("afterSqlExecute:" + sql);

@@ -21,10 +21,17 @@ public class DtsDataSource extends AbstractDtsDataSource {
   private ResourceManager resourceManager;
 
 
-  public DtsDataSource(final DataSource dataSource, final String dbName,
-      final ResourceManager resourceManager) {
+  public DtsDataSource(final DataSource dataSource, final String dbName) {
     this.dataSource = dataSource;
     this.dbName = dbName;
+  }
+
+
+  public void setDbName(final String dbName) {
+    this.dbName = dbName;
+  }
+
+  public void setResourceManager(final ResourceManager resourceManager) {
     this.resourceManager = resourceManager;
   }
 

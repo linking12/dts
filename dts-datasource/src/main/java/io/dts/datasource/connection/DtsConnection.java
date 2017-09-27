@@ -30,10 +30,10 @@ public class DtsConnection extends AbstractDtsConnection {
   private UndoLogDao undoLogDao;
 
 
-  public DtsConnection(final DtsDataSource dtsDataSource, final Connection connection) {
+  public DtsConnection(final DtsDataSource dtsDataSource, final Connection connection) throws SQLException {
     this.dtsDataSource = dtsDataSource;
     this.connection = connection;
-    this.undoLogDao = new UndoLogDao(this);
+    this.undoLogDao = new UndoLogDao(getRawConnection());
   }
 
   @Override
@@ -54,10 +54,10 @@ public class DtsConnection extends AbstractDtsConnection {
 
   @Override
   public void setAutoCommit(final boolean autoCommit) throws SQLException {
+    getRawConnection().setAutoCommit(autoCommit);
     if (!autoCommit) {
       registerBranch();
     }
-    getRawConnection().setAutoCommit(autoCommit);
   }
 
   private void registerBranch() throws SQLException {

@@ -22,6 +22,10 @@ public class BaseResourceManager implements ResourceManager {
 
   private static final Logger logger = LoggerFactory.getLogger(BaseResourceManager.class);
 
+  public static final long DEFAULT_TIMEOUT = 3000l;
+
+  private long timeout = DEFAULT_TIMEOUT;
+
   private DtsClientMessageSender clientMessageSender;
 
   public BaseResourceManager(final DtsClientMessageSender clientMessageSender) {
@@ -40,7 +44,7 @@ public class BaseResourceManager implements ResourceManager {
 
         final String serverAddress = TxcXID.getServerAddress(DtsContext.getCurrentXid());
         RegisterResultMessage resultMessage =
-            clientMessageSender.invoke(serverAddress, registerMessage, 3000l);
+            clientMessageSender.invoke(serverAddress, registerMessage, getTimeout());
         if (resultMessage.getResult() != RemotingSysResponseCode.SUCCESS) {
           throw new DtsException(resultMessage.getResult(), "error");
         } else {
@@ -69,12 +73,18 @@ public class BaseResourceManager implements ResourceManager {
       reportStatusMessage.setUdata(udata);
       final String serverAddress = TxcXID.getServerAddress(DtsContext.getCurrentXid());
       ReportStatusResultMessage resultMessage =
-          clientMessageSender.invoke(serverAddress, reportStatusMessage, 3000l);
+          clientMessageSender.invoke(serverAddress, reportStatusMessage, getTimeout());
     } else {
       throw new IllegalStateException("current thread is not bind to dts transaction.");
     }
   }
 
+  public long getTimeout() {
+    return timeout;
+  }
 
-
+  @Override
+  public void setTimeout(final long timeout) {
+    this.timeout = timeout;
+  }
 }

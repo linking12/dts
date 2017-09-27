@@ -21,6 +21,6 @@ import io.dts.client.exception.DtsTransactionException;
 public interface DtsTransactionOperations {
 
 
-	<T> T execute(DtsTransactionCallback<T> action, int timeout) throws DtsTransactionException;
+	<T> T execute(DtsTransactionCallback<T> action, long timeout) throws DtsTransactionException;
 
 }
