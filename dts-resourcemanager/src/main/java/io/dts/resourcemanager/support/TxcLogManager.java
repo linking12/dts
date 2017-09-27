@@ -23,7 +23,7 @@ public class TxcLogManager {
     while (it.hasNext()) {
       ContextStep2 c = it.next();
       if (c.getCommitMode().getValue() == CommitMode.COMMIT_RETRY_MODE.getValue()) {
-        SqlExecutor.executeSql(c.getDbname(), c.getRetrySql());
+        SqlExecuteHelper.executeSql(c.getDbname(), c.getRetrySql());
         it.remove();
       }
     }
@@ -47,10 +47,10 @@ public class TxcLogManager {
   }
 
   private void branchCommit(List<ContextStep2> contexts, String dbName) throws SQLException {
-    SqlExecutor.deleteUndoLogs(dbName, contexts);
+    SqlExecuteHelper.deleteUndoLogs(dbName, contexts);
   }
 
   public void insertUndoLog(final String dbName, final TxcRuntimeContext txcContext) throws SQLException {
-    SqlExecutor.insertUndoLog(dbName, txcContext);
+    SqlExecuteHelper.insertUndoLog(dbName, txcContext);
   }
 }

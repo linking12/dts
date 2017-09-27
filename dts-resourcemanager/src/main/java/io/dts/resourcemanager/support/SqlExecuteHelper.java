@@ -34,9 +34,9 @@ import io.dts.parser.model.TxcTable;
 /**
  * Created by guoyubo on 2017/9/27.
  */
-public class SqlExecutor {
+public class SqlExecuteHelper {
 
-  private static final Logger logger = LoggerFactory.getLogger(SqlExecutor.class);
+  private static final Logger logger = LoggerFactory.getLogger(SqlExecuteHelper.class);
 
   private static String txcLogTableName = "txc_undo_log";
 
