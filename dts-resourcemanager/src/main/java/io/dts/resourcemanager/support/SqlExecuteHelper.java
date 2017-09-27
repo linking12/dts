@@ -14,6 +14,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 import javax.sql.DataSource;
 
 import java.sql.Blob;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -198,7 +199,7 @@ public class SqlExecuteHelper {
   }
 
 
-  public static void insertUndoLog(final String dbName, TxcRuntimeContext txcLog) throws SQLException {
+  public static void insertUndoLog(final Connection connection, TxcRuntimeContext txcLog) throws SQLException {
     String xid = txcLog.getXid();
     long branchID = txcLog.getBranchId();
     long globalXid = TxcXID.getGlobalXID(xid, branchID);
@@ -217,20 +218,23 @@ public class SqlExecuteHelper {
     insertSql.append("?,"); // gmt_modified
     insertSql.append(txcLog.getStatus()); // status
     insertSql.append(",?)"); // server
-    DataSource db = DataSourceHolder.getDataSource(dbName);
-    JdbcTemplate jdbcTemplate = new JdbcTemplate(db);
-    jdbcTemplate.update(insertSql.toString(), new PreparedStatementSetter() {
-      @Override
-      public void setValues(final PreparedStatement pst) throws SQLException {
-        pst.setLong(1, globalXid);
-        pst.setString(2, xid);
-        pst.setLong(3, branchID);
-        pst.setBlob(4, BlobUtil.string2blob(txcLog.encode()));
-        java.sql.Date currentTime = new java.sql.Date(Calendar.getInstance().getTimeInMillis());
-        pst.setDate(5, currentTime);
-        pst.setDate(6, currentTime);
-        pst.setString(7, serverAddr);
+
+    PreparedStatement pst = null;
+    try {
+      pst = connection.prepareStatement(insertSql.toString());
+      pst.setLong(1, globalXid);
+      pst.setString(2, xid);
+      pst.setLong(3, branchID);
+      pst.setBlob(4, BlobUtil.string2blob(txcLog.encode()));
+      pst.setString(5, serverAddr);
+      pst.executeUpdate();
+    } finally {
+      if (pst != null) {
+        pst.close();
       }
-    });
+      if (logger.isDebugEnabled())
+        logger.debug(String.format("%s insertUndoLog cost %d ms", TxcXID.formatXid(xid, branchID), txcLog.getRTFromLastPoint()));
+    }
+
   }
 }

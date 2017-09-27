@@ -13,7 +13,7 @@ import io.dts.remoting.netty.NettyRequestProcessor;
 import io.dts.remoting.protocol.RemotingCommand;
 import io.dts.remoting.protocol.RemotingSerializable;
 import io.dts.resourcemanager.handler.impl.BranchTransProcessHandler;
-import io.dts.resourcemanager.support.TxcLogManager;
+import io.dts.resourcemanager.core.impl.TxcLogManager;
 import io.dts.util.NetUtil;
 import io.netty.channel.ChannelHandlerContext;
 

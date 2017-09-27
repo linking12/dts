@@ -10,7 +10,7 @@ import io.dts.common.common.TxcXID;
 import io.dts.common.context.ContextStep2;
 import io.dts.common.exception.DtsException;
 import io.dts.resourcemanager.handler.IBranchTransProcessHandler;
-import io.dts.resourcemanager.support.TxcLogManager;
+import io.dts.resourcemanager.core.impl.TxcLogManager;
 
 /**
  * Created by guoyubo on 2017/9/27.

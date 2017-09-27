@@ -1,5 +1,6 @@
-package io.dts.resourcemanager.support;
+package io.dts.resourcemanager.core.impl;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,13 +11,21 @@ import java.util.Map;
 import io.dts.common.common.CommitMode;
 import io.dts.common.context.ContextStep2;
 import io.dts.parser.model.TxcRuntimeContext;
+import io.dts.resourcemanager.core.ITxcLogManager;
+import io.dts.resourcemanager.support.SqlExecuteHelper;
 
 /**
  * Created by guoyubo on 2017/9/27.
  */
-public class TxcLogManager {
+public class TxcLogManager implements ITxcLogManager {
 
 
+  @Override
+  public void insertUndoLog(final Connection connection, final TxcRuntimeContext txcContext) throws SQLException {
+    SqlExecuteHelper.insertUndoLog(connection, txcContext);
+  }
+
+  @Override
   public void branchCommit(List<ContextStep2> contexts) throws SQLException {
     // RT
     Iterator<ContextStep2> it = contexts.iterator();
@@ -48,9 +57,5 @@ public class TxcLogManager {
 
   private void branchCommit(List<ContextStep2> contexts, String dbName) throws SQLException {
     SqlExecuteHelper.deleteUndoLogs(dbName, contexts);
-  }
-
-  public void insertUndoLog(final String dbName, final TxcRuntimeContext txcContext) throws SQLException {
-    SqlExecuteHelper.insertUndoLog(dbName, txcContext);
   }
 }
