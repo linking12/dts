@@ -73,19 +73,19 @@ public class TestDataSource {
     TransactionTemplate transactionTemplate = new TransactionTemplate(dataSourceTransactionManager);
 
     JdbcTemplate jdbcTemplate = new JdbcTemplate(dtsDataSource);
-    List<Long> result = jdbcTemplate.query("SELECT tx_id FROM txc_global_log", new RowMapper<Long>() {
+    List<String> result = jdbcTemplate.query("SELECT name,value FROM example", new RowMapper<String>() {
       @Override
-      public Long mapRow(final ResultSet rs, final int rowNum) throws SQLException {
-        return rs.getLong(1);
+      public String mapRow(final ResultSet rs, final int rowNum) throws SQLException {
+        return rs.getString(1);
       }
     });
-    for (Long id : result) {
-      System.out.println(id);
+    for (String name : result) {
+      System.out.println(name);
     }
     transactionTemplate.execute(new TransactionCallback<Integer>() {
       @Override
       public Integer doInTransaction(final TransactionStatus status) {
-        return jdbcTemplate.update("update txc_global_log set state=2 where tx_id=2");
+        return jdbcTemplate.update("update example set value='boddi' where id=1");
       }
     });
   }
@@ -93,7 +93,7 @@ public class TestDataSource {
   private static DataSource dataSource() {
     DruidDataSource dataSource = new DruidDataSource();
     dataSource.setDriverClassName("com.mysql.jdbc.Driver");
-    dataSource.setUrl("jdbc:mysql://127.0.0.1:3306/dts");
+    dataSource.setUrl("jdbc:mysql://127.0.0.1:3306/canal_test");
     dataSource.setUsername("root");
     dataSource.setPassword("123456");
     dataSource.setMaxActive(15);

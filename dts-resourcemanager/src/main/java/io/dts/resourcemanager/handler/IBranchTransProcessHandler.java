@@ -1,11 +1,11 @@
-package io.dts.resourcemanager.core;
+package io.dts.resourcemanager.handler;
 
 import io.dts.common.exception.DtsException;
 
 /**
  * Created by guoyubo on 2017/9/15.
  */
-public interface BranchTransExecutor {
+public interface IBranchTransProcessHandler {
 
   /**
    * 分支提交

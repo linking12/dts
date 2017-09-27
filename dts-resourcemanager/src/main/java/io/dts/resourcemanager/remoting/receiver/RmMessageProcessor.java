@@ -12,6 +12,8 @@ import io.dts.remoting.CommandCustomHeader;
 import io.dts.remoting.netty.NettyRequestProcessor;
 import io.dts.remoting.protocol.RemotingCommand;
 import io.dts.remoting.protocol.RemotingSerializable;
+import io.dts.resourcemanager.handler.impl.BranchTransProcessHandler;
+import io.dts.resourcemanager.support.TxcLogManager;
 import io.dts.util.NetUtil;
 import io.netty.channel.ChannelHandlerContext;
 
@@ -23,16 +25,16 @@ public class RmMessageProcessor implements NettyRequestProcessor {
   @Override
   public RemotingCommand processRequest(final ChannelHandlerContext ctx, final RemotingCommand request)
       throws Exception {
-    final String clientIp = NetUtil.toStringAddress(ctx.channel().remoteAddress());
+    final String serverAddressIp = NetUtil.toStringAddress(ctx.channel().remoteAddress());
     switch (request.getCode()) {
       case RequestCode.HEADER_REQUEST:
         final RequestMessage headerMessage =
             (RequestMessage) request.decodeCommandCustomHeader(CommandCustomHeader.class);
-        return processDtsMessage(clientIp, headerMessage);
+        return processDtsMessage(serverAddressIp, headerMessage);
       case RequestCode.BODY_REQUEST:
         final byte[] body = request.getBody();
         RequestMessage bodyMessage = RemotingSerializable.decode(body, RequestMessage.class);
-        return processDtsMessage(clientIp, bodyMessage);
+        return processDtsMessage(serverAddressIp, bodyMessage);
       default:
         break;
     }
@@ -42,8 +44,7 @@ public class RmMessageProcessor implements NettyRequestProcessor {
   }
 
 
-
-  private RemotingCommand processDtsMessage(String clientIp, RequestMessage dtsMessage) {
+  private RemotingCommand processDtsMessage(String serverAddressIp, RequestMessage dtsMessage) {
     RemotingCommand response = RemotingCommand.createResponseCommand(null);
     CommandCustomHeader responseHeader;
     try {
@@ -51,7 +52,7 @@ public class RmMessageProcessor implements NettyRequestProcessor {
         // 提交分支事务
         response = RemotingCommand.createResponseCommand(BeginResultMessage.class);
         responseHeader = response.readCustomHeader();
-        createMessageHandler().handleMessage(clientIp, (BranchCommitMessage) dtsMessage,
+        createMessageHandler().handleMessage(serverAddressIp, (BranchCommitMessage) dtsMessage,
             (BranchCommitResultMessage) responseHeader);
         response.setCode(ResponseCode.SUCCESS);
         return response;
@@ -59,7 +60,7 @@ public class RmMessageProcessor implements NettyRequestProcessor {
         // 回滚分支事务
         response = RemotingCommand.createResponseCommand(BranchRollbackResultMessage.class);
         responseHeader = response.readCustomHeader();
-        createMessageHandler().handleMessage(clientIp, (BranchRollBackMessage) dtsMessage,
+        createMessageHandler().handleMessage(serverAddressIp, (BranchRollBackMessage) dtsMessage,
             (BranchRollbackResultMessage) responseHeader);
         response.setCode(ResponseCode.SUCCESS);
         return response;
@@ -75,6 +76,6 @@ public class RmMessageProcessor implements NettyRequestProcessor {
   }
 
   private DtsRmMessageHandler createMessageHandler() {
-    return new DtsRmMessageHandler();
+    return new DtsRmMessageHandler(new BranchTransProcessHandler(new TxcLogManager()));
   }
 }

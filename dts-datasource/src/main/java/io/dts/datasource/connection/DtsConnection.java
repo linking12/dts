@@ -14,7 +14,7 @@ import io.dts.datasource.core.IDtsDataSource;
 import io.dts.datasource.statement.DtsStatement;
 import io.dts.parser.constant.UndoLogMode;
 import io.dts.parser.model.TxcRuntimeContext;
-import io.dts.datasource.store.DtsLogDao;
+import io.dts.resourcemanager.support.TxcLogManager;
 
 /**
  * Created by guoyubo on 2017/9/20.
@@ -27,13 +27,12 @@ public class DtsConnection extends AbstractDtsConnection {
 
   private TxcRuntimeContext txcContext; // 事务SQL上下文
 
-  private DtsLogDao dtsLogDao;
-
+  private TxcLogManager txcLogManager;
 
   public DtsConnection(final DtsDataSource dtsDataSource, final Connection connection) throws SQLException {
     this.dtsDataSource = dtsDataSource;
     this.connection = connection;
-    this.dtsLogDao = new DtsLogDao(getRawConnection());
+    this.txcLogManager = new TxcLogManager();
   }
 
   @Override
@@ -86,7 +85,7 @@ public class DtsConnection extends AbstractDtsConnection {
         // 日志写库
         txcContext.setServer(TxcXID.getServerAddress(txcContext.getXid()));
         txcContext.setStatus(UndoLogMode.COMMON_LOG.getValue());
-        dtsLogDao.insertUndoLog(txcContext);
+        txcLogManager.insertUndoLog(this.getDataSource().getDbName(), txcContext);
         getRawConnection().commit();
         reportBranchStatus(true);
       } else {
