@@ -22,7 +22,7 @@ import io.dts.remoting.netty.NettyClientConfig;
 import io.dts.remoting.netty.NettyRemotingClient;
 import io.dts.remoting.netty.NettyRequestProcessor;
 import io.dts.remoting.protocol.RemotingCommand;
-import io.dts.resourcemanager.remoting.receiver.ResourceManagerMessageProcessor;
+import io.dts.resourcemanager.remoting.receiver.RmMessageProcessor;
 
 /**
  * Created by guoyubo on 2017/9/20.
@@ -34,7 +34,7 @@ public class DtsRemotingClient {
   public DtsRemotingClient(NettyClientConfig nettyClientConfig, final List<String> serverAddressList) {
     this.remotingClient = new NettyRemotingClient(nettyClientConfig);
     this.remotingClient.updateNameServerAddressList(serverAddressList);
-    NettyRequestProcessor messageProcessor = new ResourceManagerMessageProcessor();
+    NettyRequestProcessor messageProcessor = new RmMessageProcessor();
     BlockingQueue<Runnable> clientThreadPoolQueue =
         Queues.newLinkedBlockingDeque(100);
     ExecutorService clientMessageExecutor =
@@ -43,7 +43,11 @@ public class DtsRemotingClient {
             clientThreadPoolQueue, new ThreadFactoryImpl("ResourceMessageThread_"));
     this.remotingClient.registerProcessor(RequestCode.HEADER_REQUEST, messageProcessor,
         clientMessageExecutor);
+    this.remotingClient.registerProcessor(RequestCode.BODY_REQUEST, messageProcessor,
+        clientMessageExecutor);
   }
+
+
 
   @PostConstruct
   public void start() {

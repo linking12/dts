@@ -23,7 +23,7 @@ import io.dts.client.support.DtsTransactionCallback;
 import io.dts.datasource.core.DtsDataSource;
 import io.dts.remoting.netty.NettyClientConfig;
 import io.dts.resourcemanager.core.ResourceManager;
-import io.dts.resourcemanager.core.at.BaseResourceManager;
+import io.dts.resourcemanager.core.impl.BaseResourceManager;
 import io.dts.resourcemanager.remoting.DtsRemotingClient;
 import io.dts.resourcemanager.remoting.sender.DtsClientMessageSenderImpl;
 
