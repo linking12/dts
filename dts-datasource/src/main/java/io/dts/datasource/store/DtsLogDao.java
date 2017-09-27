@@ -1,4 +1,4 @@
-package io.dts.resourcemanager.store;
+package io.dts.datasource.store;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -12,13 +12,13 @@ import io.dts.parser.model.TxcRuntimeContext;
 /**
  * Created by guoyubo on 2017/9/20.
  */
-public class UndoLogDao {
+public class DtsLogDao {
 
   private Connection connection;
 
   private final String txcLogTableName = "txc_undo_log";
 
-  public UndoLogDao(final Connection connection) {
+  public DtsLogDao(final Connection connection) {
     this.connection = connection;
   }
 
