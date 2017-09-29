@@ -11,6 +11,7 @@ import io.dts.common.common.TxcXID;
 import io.dts.common.context.DtsContext;
 import io.dts.datasource.core.DtsDataSource;
 import io.dts.datasource.core.IDtsDataSource;
+import io.dts.datasource.preparestatement.DtsPrepareStatement;
 import io.dts.datasource.statement.DtsStatement;
 import io.dts.parser.constant.UndoLogMode;
 import io.dts.parser.model.TxcRuntimeContext;
@@ -44,7 +45,7 @@ public class DtsConnection extends AbstractDtsConnection {
 
   @Override
   public PreparedStatement prepareStatement(final String sql) throws SQLException {
-    return null;
+    return new DtsPrepareStatement(this, getRawConnection().prepareStatement(sql), sql);
   }
 
   @Override

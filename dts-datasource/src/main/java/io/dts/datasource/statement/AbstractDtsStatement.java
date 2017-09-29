@@ -10,6 +10,21 @@ import java.sql.SQLWarning;
  */
 public abstract class AbstractDtsStatement implements ITxcStatement {
 
+  /**
+   * 目标SQL
+   */
+  protected String targetSql;
+
+  @Override
+  public String getTargetSql() {
+    return targetSql;
+  }
+
+  public void setTargetSql(final String targetSql) {
+    this.targetSql = targetSql;
+  }
+
+
   @Override
   public void cancel() throws SQLException {
     getRawStatement().cancel();

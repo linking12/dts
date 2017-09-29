@@ -6,17 +6,15 @@ import org.slf4j.LoggerFactory;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Collection;
-import java.util.List;
 
 import io.dts.common.exception.DtsException;
 import io.dts.parser.hint.TxcHint;
-import io.dts.parser.model.TxcColumnMeta;
 import io.dts.parser.model.TxcTable;
 import io.dts.parser.model.TxcTableMeta;
 import io.dts.parser.vistor.support.ISQLStatement;
+import net.sf.jsqlparser.expression.BinaryExpression;
+import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.schema.Column;
-import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.update.Update;
 
 /**
@@ -40,11 +38,12 @@ public class TxcUpdateVisitor extends TxcBaseVisitor {
 	public String parseWhereCondition(Statement st) {
 		Update sqlStatement = getSqlStatement();
 		StringBuilder appendable = new StringBuilder();
-
-		appendable.append(sqlStatement.getWhere().toString());
-
+		Expression where = sqlStatement.getWhere();
+		appendable.append(where.toString());
 		return appendable.toString();
 	}
+
+
 
 	@Override
 	public TxcTable executeAndGetFrontImage(Statement st) throws SQLException {

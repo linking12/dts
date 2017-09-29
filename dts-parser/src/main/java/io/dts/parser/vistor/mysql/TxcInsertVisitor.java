@@ -119,10 +119,9 @@ public class TxcInsertVisitor extends TxcBaseVisitor {
 	}
 
 	private void selectByPK(StringBuilder appender, ExpressionList itemsList, List<Column> cols) {
-		boolean bOrFlag = true;
-		PlaceHolderManager phm = getPlaceHolderManager();
+		List<Object> parameterSet = getParameterSet();
 		// SQL中不含有占位符
-		if (phm == null) {
+		if (parameterSet == null || parameterSet.size() == 0) {
 			List<Expression> args = itemsList.getExpressions();
 			for (int i = 0; i < args.size(); i++) {
 				String attrName = cols.get(i).getColumnName();
@@ -198,8 +197,8 @@ public class TxcInsertVisitor extends TxcBaseVisitor {
 				} else if (arg instanceof JdbcParameter) {
 					JdbcParameter parameter = (JdbcParameter) arg;
 					int pMarkerIndex = parameter.getIndex();
-					if (phm != null) {
-						value = phm.getPlaceHolder(pMarkerIndex).get(0);// insert语句的占位符可能有多行数据
+					if (parameterSet != null) {
+						value = parameterSet.get(pMarkerIndex);// insert语句的占位符可能有多行数据
 					}
 				}
 
@@ -230,22 +229,12 @@ public class TxcInsertVisitor extends TxcBaseVisitor {
 			}
 
 			if (rs != null) {
-				PlaceHolderManager phm = getPlaceHolderManager();
-				if (phm != null && phm.getPlaceHolderNum() > 0) {
-					boolean bOrFlag = true;
-					if (rs.next()) {
-						for (int i = 0; i < phm.getPlaceHolderLineNum(); i++) {
-							if (bOrFlag) {
-								bOrFlag = false;
-							} else {
-								appender.append(" OR ");
-							}
-
-							appender.append(column.getColumnName());
-							appender.append("=");
-							appender.append(rs.getObject(1));
-							appender.append("+" + i);
-						}
+				List<Object> parameterSet = getParameterSet();
+				if (rs.next()) {
+					if (parameterSet != null && parameterSet.size() > 0) {
+						appender.append(column.getColumnName());
+						appender.append("=");
+						appender.append(rs.getObject(1));
 					}
 				} else {
 					boolean bOrFlag = true;
@@ -273,22 +262,7 @@ public class TxcInsertVisitor extends TxcBaseVisitor {
 	}
 
 	private void selectByAllFields(StringBuilder appender, ExpressionList rows, List<Column> cols) {
-		boolean bOrFlag = true;
-		PlaceHolderManager phm = getPlaceHolderManager();
-		// SQL中不含有占位符
-		if (phm == null) {
-			if (rows == null || rows.getExpressions().isEmpty()) {
-				return;
-			}
-
-			setRow(cols, rows, 0, appender);
-		}
-		// SQL中含占位符
-		else {
-			int lineNum = phm.getPlaceHolder(1).size();
-			Expression row = rows.getExpressions().get(0);
-			setRow(cols, rows, 0, appender);
-		}
+		setRow(cols, rows, 0, appender);
 	}
 
 	/**
@@ -315,8 +289,7 @@ public class TxcInsertVisitor extends TxcBaseVisitor {
 
 			Object value = null;
 			Expression arg = args.get(i);
-			PlaceHolderManager phm = getPlaceHolderManager();
-
+			List<Object> parameterSet = getParameterSet();
 			if (arg instanceof LongValue) {
 				LongValue pNumber = (LongValue) arg;
 				value = pNumber.getValue();
@@ -329,8 +302,8 @@ public class TxcInsertVisitor extends TxcBaseVisitor {
 			} else if (arg instanceof JdbcParameter) {
 				JdbcParameter parameter = (JdbcParameter) arg;
 				int pMarkerIndex = parameter.getIndex();
-				if (phm != null) {
-					value = phm.getPlaceHolder(pMarkerIndex).get(0);// insert语句的占位符可能有多行数据
+				if (parameterSet != null && parameterSet.size() > 0) {
+					value = parameterSet.get(pMarkerIndex);// insert语句的占位符可能有多行数据
 				}
 			}
 

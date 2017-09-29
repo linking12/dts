@@ -14,5 +14,5 @@ public interface ITxcLogManager {
 
   void branchCommit(List<ContextStep2> contexts) throws SQLException;
 
-  void insertUndoLog(Connection connection, TxcRuntimeContext txcContext) throws SQLException;
+  Integer insertUndoLog(Connection connection, TxcRuntimeContext txcContext) throws SQLException;
 }

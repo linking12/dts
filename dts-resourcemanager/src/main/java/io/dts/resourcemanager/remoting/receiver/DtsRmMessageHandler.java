@@ -7,11 +7,7 @@ import io.dts.common.protocol.header.BranchRollBackMessage;
 import io.dts.common.protocol.header.BranchRollbackResultMessage;
 import io.dts.resourcemanager.handler.IBranchTransProcessHandler;
 
-/**
- * @author jiangyu.jy
- * 
- *         TXC 消息处理器
- */
+
 public class DtsRmMessageHandler {
 
   private IBranchTransProcessHandler branchTransProcessHandler;

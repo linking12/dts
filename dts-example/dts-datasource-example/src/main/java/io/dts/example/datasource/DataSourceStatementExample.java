@@ -1,6 +1,9 @@
 package io.dts.example.datasource;
 
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCallback;
+import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.TransactionStatus;
@@ -11,8 +14,10 @@ import com.alibaba.druid.pool.DruidDataSource;
 
 import javax.sql.DataSource;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -30,7 +35,7 @@ import io.dts.resourcemanager.remoting.sender.DtsClientMessageSenderImpl;
 /**
  * Created by guoyubo on 2017/9/26.
  */
-public class TestDataSource {
+public class DataSourceStatementExample {
 
   public static void main(String[] args) {
 
@@ -52,10 +57,13 @@ public class TestDataSource {
       DtsTransactionCallback<Object> dtsTransactionCallback = new DtsTransactionCallback<Object>() {
         @Override
         public Object doInTransaction() throws Throwable {
-          branch1Execute(clientMessageSender);
-          return null;
+          executeStatement(clientMessageSender);
+          System.out.println("executePrepareStatement");
+          executePrepareStatement(clientMessageSender);
+          return 1;
         }
       };
+
       transactionTemplate.execute(dtsTransactionCallback, 30000l);
     } catch (Exception e) {
       e.printStackTrace();
@@ -64,7 +72,7 @@ public class TestDataSource {
     }
   }
 
-  private static void branch1Execute(final DtsClientMessageSenderImpl clientMessageSender) {
+  private static void executeStatement(final DtsClientMessageSenderImpl clientMessageSender) {
     final ResourceManager resourceManager = new BaseResourceManager(clientMessageSender);
     resourceManager.setTimeout(30000l);
     DtsDataSource dtsDataSource = new DtsDataSource(dataSource(), "dts");
@@ -86,6 +94,46 @@ public class TestDataSource {
       @Override
       public Integer doInTransaction(final TransactionStatus status) {
         return jdbcTemplate.update("update example set value='boddi' where id=1");
+      }
+    });
+  }
+
+  private static void executePrepareStatement(final DtsClientMessageSenderImpl clientMessageSender)
+      throws SQLException {
+    final ResourceManager resourceManager = new BaseResourceManager(clientMessageSender);
+    resourceManager.setTimeout(30000l);
+    DtsDataSource dtsDataSource = new DtsDataSource(dataSource(), "dts");
+    dtsDataSource.setResourceManager(resourceManager);
+    DataSourceTransactionManager dataSourceTransactionManager = new DataSourceTransactionManager(dtsDataSource);
+    TransactionTemplate transactionTemplate = new TransactionTemplate(dataSourceTransactionManager);
+
+    JdbcTemplate jdbcTemplate = new JdbcTemplate(dtsDataSource);
+    List<String> result = jdbcTemplate.execute("SELECT name,value FROM example where id=?",
+        new PreparedStatementCallback<List<String>>() {
+          @Override
+          public List<String> doInPreparedStatement(final PreparedStatement ps) throws SQLException, DataAccessException {
+            ps.setInt(1, 1);
+            ResultSet resultSet = ps.executeQuery();
+            List<String> names = new ArrayList<>();
+            while (resultSet.next()) {
+              names.add(resultSet.getString("value"));
+            }
+            return names;
+
+          }
+        });
+
+    result.forEach(e-> System.out.println(e));
+
+    transactionTemplate.execute(new TransactionCallback<Integer>() {
+      @Override
+      public Integer doInTransaction(final TransactionStatus status) {
+        return jdbcTemplate.update("update example set value='boddi111' where id=?", new PreparedStatementSetter() {
+          @Override
+          public void setValues(final PreparedStatement ps) throws SQLException {
+            ps.setInt(1, 1);
+          }
+        });
       }
     });
   }

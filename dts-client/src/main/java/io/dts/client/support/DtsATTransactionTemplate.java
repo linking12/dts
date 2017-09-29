@@ -33,10 +33,12 @@ public class DtsATTransactionTemplate implements DtsTransactionOperations {
     } catch (RuntimeException ex) {
         // Transactional code threw application exception -> rollback
         rollbackOnException(ex);
+      throw ex;
     }
     catch (Error err) {
       // Transactional code threw error -> rollback
       rollbackOnException(err);
+      throw err;
     }
     catch (Throwable ex) {
       // Transactional code threw unexpected exception -> rollback
@@ -47,7 +49,7 @@ public class DtsATTransactionTemplate implements DtsTransactionOperations {
 
 
   private void rollbackOnException(Throwable ex) throws DtsTransactionException {
-    logger.debug("Initiating transaction rollback on application exception", ex);
+    logger.error("Initiating transaction rollback on application exception", ex);
     this.transactionManager.rollback();
   }
 

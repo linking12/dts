@@ -91,7 +91,7 @@ public interface ITxcVisitor {
 
     ISQLStatement getSQLStatement();
 
-    void setPlaceHolderManager(PlaceHolderManager pm);
+  void setParameterSet(List<Object> parameterSet);
 
-    PlaceHolderManager getPlaceHolderManager();
+
 }

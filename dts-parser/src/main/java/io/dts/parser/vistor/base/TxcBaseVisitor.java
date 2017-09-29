@@ -1,7 +1,4 @@
-package io.dts.parser.vistor.mysql;
-
-import com.alibaba.druid.sql.dialect.mysql.visitor.MySqlOutputVisitor;
-import com.alibaba.druid.sql.visitor.SQLASTOutputVisitor;
+package io.dts.parser.vistor.base;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -21,6 +18,7 @@ import io.dts.parser.model.TxcLine;
 import io.dts.parser.model.TxcTable;
 import io.dts.parser.model.TxcTableMeta;
 import io.dts.parser.vistor.ITxcVisitor;
+import io.dts.parser.vistor.mysql.TxcObjectWapper;
 import io.dts.parser.vistor.support.ISQLStatement;
 import io.dts.parser.vistor.support.PlaceHolderManager;
 import io.dts.parser.vistor.support.TxcTableMetaTools;
@@ -262,7 +260,7 @@ public abstract class TxcBaseVisitor implements ITxcVisitor {
 		try {
 			st = connection.createStatement();
 			rs = st.executeQuery(sql);
-			java.sql.ResultSetMetaData rsmd = rs.getMetaData();
+			ResultSetMetaData rsmd = rs.getMetaData();
 			int column = rsmd.getColumnCount();
 
 			while (rs.next()) {

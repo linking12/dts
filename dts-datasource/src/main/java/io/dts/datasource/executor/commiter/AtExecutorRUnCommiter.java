@@ -24,14 +24,15 @@ public class AtExecutorRUnCommiter {
 
   private BaseStatementUnit baseStatementUnit;
 
-  private List<List<Object>> parameterSets;
+  private List<Object> parameterSet;
 
   public AtExecutorRUnCommiter(BaseStatementUnit baseStatementUnit,
-      final List<List<Object>> parameterSets) throws SQLException {
-    this.parameterSets = parameterSets;
+      final List<Object> parameterSet) throws SQLException {
+    this.parameterSet = parameterSet;
     this.baseStatementUnit = baseStatementUnit;
     this.txcVisitor = TxcVisitorFactory.getSqlVisitor(baseStatementUnit.getStatement().getTxcConnection().getRawConnection(),
         baseStatementUnit.getSqlExecutionUnit().getSql());
+    this.txcVisitor.setParameterSet(parameterSet);
   }
 
 
