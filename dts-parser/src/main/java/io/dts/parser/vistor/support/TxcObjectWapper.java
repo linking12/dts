@@ -1,4 +1,4 @@
-package io.dts.parser.vistor.mysql;
+package io.dts.parser.vistor.support;
 
 
 import com.alibaba.fastjson.JSON;
@@ -8,8 +8,6 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import java.util.Date;
 
 import io.dts.common.exception.DtsException;
-import net.sf.jsqlparser.expression.Expression;
-import net.sf.jsqlparser.expression.NullValue;
 
 public class TxcObjectWapper {
 	public static String jsonObjectDeserialize(int type, Object value) {

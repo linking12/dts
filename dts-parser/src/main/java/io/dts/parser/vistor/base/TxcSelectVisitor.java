@@ -1,25 +1,40 @@
 package io.dts.parser.vistor.base;
 
-import java.sql.Connection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.alibaba.druid.sql.ast.statement.SQLExprTableSource;
+import com.alibaba.druid.sql.ast.statement.SQLSelectItem;
+import com.alibaba.druid.sql.ast.statement.SQLSelectQueryBlock;
+import com.alibaba.druid.sql.ast.statement.SQLSelectStatement;
+import com.alibaba.druid.sql.ast.statement.SQLUpdateStatement;
+import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlSelectQueryBlock;
+
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
 import io.dts.parser.model.TxcTable;
-import io.dts.parser.vistor.mysql.TxcBaseVisitor;
 import io.dts.parser.vistor.support.ISQLStatement;
-import net.sf.jsqlparser.expression.Expression;
-import net.sf.jsqlparser.statement.select.Join;
-import net.sf.jsqlparser.statement.select.PlainSelect;
-import net.sf.jsqlparser.statement.select.Select;
-import net.sf.jsqlparser.statement.select.SelectItem;
 
 public class TxcSelectVisitor extends TxcBaseVisitor {
 
+	private static final Logger logger = LoggerFactory.getLogger(TxcSelectVisitor.class);
 
-	public TxcSelectVisitor(Connection connection, ISQLStatement stmt) throws SQLException {
-		super(connection, stmt);
+
+
+	public TxcSelectVisitor(ISQLStatement node, List<Object> parameterSet) {
+		super(node, parameterSet);
 	}
+
+
+	@Override
+	public String parseWhereCondition(Statement st) {
+		SQLSelectStatement selectStatement = (SQLSelectStatement) this.node.getSQLStatement();
+		StringBuffer out = parseWhereCondition(((SQLSelectQueryBlock)selectStatement.getSelect().getQuery()).getWhere());
+		return out.toString();
+	}
+
 
 	@Override
 	public TxcTable executeAndGetFrontImage(final Statement st) throws SQLException {
@@ -32,44 +47,18 @@ public class TxcSelectVisitor extends TxcBaseVisitor {
 	}
 
 	@Override
-	public String getsql(final String extraWhereCondition) {
-		return null;
-	}
-
-	public String parseSelectSql() {
-		PlainSelect ps = getPlainSelect();
-
-		StringBuilder selectSb = new StringBuilder("select ");
-
-		for (SelectItem selectItem : ps.getSelectItems()) {
-			selectSb.append(selectItem.toString()).append(",");
+	public boolean visit(final MySqlSelectQueryBlock x) {
+		if (x.getFrom() instanceof SQLExprTableSource) {
+			SQLExprTableSource tableExpr = (SQLExprTableSource) x.getFrom();
+			setTableName(tableExpr.getExpr().toString());
+			setTableNameAlias(tableExpr.getAlias() != null ? tableExpr.getAlias() : null);
 		}
-		System.out.println(selectSb);
-		selectSb.deleteCharAt(selectSb.length()-1);
-
-		selectSb.append(" from ");
-		selectSb.append(ps.getFromItem().toString());
-		List<Join> joins = ps.getJoins();
-		if (joins != null) {
-			for (Join join : joins) {
-				if (join.isSimple()) {
-					selectSb.append(",");
-				} else {
-					selectSb.append(" ");
-				}
-				selectSb.append(join.toString());
-			}
-		}
-		return selectSb.toString();
+		return super.visit(x);
 	}
 
-	private PlainSelect getPlainSelect() {
-		return ((PlainSelect) ((Select) getSQLStatement().getStatement()).getSelectBody());
+	public boolean visit(final SQLSelectItem x) {
+		return super.visit(x);
 	}
 
-	@Override
-	protected String parseWhereCondition(final Statement st) {
-		Expression where = getPlainSelect().getWhere();
-		return where != null ?  where.toString() : null;
-	}
+
 }

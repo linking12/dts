@@ -93,7 +93,7 @@ public class DataSourceStatementExample {
     transactionTemplate.execute(new TransactionCallback<Integer>() {
       @Override
       public Integer doInTransaction(final TransactionStatus status) {
-        return jdbcTemplate.update("update example set value='boddi' where id=1");
+        return jdbcTemplate.update("update example set value='boddi12345' where id=1");
       }
     });
   }
@@ -128,7 +128,7 @@ public class DataSourceStatementExample {
     transactionTemplate.execute(new TransactionCallback<Integer>() {
       @Override
       public Integer doInTransaction(final TransactionStatus status) {
-        return jdbcTemplate.update("update example set value='boddi111' where id=?", new PreparedStatementSetter() {
+        return jdbcTemplate.update("update example set value='boddi222' where id=?", new PreparedStatementSetter() {
           @Override
           public void setValues(final PreparedStatement ps) throws SQLException {
             ps.setInt(1, 1);

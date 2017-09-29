@@ -9,12 +9,12 @@ import java.util.List;
 
 import io.dts.common.context.DtsContext;
 import io.dts.common.exception.DtsException;
+import io.dts.datasource.connection.ITxcConnection;
 import io.dts.datasource.executor.BaseStatementUnit;
 import io.dts.parser.model.RollbackInfor;
 import io.dts.parser.model.TxcTable;
 import io.dts.parser.vistor.ITxcVisitor;
 import io.dts.parser.vistor.TxcVisitorFactory;
-import io.dts.parser.vistor.mysql.TxcDeleteVisitor;
 
 public class AtExecutorRUnCommiter {
 
@@ -24,15 +24,17 @@ public class AtExecutorRUnCommiter {
 
   private BaseStatementUnit baseStatementUnit;
 
-  private List<Object> parameterSet;
 
   public AtExecutorRUnCommiter(BaseStatementUnit baseStatementUnit,
       final List<Object> parameterSet) throws SQLException {
-    this.parameterSet = parameterSet;
     this.baseStatementUnit = baseStatementUnit;
-    this.txcVisitor = TxcVisitorFactory.getSqlVisitor(baseStatementUnit.getStatement().getTxcConnection().getRawConnection(),
-        baseStatementUnit.getSqlExecutionUnit().getSql());
-    this.txcVisitor.setParameterSet(parameterSet);
+    ITxcConnection txcConnection = baseStatementUnit.getStatement().getTxcConnection();
+    this.txcVisitor = TxcVisitorFactory.createSqlVisitor(
+        txcConnection.getDataSource().getDatabaseType(),
+        txcConnection.getRawConnection(),
+        baseStatementUnit.getSqlExecutionUnit().getSql(),
+        parameterSet);
+
   }
 
 

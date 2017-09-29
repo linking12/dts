@@ -1,5 +1,10 @@
 package io.dts.parser.vistor.base;
 
+import com.alibaba.druid.sql.SQLUtils;
+import com.alibaba.druid.sql.ast.SQLExpr;
+import com.alibaba.druid.sql.dialect.mysql.visitor.MySqlOutputVisitor;
+import com.alibaba.druid.sql.visitor.SQLASTOutputVisitor;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -18,36 +23,44 @@ import io.dts.parser.model.TxcLine;
 import io.dts.parser.model.TxcTable;
 import io.dts.parser.model.TxcTableMeta;
 import io.dts.parser.vistor.ITxcVisitor;
-import io.dts.parser.vistor.mysql.TxcObjectWapper;
 import io.dts.parser.vistor.support.ISQLStatement;
-import io.dts.parser.vistor.support.PlaceHolderManager;
+import io.dts.parser.vistor.support.TxcObjectWapper;
 import io.dts.parser.vistor.support.TxcTableMetaTools;
 
 /**
  * 
  * @author xiaoyan
  */
-public abstract class TxcBaseVisitor implements ITxcVisitor {
+public abstract class TxcBaseVisitor extends MySqlOutputVisitor implements ITxcVisitor {
+
 	private String selectSql = null;
+
 	private String whereCondition = null;
 
 	private TxcTableMeta tableMeta = null;// table语法树
-	private PlaceHolderManager pm = null;
-	private List<Object> parameterSet = null;
 	private String rollbackRule = null; // 用户通过hint定义sql的自定义规则
 
-	private ISQLStatement node;
+	protected ISQLStatement node;
 	private final TxcTable tableOriginalValue = new TxcTable(); // 保存SQL前置镜像
 	private final TxcTable tablePresentValue = new TxcTable(); // 保存SQL后置镜像
-	protected StringBuilder appendable = new StringBuilder();
+
 
 	protected Connection connection;
 
-	protected String sql;
+	protected String tableName;
 
-	public TxcBaseVisitor(final Connection connection, ISQLStatement stmt) throws SQLException {
+	protected String tableNameAlias;
+
+	public TxcBaseVisitor(ISQLStatement node, List<Object> parameterSet) {
+		super(new StringBuilder());
+		this.node  = node;
+		super.setParameters(parameterSet);
+		node.getSQLStatement().accept(this);
+	}
+
+	@Override
+	public void setConnection(final Connection connection) {
 		this.connection = connection;
-		this.node = stmt;
 	}
 
 	@Override
@@ -56,11 +69,9 @@ public abstract class TxcBaseVisitor implements ITxcVisitor {
 			return tableMeta;
 		}
 		try {
-			String tablename = node.getTableName();
-
-			String tablenameAlias = node.getTableNameAlias();
+			String tablename = getTableName();
 			tableMeta = TxcTableMetaTools.getTableMeta(connection, tablename);
-			tableMeta.setAlias(tablenameAlias);
+			tableMeta.setAlias(tableNameAlias);
 		} catch (Exception e) {
 			throw new DtsException(e, "getTableMeta error");
 		}
@@ -93,6 +104,11 @@ public abstract class TxcBaseVisitor implements ITxcVisitor {
 	}
 
 	@Override
+	public String getFullSql() {
+		return getAppender().toString();
+	}
+
+	@Override
 	public String getSelectSql() {
 		if (selectSql == null) {
 			selectSql = parseSelectSql();
@@ -101,7 +117,7 @@ public abstract class TxcBaseVisitor implements ITxcVisitor {
 	}
 
 	public String parseSelectSql() {
-		StringBuilder appendable = getNullSqlAppenderBuilder();
+		StringBuilder appendable = new StringBuilder();
 		appendable.append("SELECT ");
 		appendable.append(printColumns());
 		appendable.append(" FROM ");
@@ -131,7 +147,6 @@ public abstract class TxcBaseVisitor implements ITxcVisitor {
 	}
 
 
-	@Override
 	public String getWhereCondition(Statement st) {
 		if (whereCondition == null) {
 			whereCondition = " WHERE " + parseWhereCondition(st);
@@ -190,6 +205,17 @@ public abstract class TxcBaseVisitor implements ITxcVisitor {
 		}
 	}
 
+
+	protected StringBuffer parseWhereCondition(final SQLExpr where) {
+		StringBuffer out = new StringBuffer() ;
+		SQLASTOutputVisitor sqlastOutputVisitor = SQLUtils.createFormatOutputVisitor(out , null ,
+				node.getDatabaseType().getDruidSqlType()) ;
+		sqlastOutputVisitor.setParameters(getParameters());
+		where.accept(sqlastOutputVisitor);
+		return out;
+	}
+
+
 	protected abstract String parseWhereCondition(final Statement st);
 
 	@Override
@@ -207,28 +233,17 @@ public abstract class TxcBaseVisitor implements ITxcVisitor {
 		return node.getSql();
 	}
 
-	@Override
-	public void setParameterSet(List<Object> parameterSet) {
-		this.parameterSet = parameterSet;
-	}
 
-	public List<Object> getParameterSet() {
-		return parameterSet;
+	public void setTableName(final String tableName) {
+		this.tableName = tableName;
+	}
+	public void setTableNameAlias(final String tableNameAlias) {
+		this.tableNameAlias = tableNameAlias;
 	}
 
 	@Override
 	public String getTableName() {
-		return getTableMeta().getTableName().toUpperCase();
-	}
-
-	public StringBuilder getSqlAppenderBuilder() {
-		return appendable;
-	}
-
-	public StringBuilder getNullSqlAppenderBuilder() {
-		StringBuilder appender = getSqlAppenderBuilder();
-		appender.delete(0, appender.length());
-		return appender;
+		return tableName;
 	}
 
 	private TxcLine addLine(ResultSet rs, ResultSetMetaData rsmd, int column) throws SQLException {

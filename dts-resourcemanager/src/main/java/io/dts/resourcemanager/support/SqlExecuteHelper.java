@@ -21,8 +21,6 @@ public class SqlExecuteHelper {
 
   private static final Logger logger = LoggerFactory.getLogger(SqlExecuteHelper.class);
 
-  private static String txcLogTableName = "txc_undo_log";
-
 
   public static void executeSql(String dbName, String retrySql) throws SQLException {
     if (retrySql == null) {

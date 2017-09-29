@@ -1,21 +1,23 @@
-package io.dts.parser.vistor.mysql;
+package io.dts.parser.vistor.base;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.Connection;
+import com.alibaba.druid.sql.SQLUtils;
+import com.alibaba.druid.sql.ast.SQLExpr;
+import com.alibaba.druid.sql.ast.statement.SQLUpdateStatement;
+import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlUpdateStatement;
+import com.alibaba.druid.sql.visitor.SQLASTOutputVisitor;
+
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 
 import io.dts.common.exception.DtsException;
 import io.dts.parser.hint.TxcHint;
 import io.dts.parser.model.TxcTable;
 import io.dts.parser.model.TxcTableMeta;
 import io.dts.parser.vistor.support.ISQLStatement;
-import net.sf.jsqlparser.expression.BinaryExpression;
-import net.sf.jsqlparser.expression.Expression;
-import net.sf.jsqlparser.schema.Column;
-import net.sf.jsqlparser.statement.update.Update;
 
 /**
  * @author xiaoyan
@@ -26,24 +28,24 @@ public class TxcUpdateVisitor extends TxcBaseVisitor {
 	private static final Logger logger = LoggerFactory.getLogger(TxcUpdateVisitor.class);
 
 
-	public TxcUpdateVisitor(Connection connection, ISQLStatement stmt) throws SQLException {
-		super(connection, stmt);
+	public TxcUpdateVisitor(ISQLStatement node, List<Object> parameterSet) {
+		super(node, parameterSet);
 	}
 
-	private Update getSqlStatement() {
-		return (Update) getSQLStatement().getStatement();
+	@Override
+	public boolean visit(final MySqlUpdateStatement x) {
+		setTableName(x.getTableName().toString());
+		setTableNameAlias(x.getTableSource() != null ? x.getTableSource().getAlias() : null);
+
+		return super.visit(x);
 	}
 
 	@Override
 	public String parseWhereCondition(Statement st) {
-		Update sqlStatement = getSqlStatement();
-		StringBuilder appendable = new StringBuilder();
-		Expression where = sqlStatement.getWhere();
-		appendable.append(where.toString());
-		return appendable.toString();
+		SQLUpdateStatement selectStatement = (SQLUpdateStatement) this.node.getSQLStatement();
+		StringBuffer out = parseWhereCondition(selectStatement.getWhere());
+		return out.toString();
 	}
-
-
 
 	@Override
 	public TxcTable executeAndGetFrontImage(Statement st) throws SQLException {
@@ -103,14 +105,6 @@ public class TxcUpdateVisitor extends TxcBaseVisitor {
 		return tablePresentValue;
 	}
 
-
-	@Override
-	public String getsql(String extraWhereCondition) {
-		StringBuilder appendable = new StringBuilder();
-
-
-		return appendable.toString();
-	}
 
 
 }

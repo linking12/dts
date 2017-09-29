@@ -1,22 +1,20 @@
-package io.dts.parser.vistor.mysql;
+package io.dts.parser.vistor.base;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.alibaba.druid.sql.ast.statement.SQLDeleteStatement;
+import com.alibaba.druid.sql.ast.statement.SQLSelectQueryBlock;
+import com.alibaba.druid.sql.ast.statement.SQLSelectStatement;
+import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlDeleteStatement;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Collection;
 import java.util.List;
 
-import io.dts.common.exception.DtsException;
-import io.dts.parser.model.TxcColumnMeta;
 import io.dts.parser.model.TxcTable;
 import io.dts.parser.model.TxcTableMeta;
 import io.dts.parser.vistor.support.ISQLStatement;
-import net.sf.jsqlparser.schema.Table;
-import net.sf.jsqlparser.statement.delete.Delete;
 
 /**
  * @author xiaoyan
@@ -27,23 +25,15 @@ public class TxcDeleteVisitor extends TxcBaseVisitor {
 	private static final Logger logger = LoggerFactory.getLogger(TxcDeleteVisitor.class);
 
 
-	public TxcDeleteVisitor(Connection connection, ISQLStatement stmt) throws SQLException {
-		super(connection, stmt);
+	public TxcDeleteVisitor(ISQLStatement node, List<Object> parameterSet) {
+		super(node, parameterSet);
 	}
-
-	private Delete getSqlStatement() {
-		return (Delete) getSQLStatement().getStatement();
-	}
-
 
 	@Override
 	public String parseWhereCondition(Statement st) {
-		Delete sqlStatement = getSqlStatement();
-		StringBuilder appendable = new StringBuilder();
-
-		appendable.append(sqlStatement.getWhere().toString());
-
-		return appendable.toString();
+		SQLDeleteStatement selectStatement = (SQLDeleteStatement) this.node.getSQLStatement();
+		StringBuffer out = parseWhereCondition(selectStatement.getWhere());
+		return out.toString();
 	}
 
 	@Override
@@ -75,10 +65,11 @@ public class TxcDeleteVisitor extends TxcBaseVisitor {
 		return tablePresentValue;
 	}
 
-
 	@Override
-	public String getsql(final String extraWhereCondition) {
-		return null;
+	public boolean visit(final MySqlDeleteStatement x) {
+		setTableName(x.getTableName().toString());
+		setTableNameAlias(x.getAlias() != null ? x.getAlias() : null);
+		return super.visit(x);
 	}
 
 }
