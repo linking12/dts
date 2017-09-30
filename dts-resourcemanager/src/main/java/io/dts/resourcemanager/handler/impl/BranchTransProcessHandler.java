@@ -27,7 +27,7 @@ public class BranchTransProcessHandler implements IBranchTransProcessHandler {
 
   @Override
   public void branchCommit(final String xid, final long branchId, final String key, final String udata,
-      final byte commitMode, final String retrySql)
+      final int commitMode, final String retrySql)
       throws DtsException {
     String branchName = TxcXID.getBranchName(xid, branchId);
     if (currentTaskMap.containsKey(branchName)) {
@@ -54,17 +54,8 @@ public class BranchTransProcessHandler implements IBranchTransProcessHandler {
       context.setRetrySql(retrySql);
       context.setGlobalXid(TxcXID.getGlobalXID(xid, branchId));
 
-      switch (context.getCommitMode()) {
-        case COMMIT_IN_PHASE1:
-        case COMMIT_IN_PHASE2:
-//          currentTaskCommitedAt.put(context.getGlobalXid(), context);
-          break;
-        case COMMIT_RETRY_MODE:
-          txcLogManager.branchCommit(Arrays.asList(context));
-          break;
-        default:
-          break;
-      }
+      txcLogManager.branchCommit(Arrays.asList(context));
+
     } catch (DtsException e) {
       throw e;
     } catch (SQLException e) {
@@ -76,13 +67,13 @@ public class BranchTransProcessHandler implements IBranchTransProcessHandler {
 
   @Override
   public void branchRollback(final String xid, final long branchId, final String key, final String udata,
-      final byte commitMode) throws DtsException {
+      final int commitMode) throws DtsException {
 
   }
 
   @Override
   public void branchRollback(final String xid, final long branchId, final String key, final String udata,
-      final byte commitMode, final int isDelKey)
+      final int commitMode, final int isDelKey)
       throws DtsException {
 
   }

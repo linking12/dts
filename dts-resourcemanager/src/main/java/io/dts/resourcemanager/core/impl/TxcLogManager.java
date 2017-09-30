@@ -18,7 +18,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -79,9 +78,9 @@ public class TxcLogManager implements ITxcLogManager {
         pst.setString(2, xid);
         pst.setLong(3, branchID);
         pst.setBlob(4, BlobUtil.string2blob(txcContext.encode()));
-        java.sql.Date currentTime = new java.sql.Date(Calendar.getInstance().getTimeInMillis());
-        pst.setDate(5, currentTime);
-        pst.setDate(6, currentTime);
+        java.sql.Timestamp currentTime = new java.sql.Timestamp(System.currentTimeMillis());
+        pst.setTimestamp(5, currentTime);
+        pst.setTimestamp(6, currentTime);
         pst.setString(7, serverAddr);
         return pst.executeUpdate();
       }

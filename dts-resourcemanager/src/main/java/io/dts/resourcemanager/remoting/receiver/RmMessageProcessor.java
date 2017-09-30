@@ -50,7 +50,7 @@ public class RmMessageProcessor implements NettyRequestProcessor {
     try {
       if (dtsMessage instanceof BranchCommitMessage) {
         // 提交分支事务
-        response = RemotingCommand.createResponseCommand(BeginResultMessage.class);
+        response = RemotingCommand.createResponseCommand(BranchCommitResultMessage.class);
         responseHeader = response.readCustomHeader();
         createMessageHandler().handleMessage(serverAddressIp, (BranchCommitMessage) dtsMessage,
             (BranchCommitResultMessage) responseHeader);

@@ -11,6 +11,7 @@ import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import com.alibaba.druid.pool.DruidDataSource;
+import com.google.common.base.Stopwatch;
 
 import javax.sql.DataSource;
 
@@ -20,6 +21,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import io.dts.client.DefaultDtsTransactionManager;
 import io.dts.client.DtsTransactionManager;
@@ -41,7 +43,7 @@ public class DataSourceStatementExample {
 
     NettyClientConfig nettyClientConfig = new NettyClientConfig();
     nettyClientConfig.setConnectTimeoutMillis(30000);
-    DtsRemotingClient dtsClient = new DtsRemotingClient(nettyClientConfig, Collections.singletonList("127.0.0.1:10086"));
+    DtsRemotingClient dtsClient = new DtsRemotingClient(nettyClientConfig, Collections.singletonList("10.9.27.196:10086"));
 //     dtsClient.setAddressManager(new ZookeeperAddressManager("localhost:2181", "/dts"));
 //     dtsClient.setGroup("Default");
 //     dtsClient.setAppName("Demo");
@@ -57,9 +59,13 @@ public class DataSourceStatementExample {
       DtsTransactionCallback<Object> dtsTransactionCallback = new DtsTransactionCallback<Object>() {
         @Override
         public Object doInTransaction() throws Throwable {
+          Stopwatch stopwatch = Stopwatch.createStarted();
           executeStatement(clientMessageSender);
           System.out.println("executePrepareStatement");
-          executePrepareStatement(clientMessageSender);
+          executeUpdatePrepareStatement(clientMessageSender);
+          executeInsertPrepareStatement(clientMessageSender);
+          stopwatch.stop();
+          System.out.println(stopwatch.elapsed(TimeUnit.MILLISECONDS));
           return 1;
         }
       };
@@ -98,7 +104,7 @@ public class DataSourceStatementExample {
     });
   }
 
-  private static void executePrepareStatement(final DtsClientMessageSenderImpl clientMessageSender)
+  private static void executeUpdatePrepareStatement(final DtsClientMessageSenderImpl clientMessageSender)
       throws SQLException {
     final ResourceManager resourceManager = new BaseResourceManager(clientMessageSender);
     resourceManager.setTimeout(30000l);
@@ -132,6 +138,32 @@ public class DataSourceStatementExample {
           @Override
           public void setValues(final PreparedStatement ps) throws SQLException {
             ps.setInt(1, 1);
+          }
+        });
+      }
+    });
+  }
+
+  private static void executeInsertPrepareStatement(final DtsClientMessageSenderImpl clientMessageSender)
+      throws SQLException {
+    final ResourceManager resourceManager = new BaseResourceManager(clientMessageSender);
+    resourceManager.setTimeout(30000l);
+    DtsDataSource dtsDataSource = new DtsDataSource(dataSource(), "dts");
+    dtsDataSource.setResourceManager(resourceManager);
+    DataSourceTransactionManager dataSourceTransactionManager = new DataSourceTransactionManager(dtsDataSource);
+    TransactionTemplate transactionTemplate = new TransactionTemplate(dataSourceTransactionManager);
+
+    JdbcTemplate jdbcTemplate = new JdbcTemplate(dtsDataSource);
+
+
+    transactionTemplate.execute(new TransactionCallback<Integer>() {
+      @Override
+      public Integer doInTransaction(final TransactionStatus status) {
+        return jdbcTemplate.update("insert into example(name,value) values(?,?)", new PreparedStatementSetter() {
+          @Override
+          public void setValues(final PreparedStatement ps) throws SQLException {
+            ps.setString(1, "testadsf");
+            ps.setString(2, "fds");
           }
         });
       }

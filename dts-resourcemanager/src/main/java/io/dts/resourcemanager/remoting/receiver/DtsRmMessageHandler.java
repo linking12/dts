@@ -23,7 +23,7 @@ public class DtsRmMessageHandler {
     String servAddr = commitMessage.getServerAddr();
     String dbName = commitMessage.getDbName();
     String udata = commitMessage.getUdata();
-    byte commitMode = commitMessage.getCommitMode();
+    int commitMode = commitMessage.getCommitMode();
     String retrySql = commitMessage.getRetrySql();
 
     resultMessage.setBranchId(branchId);

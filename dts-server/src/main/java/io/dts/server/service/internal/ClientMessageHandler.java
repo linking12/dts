@@ -131,6 +131,8 @@ public interface ClientMessageHandler {
                   dtsTransStatusDao.insertCommitedResult(branchLog.getBranchId(),
                       CommitingResultCode.BEGIN.getValue());
                 }
+                this.syncGlobalCommit(branchLogs, globalLog);
+
               } else {
                 try {
                   Collections.sort(branchLogs, new Comparator<BranchLog>() {
@@ -211,7 +213,7 @@ public interface ClientMessageHandler {
           branchCommitMessage.setTranId(globalLog.getTransId());
           branchCommitMessage.setBranchId(branchId);
           branchCommitMessage.setUdata(branchLog.getUdata());
-          branchCommitMessage.setCommitMode((byte) branchLog.getCommitMode());
+          branchCommitMessage.setCommitMode(branchLog.getCommitMode());
           branchCommitMessage.setRetrySql(branchLog.getRetrySql());
           try {
             BranchCommitResultMessage branchCommitResult =

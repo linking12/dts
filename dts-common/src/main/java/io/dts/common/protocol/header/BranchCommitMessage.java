@@ -41,7 +41,7 @@ public class BranchCommitMessage implements CommandCustomHeader, RequestMessage 
 
   private String retrySql;
 
-  private byte commitMode;
+  private int commitMode;
 
   private String udata;
 
@@ -101,11 +101,11 @@ public class BranchCommitMessage implements CommandCustomHeader, RequestMessage 
     this.retrySql = retrySql;
   }
 
-  public byte getCommitMode() {
+  public int getCommitMode() {
     return commitMode;
   }
 
-  public void setCommitMode(byte commitMode) {
+  public void setCommitMode(int commitMode) {
     this.commitMode = commitMode;
   }
 

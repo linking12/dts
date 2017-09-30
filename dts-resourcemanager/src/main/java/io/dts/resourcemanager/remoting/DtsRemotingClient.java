@@ -35,6 +35,8 @@ public class DtsRemotingClient {
 
   private RemotingClient remotingClient;
 
+  private ScheduledExecutorService scheduledExecutorService;
+
   public DtsRemotingClient(NettyClientConfig nettyClientConfig, final List<String> serverAddressList) {
     this.remotingClient = new NettyRemotingClient(nettyClientConfig);
     this.remotingClient.updateNameServerAddressList(serverAddressList);
@@ -49,14 +51,13 @@ public class DtsRemotingClient {
         clientMessageExecutor);
     this.remotingClient.registerProcessor(RequestCode.BODY_REQUEST, messageProcessor,
         clientMessageExecutor);
-
-//    sendHeartbeatToServer();
+    scheduledExecutorService =
+        Executors.newSingleThreadScheduledExecutor(new ThreadFactoryImpl("Dts RM Heartbeat"));
 
   }
 
   private void sendHeartbeatToServer() {
-    ScheduledExecutorService scheduledExecutorService =
-        Executors.newSingleThreadScheduledExecutor(new ThreadFactoryImpl("Dts RM Heartbeat"));
+
     scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
       @Override
       public void run() {
@@ -75,10 +76,12 @@ public class DtsRemotingClient {
   @PostConstruct
   public void start() {
     remotingClient.start();
+    sendHeartbeatToServer();
   }
 
   @PreDestroy
   public void shutdown() {
+    scheduledExecutorService.shutdown();
     remotingClient.shutdown();
   }
 

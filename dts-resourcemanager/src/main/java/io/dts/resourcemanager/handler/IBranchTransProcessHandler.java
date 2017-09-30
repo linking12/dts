@@ -17,7 +17,7 @@ public interface IBranchTransProcessHandler {
    * @param commitMode
    * @throws DtsException
    */
-  public void branchCommit(String xid, long branchId, String key, String udata, byte commitMode, String retrySql) throws DtsException;
+  public void branchCommit(String xid, long branchId, String key, String udata, int commitMode, String retrySql) throws DtsException;
 
   /**
    * 分支回滚
@@ -29,8 +29,8 @@ public interface IBranchTransProcessHandler {
    * @param commitMode
    * @throws DtsException
    */
-  public void branchRollback(String xid, long branchId, String key, String udata, byte commitMode) throws DtsException;
+  public void branchRollback(String xid, long branchId, String key, String udata, int commitMode) throws DtsException;
 
-  public void branchRollback(String xid, long branchId, String key, String udata, byte commitMode, int isDelKey) throws DtsException;
+  public void branchRollback(String xid, long branchId, String key, String udata, int commitMode, int isDelKey) throws DtsException;
 
 }

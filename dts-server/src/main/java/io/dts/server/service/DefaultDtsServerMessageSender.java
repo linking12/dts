@@ -25,6 +25,8 @@ import io.dts.remoting.exception.RemotingSendRequestException;
 import io.dts.remoting.exception.RemotingTimeoutException;
 import io.dts.remoting.exception.RemotingTooMuchRequestException;
 import io.dts.remoting.protocol.RemotingCommand;
+import io.dts.server.common.LifecycleListener;
+import io.dts.server.remoting.DtsServerContainer;
 import io.dts.server.remoting.channel.ChannelRepository;
 import io.netty.channel.Channel;
 
@@ -38,15 +40,9 @@ public class DefaultDtsServerMessageSender implements DtsServerMessageSender {
   @Autowired
   private ChannelRepository channelRepository;
 
-  private RemotingServer remoteServer;
+  @Autowired
+  DtsServerContainer dtsServerContainer;
 
-  public RemotingServer getRemoteServer() {
-    return remoteServer;
-  }
-
-  public void setRemoteServer(RemotingServer remoteServer) {
-    this.remoteServer = remoteServer;
-  }
 
   @Override
   public <T> T invokeSync(String clientAddress, RequestMessage msg, long timeout)
@@ -55,7 +51,7 @@ public class DefaultDtsServerMessageSender implements DtsServerMessageSender {
     if (channel != null) {
       RemotingCommand request = this.buildRequest(msg);
       try {
-        RemotingCommand response = remoteServer.invokeSync(channel, request, timeout);
+        RemotingCommand response = dtsServerContainer.getRemotingServer().invokeSync(channel, request, timeout);
         return this.buildResponse(response);
       } catch (RemotingSendRequestException | RemotingTimeoutException | InterruptedException
           | RemotingCommandException e) {
@@ -72,7 +68,7 @@ public class DefaultDtsServerMessageSender implements DtsServerMessageSender {
     if (channel != null) {
       RemotingCommand request = this.buildRequest(msg);
       try {
-        remoteServer.invokeAsync(channel, request, timeout, null);
+        dtsServerContainer.getRemotingServer().invokeAsync(channel, request, timeout, null);
       } catch (RemotingSendRequestException | RemotingTimeoutException | InterruptedException
           | RemotingTooMuchRequestException e) {
         throw new DtsException(e);
