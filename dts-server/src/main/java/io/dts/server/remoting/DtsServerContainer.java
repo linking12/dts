@@ -30,12 +30,12 @@ import com.google.common.collect.Queues;
 
 import io.dts.common.ThreadFactoryImpl;
 import io.dts.common.common.TxcXID;
+import io.dts.common.lifecycle.AbstractLifecycleComponent;
 import io.dts.common.protocol.RequestCode;
 import io.dts.remoting.RemotingServer;
 import io.dts.remoting.netty.NettyRemotingServer;
 import io.dts.remoting.netty.NettyServerConfig;
 import io.dts.server.DtsServerProperties;
-import io.dts.server.common.AbstractLifecycleComponent;
 import io.dts.server.remoting.channel.ChannelkeepingComponent;
 import io.dts.server.remoting.latency.ServerFixedThreadPoolExecutor;
 import io.dts.server.remoting.processor.DtsMessageProcessor;

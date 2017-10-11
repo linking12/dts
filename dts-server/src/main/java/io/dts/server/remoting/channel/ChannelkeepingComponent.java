@@ -24,8 +24,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import io.dts.common.ThreadFactoryImpl;
+import io.dts.common.lifecycle.AbstractLifecycleComponent;
 import io.dts.remoting.ChannelEventListener;
-import io.dts.server.common.AbstractLifecycleComponent;
 import io.netty.channel.Channel;
 
 /**
