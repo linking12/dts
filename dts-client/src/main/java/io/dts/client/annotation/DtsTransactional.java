@@ -18,37 +18,19 @@ import java.lang.annotation.Target;
 @Documented
 public @interface DtsTransactional {
 
-  /**
-   * Alias for {@link #transactionManager}.
-   * @see #transactionManager
-   */
+
   @AliasFor("transactionManager")
   String value() default "";
 
-  /**
-   * A <em>qualifier</em> value for the specified transaction.
-   * <p>May be used to determine the target transaction manager,
-   * matching the qualifier value (or the bean name) of a specific
-   * {@link org.springframework.transaction.PlatformTransactionManager}
-   * bean definition.
-   * @since 4.2
-   * @see #value
-   */
+
   @AliasFor("value")
   String transactionManager() default "";
 
-  /**
-   * millio second of timeout
-   * @return
-   */
+
   int timeout() default 3000;
 
-  /**
-   * millio second of effectiveTime
-   * @return
-   */
+
   int effectiveTime() default 3000;
 
-//  DtsTranModel tranModel() default RB;
 
 }
