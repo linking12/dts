@@ -25,6 +25,7 @@ public class DefaultDtsTransactionManager implements DtsTransactionManager {
   private static final Logger logger = LoggerFactory.getLogger(TransactionDtsInterceptor.class);
 
   private DtsClientMessageSender dtsClient;
+  
 
   public DefaultDtsTransactionManager(final DtsClientMessageSender dtsClient) {
     this.dtsClient = dtsClient;
