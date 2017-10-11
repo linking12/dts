@@ -43,7 +43,7 @@ public class DataSourceStatementExample {
 
     NettyClientConfig nettyClientConfig = new NettyClientConfig();
     nettyClientConfig.setConnectTimeoutMillis(30000);
-    DtsRemotingClient dtsClient = new DtsRemotingClient(nettyClientConfig, Collections.singletonList("10.9.27.196:10086"));
+    DtsRemotingClient dtsClient = new DtsRemotingClient(nettyClientConfig, Collections.singletonList("10.9.25.218:10086"));
 //     dtsClient.setAddressManager(new ZookeeperAddressManager("localhost:2181", "/dts"));
 //     dtsClient.setGroup("Default");
 //     dtsClient.setAppName("Demo");

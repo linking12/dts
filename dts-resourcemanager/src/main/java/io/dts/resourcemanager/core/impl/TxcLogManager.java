@@ -125,11 +125,10 @@ public class TxcLogManager implements ITxcLogManager {
     TransactionTemplate transactionTemplate = new TransactionTemplate(tm);
     final JdbcTemplate template = new JdbcTemplate(datasource);
 
-
-    for (final ContextStep2 c : contexts) {
-      transactionTemplate.execute(new TransactionCallbackWithoutResult() {
-        @Override
-        protected void doInTransactionWithoutResult(TransactionStatus status) {
+    transactionTemplate.execute(new TransactionCallbackWithoutResult() {
+      @Override
+      protected void doInTransactionWithoutResult(TransactionStatus status) {
+        for (final ContextStep2 c : contexts) {
           try {
             long gid = TxcXID.getGlobalXID(c.getXid(), c.getBranchId());
 
@@ -145,19 +144,20 @@ public class TxcLogManager implements ITxcLogManager {
                 delayDelete(infor, template);
               }
             }
-
-            // 删除undolog
-            deleteUndoLog(c, template);
-
             // 删除事务锁
-//            TxcActivityInfo.deleteXLock(c.getXid(), template);
+  //            TxcActivityInfo.deleteXLock(c.getXid(), template);
           } catch (Exception ex) {
             status.setRollbackOnly();
             throw new DtsException(ex);
           }
         }
-      });
-    }
+
+
+        // 删除undolog
+        deleteUndoLog(contexts, template);
+
+      }
+    });
   }
 
   private TxcRuntimeContext getTxcRuntimeContexts(final long gid, final JdbcTemplate template) {
@@ -212,10 +212,10 @@ public class TxcLogManager implements ITxcLogManager {
     template.execute(sql);
   }
 
-  private static void deleteUndoLog(final ContextStep2 contexts, final JdbcTemplate template) {
+  private static void deleteUndoLog(final List<ContextStep2> contexts, final JdbcTemplate template) {
     StringBuilder sb = new StringBuilder();
     boolean flag = false;
-    for (ContextStep2 c : (List<ContextStep2>) contexts) {
+    for (ContextStep2 c : contexts) {
       if (flag == true) {
         sb.append(",");
       } else {

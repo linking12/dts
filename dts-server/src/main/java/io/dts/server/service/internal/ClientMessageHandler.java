@@ -215,6 +215,7 @@ public interface ClientMessageHandler {
           branchCommitMessage.setUdata(branchLog.getUdata());
           branchCommitMessage.setCommitMode(branchLog.getCommitMode());
           branchCommitMessage.setRetrySql(branchLog.getRetrySql());
+          branchCommitMessage.setDbName(branchLog.getClientInfo());
           try {
             BranchCommitResultMessage branchCommitResult =
                 serverMessageServer.invokeSync(clientAddress, branchCommitMessage, 3000);

@@ -76,8 +76,8 @@ public interface ResourceManagerMessageHandler {
         branchLog.setTransId(tranId);
         branchLog.setWaitPeriods(0);
         branchLog.setClientAppName(clientIp);
-        branchLog.setClientInfo(clientIp);
-        branchLog.setBusinessKey(clientIp);
+        branchLog.setClientInfo(registerMessage.getKey());
+        branchLog.setBusinessKey(registerMessage.getBusinessKey());
         branchLog.setClientIp(clientIp);
         branchLog.setState(BranchLogState.Begin.getValue());
         branchLog.setCommitMode(commitMode);
