@@ -24,11 +24,19 @@ public class DefaultDtsTransactionManager implements DtsTransactionManager {
 
   private static final Logger logger = LoggerFactory.getLogger(TransactionDtsInterceptor.class);
 
-  private DtsClientMessageSender dtsClient;
-  
+  private final DtsClientMessageSender dtsClient;
 
-  public DefaultDtsTransactionManager(final DtsClientMessageSender dtsClient) {
-    this.dtsClient = dtsClient;
+  private static final DtsTransactionManager transcationManager =
+      new DefaultDtsTransactionManager();
+
+  private DefaultDtsTransactionManager() {
+    // 这里需要负载均衡
+    final String serverAddress = "";
+    this.dtsClient = new DefaultDtsClientMessageSender(serverAddress);
+  }
+
+  public static DtsTransactionManager getInstance() {
+    return transcationManager;
   }
 
   @Override

@@ -1,5 +1,6 @@
 package io.dts.parser.constant;
 
+import com.alibaba.druid.util.JdbcUtils;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterators;
@@ -10,12 +11,19 @@ import java.util.Arrays;
  * Created by guoyubo on 2017/9/20.
  */
 public enum DatabaseType {
-  H2("H2"), MySQL("MySQL"), Oracle("Oracle"), SQLServer("Microsoft SQL Server"), PostgreSQL("PostgreSQL");
+  H2("H2", JdbcUtils.H2), MySQL("MySQL", JdbcUtils.MYSQL), Oracle("Oracle", JdbcUtils.ORACLE),
+  SQLServer("Microsoft SQL Server", JdbcUtils.SQL_SERVER), PostgreSQL("PostgreSQL", JdbcUtils.POSTGRESQL), DB2("DB2", JdbcUtils.DB2);
 
   private final String productName;
+  private final String druidSqlType;
 
-  DatabaseType(final String productName) {
+  DatabaseType(final String productName, final String druidSqlType) {
     this.productName = productName;
+    this.druidSqlType = druidSqlType;
+  }
+
+  public String getDruidSqlType() {
+    return druidSqlType;
   }
 
   /**

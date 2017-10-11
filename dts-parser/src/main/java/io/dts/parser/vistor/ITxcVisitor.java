@@ -17,6 +17,7 @@
 
 package io.dts.parser.vistor;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
@@ -33,14 +34,20 @@ import io.dts.parser.vistor.support.PlaceHolderManager;
  * @author zhangliang
  */
 public interface ITxcVisitor {
-    /**
-     * 获取前置镜像
-     *
-     * @throws SQLException
-     */
-    TxcTable executeAndGetFrontImage(Statement st) throws SQLException;
 
-    TxcTable getTableOriginalValue() throws SQLException;
+  void setConnection(Connection connection);
+
+  TxcTableMeta buildTableMeta() throws SQLException;
+
+  /**
+   * 获取前置镜像
+   *
+   * @throws SQLException
+   */
+  TxcTable executeAndGetFrontImage(Statement st) throws SQLException;
+
+
+  TxcTable getTableOriginalValue() throws SQLException;
 
     /**
      * 获取后置镜像
@@ -59,11 +66,11 @@ public interface ITxcVisitor {
     String getInputSql();
 
     /**
-     * 获取目标Sql
+     * 获取原始数据的SQL
      *
      * @return
      */
-    String getUserSql() throws SQLException;
+    String getFullSql();
 
     /**
      * 查询SQL，用于取得DB行变更前后镜像
@@ -72,12 +79,6 @@ public interface ITxcVisitor {
      */
     String getSelectSql() throws SQLException;
 
-    /**
-     * 获取where查询条件
-     *
-     * @return
-     */
-    String getWhereCondition(Statement st) throws SQLException;
 
     String getWhereCondition(TxcTable table);
 
@@ -86,15 +87,11 @@ public interface ITxcVisitor {
 
     SqlType getSqlType();
 
-    String getsql(String extraWhereCondition);
-
     String getRollbackRule();
 
     TxcTableMeta getTableMeta();
 
     ISQLStatement getSQLStatement();
 
-    void setPlaceHolderManager(PlaceHolderManager pm);
 
-    PlaceHolderManager getPlaceHolderManager();
 }

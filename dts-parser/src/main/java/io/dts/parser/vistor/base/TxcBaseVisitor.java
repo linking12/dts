@@ -1,4 +1,9 @@
-package io.dts.parser.vistor.mysql;
+package io.dts.parser.vistor.base;
+
+import com.alibaba.druid.sql.SQLUtils;
+import com.alibaba.druid.sql.ast.SQLExpr;
+import com.alibaba.druid.sql.dialect.mysql.visitor.MySqlOutputVisitor;
+import com.alibaba.druid.sql.visitor.SQLASTOutputVisitor;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -6,10 +11,9 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import io.dts.common.exception.DtsException;
 import io.dts.parser.constant.SqlType;
@@ -20,47 +24,54 @@ import io.dts.parser.model.TxcTable;
 import io.dts.parser.model.TxcTableMeta;
 import io.dts.parser.vistor.ITxcVisitor;
 import io.dts.parser.vistor.support.ISQLStatement;
-import io.dts.parser.vistor.support.PlaceHolderManager;
+import io.dts.parser.vistor.support.TxcObjectWapper;
 import io.dts.parser.vistor.support.TxcTableMetaTools;
 
 /**
  * 
  * @author xiaoyan
  */
-public abstract class TxcBaseVisitor implements ITxcVisitor {
-	private String userSql = null; // 输入SQL，经过解析
-	private String userSql0 = null; // 输入SQL，经过解析，替换占位符
+public abstract class TxcBaseVisitor extends MySqlOutputVisitor implements ITxcVisitor {
+
 	private String selectSql = null;
+
 	private String whereCondition = null;
 
 	private TxcTableMeta tableMeta = null;// table语法树
-	private PlaceHolderManager pm = null;
 	private String rollbackRule = null; // 用户通过hint定义sql的自定义规则
 
-	private ISQLStatement node;
+	protected ISQLStatement node;
 	private final TxcTable tableOriginalValue = new TxcTable(); // 保存SQL前置镜像
 	private final TxcTable tablePresentValue = new TxcTable(); // 保存SQL后置镜像
-	protected StringBuilder appendable = new StringBuilder();
+
 
 	protected Connection connection;
 
-	protected String sql;
+	protected String tableName;
 
-	public TxcBaseVisitor(final Connection connection, ISQLStatement stmt) throws SQLException {
-		this.connection = connection;
-		this.node = stmt;
-		this.tableMeta = buildTableMeta();
+	protected String tableNameAlias;
+
+	public TxcBaseVisitor(ISQLStatement node, List<Object> parameterSet) {
+		super(new StringBuilder());
+		this.node  = node;
+		super.setParameters(parameterSet);
+		node.getSQLStatement().accept(this);
 	}
 
+	@Override
+	public void setConnection(final Connection connection) {
+		this.connection = connection;
+	}
 
+	@Override
 	public  TxcTableMeta buildTableMeta() throws SQLException {
-		TxcTableMeta tableMeta = null;
+		if (tableMeta != null) {
+			return tableMeta;
+		}
 		try {
-			String tablename = node.getTableName();
-
-			String tablenameAlias = node.getTableNameAlias();
+			String tablename = getTableName();
 			tableMeta = TxcTableMetaTools.getTableMeta(connection, tablename);
-			tableMeta.setAlias(tablenameAlias);
+			tableMeta.setAlias(tableNameAlias);
 		} catch (Exception e) {
 			throw new DtsException(e, "getTableMeta error");
 		}
@@ -93,17 +104,9 @@ public abstract class TxcBaseVisitor implements ITxcVisitor {
 	}
 
 	@Override
-	public String getUserSql() {
-		if (userSql == null) {
-			userSql = parseUserSql();
-		}
-		return userSql;
+	public String getFullSql() {
+		return getAppender().toString();
 	}
-
-	protected abstract String parseUserSql();
-
-
-	protected abstract String parseUserSql0();
 
 	@Override
 	public String getSelectSql() {
@@ -113,12 +116,40 @@ public abstract class TxcBaseVisitor implements ITxcVisitor {
 		return selectSql;
 	}
 
-	protected abstract String parseSelectSql();
+	public String parseSelectSql() {
+		StringBuilder appendable = new StringBuilder();
+		appendable.append("SELECT ");
+		appendable.append(printColumns());
+		appendable.append(" FROM ");
+		appendable.append(getTableName());
+		return appendable.toString();
+	}
 
-	@Override
+	public String printColumns() {
+		StringBuilder appender = new StringBuilder();
+
+		Collection<TxcColumnMeta> list = (Collection<TxcColumnMeta>) getTableMeta().getAllColumns().values();
+
+		boolean isFst = true;
+		for (Object obj : list) {
+			if (isFst) {
+				isFst = false;
+			} else if (obj instanceof TxcColumnMeta) {
+				appender.append(",");
+			}
+			appender.append(getTableName());
+			appender.append(".");
+
+			appender.append(((TxcColumnMeta) obj).getColumnName());
+		}
+
+		return appender.toString();
+	}
+
+
 	public String getWhereCondition(Statement st) {
 		if (whereCondition == null) {
-			whereCondition = parseWhereCondition(st);
+			whereCondition = " WHERE " + parseWhereCondition(st);
 		}
 		return whereCondition;
 	}
@@ -174,6 +205,17 @@ public abstract class TxcBaseVisitor implements ITxcVisitor {
 		}
 	}
 
+
+	protected StringBuffer parseWhereCondition(final SQLExpr where) {
+		StringBuffer out = new StringBuffer() ;
+		SQLASTOutputVisitor sqlastOutputVisitor = SQLUtils.createFormatOutputVisitor(out , null ,
+				node.getDatabaseType().getDruidSqlType()) ;
+		sqlastOutputVisitor.setParameters(getParameters());
+		where.accept(sqlastOutputVisitor);
+		return out;
+	}
+
+
 	protected abstract String parseWhereCondition(final Statement st);
 
 	@Override
@@ -191,29 +233,17 @@ public abstract class TxcBaseVisitor implements ITxcVisitor {
 		return node.getSql();
 	}
 
-	@Override
-	public void setPlaceHolderManager(PlaceHolderManager pm) {
-		this.pm = pm;
-	}
 
-	@Override
-	public PlaceHolderManager getPlaceHolderManager() {
-		return pm;
+	public void setTableName(final String tableName) {
+		this.tableName = tableName;
+	}
+	public void setTableNameAlias(final String tableNameAlias) {
+		this.tableNameAlias = tableNameAlias;
 	}
 
 	@Override
 	public String getTableName() {
-		return getTableMeta().getTableName().toUpperCase();
-	}
-
-	public StringBuilder getSqlAppenderBuilder() {
-		return appendable;
-	}
-
-	public StringBuilder getNullSqlAppenderBuilder() {
-		StringBuilder appender = getSqlAppenderBuilder();
-		appender.delete(0, appender.length());
-		return appender;
+		return tableName;
 	}
 
 	private TxcLine addLine(ResultSet rs, ResultSetMetaData rsmd, int column) throws SQLException {
@@ -222,7 +252,13 @@ public abstract class TxcBaseVisitor implements ITxcVisitor {
 			TxcField field = new TxcField();
 			field.setFieldName(rsmd.getColumnName(i));
 			field.setFieldType(rsmd.getColumnType(i));
-			field.setFieldValue(rs.getObject(i));
+			if (rsmd.getColumnTypeName(i).equals("TINYINT")) {
+				field.setFieldValue(rs.getInt(i));
+			} else {
+				field.setFieldValue(rs.getObject(i));
+			}
+
+
 			fields.add(field);
 		}
 
@@ -239,7 +275,7 @@ public abstract class TxcBaseVisitor implements ITxcVisitor {
 		try {
 			st = connection.createStatement();
 			rs = st.executeQuery(sql);
-			java.sql.ResultSetMetaData rsmd = rs.getMetaData();
+			ResultSetMetaData rsmd = rs.getMetaData();
 			int column = rsmd.getColumnCount();
 
 			while (rs.next()) {

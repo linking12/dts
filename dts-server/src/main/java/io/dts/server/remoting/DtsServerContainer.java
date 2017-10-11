@@ -139,4 +139,7 @@ public class DtsServerContainer extends AbstractLifecycleComponent {
 
   }
 
+  public RemotingServer getRemotingServer() {
+    return remotingServer;
+  }
 }

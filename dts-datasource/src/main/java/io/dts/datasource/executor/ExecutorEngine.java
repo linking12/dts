@@ -7,7 +7,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import io.dts.common.context.DtsContext;
 import io.dts.common.util.EventBusInstance;
 import io.dts.datasource.executor.commiter.AtExecutorRUnCommiter;
 import io.dts.datasource.executor.event.AbstractExecutionEvent;
@@ -16,11 +15,7 @@ import io.dts.datasource.executor.event.DQLExecutionEvent;
 import io.dts.datasource.executor.event.EventExecutionType;
 import io.dts.datasource.executor.prepared.PreparedStatementUnit;
 import io.dts.datasource.executor.statement.StatementUnit;
-import io.dts.datasource.statement.ITxcStatement;
 import io.dts.parser.constant.SqlType;
-import io.dts.parser.model.TxcTable;
-import io.dts.parser.vistor.ITxcVisitor;
-import io.dts.parser.vistor.TxcVisitorFactory;
 
 /**
  * Created by guoyubo on 2017/9/21.
@@ -43,7 +38,7 @@ public class ExecutorEngine{
    */
   public <T> T executeStatement(final StatementUnit statementUnit, final ExecuteCallback<T> executeCallback)
       throws Exception {
-    return execute(statementUnit, Collections.<List<Object>>emptyList(), executeCallback);
+    return execute(statementUnit, Collections.emptyList(), executeCallback);
   }
 
 
@@ -60,35 +55,30 @@ public class ExecutorEngine{
   public <T> T  executePreparedStatement(final PreparedStatementUnit preparedStatementUnits, final List<Object> parameters, final ExecuteCallback<T> executeCallback)
 
       throws Exception {
-    return execute(preparedStatementUnits, Collections.singletonList(parameters), executeCallback);
+    return execute(preparedStatementUnits, parameters, executeCallback);
   }
 
 
   private  <T> T  execute(
-      BaseStatementUnit baseStatementUnit, final List<List<Object>> parameterSets, final ExecuteCallback<T> executeCallback)
+      BaseStatementUnit baseStatementUnit, final List<Object> parameterSet, final ExecuteCallback<T> executeCallback)
       throws Exception {
-    T result = executeInternal(baseStatementUnit, parameterSets, executeCallback);
+    T result = executeInternal(baseStatementUnit, parameterSet, executeCallback);
     return result;
   }
 
 
-  private <T> T  executeInternal(final BaseStatementUnit baseStatementUnit, final List<List<Object>> parameterSets, final ExecuteCallback<T> executeCallback
+  private <T> T  executeInternal(final BaseStatementUnit baseStatementUnit, final List<Object> parameterSet, final ExecuteCallback<T> executeCallback
      ) throws Exception {
       T result;
       List<AbstractExecutionEvent> events = new LinkedList<>();
-      if (parameterSets.isEmpty()) {
-        events.add(getExecutionEvent(baseStatementUnit, Collections.emptyList()));
-      }
-      for (List<Object> each : parameterSets) {
-        events.add(getExecutionEvent(baseStatementUnit, each));
-      }
-      for (AbstractExecutionEvent event : events) {
-        EventBusInstance.getInstance().post(event);
-      }
+      events.add(getExecutionEvent(baseStatementUnit, parameterSet));
 
+      for (AbstractExecutionEvent event : events) {
+          EventBusInstance.getInstance().post(event);
+      }
 
     try {
-      AtExecutorRUnCommiter commiter = new AtExecutorRUnCommiter(baseStatementUnit, parameterSets);
+      AtExecutorRUnCommiter commiter = new AtExecutorRUnCommiter(baseStatementUnit, parameterSet);
 
       commiter.beforeExecute();
 

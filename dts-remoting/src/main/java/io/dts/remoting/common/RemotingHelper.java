@@ -35,7 +35,7 @@ import java.nio.channels.SocketChannel;
  * @since 2013-7-13
  */
 public class RemotingHelper {
-    public static final String RemotingLogName = "RocketmqRemoting";
+    public static final String RemotingLogName = "DtsRemoting";
 
 
     public static String exceptionSimpleDesc(final Throwable e) {

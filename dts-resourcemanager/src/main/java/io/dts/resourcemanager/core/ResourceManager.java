@@ -29,6 +29,9 @@ public interface ResourceManager {
    */
   public void reportStatus(long branchId, boolean success, String key, String udata) throws DtsException;
 
-
-
+  /**
+   * 设置远程调用超时
+   * @param timeout
+   */
+  void setTimeout(long timeout);
 }

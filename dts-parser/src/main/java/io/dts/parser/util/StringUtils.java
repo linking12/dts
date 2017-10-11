@@ -1,47 +1,13 @@
 package io.dts.parser.util;
 
-
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.regex.Pattern;
 
 /**
  * Created by guoyubo on 2017/9/23.
  */
 public class StringUtils {
 
-  public static final String NL = System.getProperty("line.separator");
-
-  /**
-   * 验证输入的参数是否非空非""，如果为空则抛出InputStringIsNotValid异常，异常中使用errMsg作为参数。
-   * 如果非空则对其进行trim
-   * @param str 目标字段
-   * @param errMsg 为空时的提示信息
-   * @return
-   */
-  public static String validAndTrim(String str, String errMsg) {
-    String ret = null;
-    if (str == null || (ret = str.trim()).equals("")) {
-      throw new RuntimeException(errMsg);
-    }
-    return ret;
-  }
-
-  /**
-   * 对字段进行trim如果字段原来就为null则仍然返回null
-   * @param str 目标字段
-   * @return 为空时的提示信息
-   */
-  public static String trim(String str) {
-    if (str != null) {
-      return str.trim();
-    }
-    return null;
-  }
 
   /**
    * Determines whether or not the sting 'searchIn' contains the string
@@ -225,64 +191,6 @@ public class StringUtils {
     return buf.toString();
   }
 
-  /**
-   * 是否以suffix串结尾，忽略大小写
-   *
-   * @param s
-   * @param suffix
-   * @return
-   */
-  public static boolean endsWithIgnoreCase(String s, String suffix) {
-    return s.regionMatches(true, s.length() - suffix.length(), suffix, 0, suffix.length());
-  }
-
-  /**
-   * 忽略大小写替换字符串
-   *
-   * @param s 原始字符串
-   * @param oldPattern 要替换的字符串的正则表达式
-   * @param newPattern 新字符串
-   * @return 返回替换后的字符串
-   */
-  public static String replaceIgnoreCase(String s, String oldPattern, String newPattern) {
-    return Pattern.compile(oldPattern, Pattern.CASE_INSENSITIVE).matcher(s).replaceAll(newPattern);
-  }
-
-  //String.split得到的每个子串没有去掉空格，另外如果有连续两个分隔符排在一起如"a,,b"则会得到一个""子串
-  public static String[] split(String str, String delimiter) {
-    String[] strs = str.split(delimiter);
-    ArrayList<String> list = new ArrayList<String>(strs.length);
-
-    for (String s : strs) {
-      if (s != null && (s = s.trim()).length() > 0) {
-        list.add(s);
-      }
-    }
-    return list.toArray(new String[0]);
-  }
-
-
-  /**
-   * 简单地检查是否是逻辑表与具体子表的关系。子表名满足父表名+"_数字";
-   * @param fatherTable
-   * @param sonTable
-   * @return
-   */
-  public static boolean isTableFatherAndSon(String fatherTable, String sonTable){
-    if(fatherTable == null || fatherTable.trim().isEmpty() ||
-        sonTable == null || sonTable.trim().isEmpty()) {
-      return false;
-    }
-    if(!sonTable.startsWith(fatherTable) || fatherTable.length()+2 > sonTable.length() ){
-      return false;
-    }
-    String suffix = sonTable.substring(fatherTable.length());
-    if(suffix.matches("_[\\d]+")){
-      return true;
-    }
-    return false;
-
-  }
 
   public static String removeBetweenWithSplitor(String sql, String start, String end) {
     if (sql == null) {
@@ -319,25 +227,6 @@ public class StringUtils {
     return sql.substring(index0 + start.length(), index1).trim();
   }
 
-  public static List<String> readLineToList(String data) {
-    if (data == null) {
-      return null;
-    }
-
-    try {
-      List<String> list = new LinkedList<String>();
-      BufferedReader br = new BufferedReader(new StringReader(data));
-      String line;
-
-      while ((line = br.readLine()) != null) {
-        list.add(line);
-      }
-      return list;
-    } catch (IOException e) {
-      // unreachable code
-      return null;
-    }
-  }
 
 
 }

@@ -10,7 +10,7 @@ public enum CommitMode {
 	/**
 	 * 1阶段中做本地事务commit；AT模式
 	 */
-	COMMIT_IN_PHASE1(1),
+	 COMMIT_IN_PHASE1(1),
 
 	/**
 	 * 2阶段中做本地事务commit；MT模式

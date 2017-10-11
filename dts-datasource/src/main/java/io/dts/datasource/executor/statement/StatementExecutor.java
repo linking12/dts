@@ -50,7 +50,7 @@ public final class StatementExecutor {
             
             @Override
             public ResultSet execute(final BaseStatementUnit baseStatementUnit) throws Exception {
-                return baseStatementUnit.getStatement().executeQuery(baseStatementUnit.getSqlExecutionUnit().getSql());
+                return baseStatementUnit.getStatement().getRawStatement().executeQuery(baseStatementUnit.getSqlExecutionUnit().getSql());
             }
         });
     }
@@ -124,7 +124,7 @@ public final class StatementExecutor {
             @Override
             public Integer execute(final BaseStatementUnit baseStatementUnit) throws Exception {
 
-                return updater.executeUpdate(baseStatementUnit.getStatement(), baseStatementUnit.getSqlExecutionUnit().getSql());
+                return updater.executeUpdate(baseStatementUnit.getStatement().getRawStatement(), baseStatementUnit.getSqlExecutionUnit().getSql());
             }
         });
         return results;
@@ -199,7 +199,7 @@ public final class StatementExecutor {
             
             @Override
             public Boolean execute(final BaseStatementUnit baseStatementUnit) throws Exception {
-                return executor.execute(baseStatementUnit.getStatement(), baseStatementUnit.getSqlExecutionUnit().getSql());
+                return executor.execute(baseStatementUnit.getStatement().getRawStatement(), baseStatementUnit.getSqlExecutionUnit().getSql());
             }
         });
         if (null == result) {

@@ -1,18 +1,20 @@
 package io.dts.parser.vistor.support;
 
 
+import com.alibaba.druid.sql.ast.SQLStatement;
+
+import io.dts.parser.constant.DatabaseType;
 import io.dts.parser.constant.SqlType;
-import net.sf.jsqlparser.statement.Statement;
 
 public interface ISQLStatement {
 
-	Statement getStatement();
+
+	SQLStatement getSQLStatement();
 
 	SqlType getType();
 
+	DatabaseType getDatabaseType();
+
 	String getSql();
 
-	String getTableNameAlias();
-
-	String getTableName();
 }

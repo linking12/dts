@@ -9,12 +9,12 @@ import java.util.List;
 
 import io.dts.common.context.DtsContext;
 import io.dts.common.exception.DtsException;
+import io.dts.datasource.connection.ITxcConnection;
 import io.dts.datasource.executor.BaseStatementUnit;
 import io.dts.parser.model.RollbackInfor;
 import io.dts.parser.model.TxcTable;
 import io.dts.parser.vistor.ITxcVisitor;
 import io.dts.parser.vistor.TxcVisitorFactory;
-import io.dts.parser.vistor.mysql.TxcDeleteVisitor;
 
 public class AtExecutorRUnCommiter {
 
@@ -24,31 +24,31 @@ public class AtExecutorRUnCommiter {
 
   private BaseStatementUnit baseStatementUnit;
 
-  private List<List<Object>> parameterSets;
 
   public AtExecutorRUnCommiter(BaseStatementUnit baseStatementUnit,
-      final List<List<Object>> parameterSets) throws SQLException {
-    this.parameterSets = parameterSets;
+      final List<Object> parameterSet) throws SQLException {
     this.baseStatementUnit = baseStatementUnit;
-   this.txcVisitor = TxcVisitorFactory.getSqlVisitor(baseStatementUnit.getStatement().getTxcConnection(),
-        baseStatementUnit.getSqlExecutionUnit().getSql());
+    ITxcConnection txcConnection = baseStatementUnit.getStatement().getTxcConnection();
+    this.txcVisitor = TxcVisitorFactory.createSqlVisitor(
+        txcConnection.getDataSource().getDatabaseType(),
+        txcConnection.getRawConnection(),
+        baseStatementUnit.getSqlExecutionUnit().getSql(),
+        parameterSet);
+
   }
 
 
-  public TxcTable beforeExecute()
-
-      throws SQLException {
+  public TxcTable beforeExecute() throws SQLException {
     if (!DtsContext.inTxcTransaction()) {
       return null;
     }
-
-    baseStatementUnit.getStatement().getTxcConnection().setAutoCommit(false);
 
     TxcTable nRet = null;
     switch (baseStatementUnit.getSqlExecutionUnit().getSqlType()) {
       case DELETE:
       case UPDATE:
       case INSERT:
+        this.txcVisitor.buildTableMeta();
         // 获取前置镜像
         txcVisitor.executeAndGetFrontImage(baseStatementUnit.getStatement().getRawStatement());
         break;
@@ -58,9 +58,7 @@ public class AtExecutorRUnCommiter {
     return nRet;
   }
 
-  public TxcTable afterExecute()
-
-      throws SQLException {
+  public TxcTable afterExecute() throws SQLException {
     if (!DtsContext.inTxcTransaction()) {
       return null;
     }
@@ -80,7 +78,7 @@ public class AtExecutorRUnCommiter {
     return nRet;
   }
 
-  public void insertUndoLog() throws SQLException {
+  private void insertUndoLog() throws SQLException {
     // 对于空操作，直接返回成功，不写Log
     if (txcVisitor.getTableOriginalValue().getLinesNum() == 0 && txcVisitor.getTablePresentValue().getLinesNum() == 0 && txcVisitor.getRollbackRule() == null) {
       String errorInfo = "null result error:" + txcVisitor.getInputSql();

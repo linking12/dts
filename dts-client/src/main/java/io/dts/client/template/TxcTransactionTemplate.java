@@ -3,12 +3,13 @@ package io.dts.client.template;
 
 
 import io.dts.client.api.DtsTransactionManager;
+import io.dts.client.api.impl.DefaultDtsTransactionManager;
 import io.dts.common.context.DtsContext;
 import io.dts.common.exception.DtsException;
 
 
 public class TxcTransactionTemplate {
-  private DtsTransactionManager tm;
+  private DtsTransactionManager tm = DefaultDtsTransactionManager.getInstance();
 
   /**
    * 

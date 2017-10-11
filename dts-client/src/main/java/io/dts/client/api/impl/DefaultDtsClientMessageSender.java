@@ -31,8 +31,8 @@ public class DefaultDtsClientMessageSender extends AbstractLifecycleComponent
   private final ScheduledExecutorService scheduledExecutorService;
   private final String serverAddress;
 
-  public DefaultDtsClientMessageSender(final NettyClientConfig nettyClientConfig,
-      final String serverAddress) {
+  public DefaultDtsClientMessageSender(final String serverAddress) {
+    final NettyClientConfig nettyClientConfig = new NettyClientConfig();
     this.remotingClient = new NettyRemotingClient(nettyClientConfig, null);
     this.scheduledExecutorService =
         Executors.newSingleThreadScheduledExecutor(new ThreadFactoryImpl("DtsClient Heartbeat"));

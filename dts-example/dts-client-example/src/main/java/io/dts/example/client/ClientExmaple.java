@@ -1,3 +1,5 @@
+package io.dts.example.client;
+
 import java.util.Collections;
 
 import io.dts.client.DefaultDtsTransactionManager;

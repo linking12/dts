@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import io.dts.datasource.connection.DtsConnection;
 import io.dts.parser.constant.DatabaseType;
 import io.dts.resourcemanager.core.ResourceManager;
+import io.dts.resourcemanager.support.DataSourceHolder;
 
 /**
  * Created by guoyubo on 2017/9/20.
@@ -21,10 +22,13 @@ public class DtsDataSource extends AbstractDtsDataSource {
   private ResourceManager resourceManager;
 
 
-  public DtsDataSource(final DataSource dataSource, final String dbName,
-      final ResourceManager resourceManager) {
+  public DtsDataSource(final DataSource dataSource, final String dbName) {
     this.dataSource = dataSource;
     this.dbName = dbName;
+    DataSourceHolder.registerDataSource(dbName, dataSource);
+  }
+
+  public void setResourceManager(final ResourceManager resourceManager) {
     this.resourceManager = resourceManager;
   }
 

@@ -11,5 +11,12 @@
 
   <artifactId>dts-client-example</artifactId>
 
+  <dependencies>
+    <dependency>
+      <groupId>io.dts</groupId>
+      <artifactId>dts-client</artifactId>
+      <version>${dts.version}</version>
+    </dependency>
+  </dependencies>
 
 </project>

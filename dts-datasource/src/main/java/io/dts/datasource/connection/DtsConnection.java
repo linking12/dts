@@ -11,10 +11,12 @@ import io.dts.common.common.TxcXID;
 import io.dts.common.context.DtsContext;
 import io.dts.datasource.core.DtsDataSource;
 import io.dts.datasource.core.IDtsDataSource;
+import io.dts.datasource.preparestatement.DtsPrepareStatement;
 import io.dts.datasource.statement.DtsStatement;
 import io.dts.parser.constant.UndoLogMode;
 import io.dts.parser.model.TxcRuntimeContext;
-import io.dts.resourcemanager.store.UndoLogDao;
+import io.dts.resourcemanager.core.ITxcLogManager;
+import io.dts.resourcemanager.core.impl.TxcLogManager;
 
 /**
  * Created by guoyubo on 2017/9/20.
@@ -25,15 +27,14 @@ public class DtsConnection extends AbstractDtsConnection {
 
   private Connection connection;
 
-  private TxcRuntimeContext txcContext = null; // 事务SQL上下文
+  private TxcRuntimeContext txcContext; // 事务SQL上下文
 
-  private UndoLogDao undoLogDao;
+  private ITxcLogManager txcLogManager;
 
-
-  public DtsConnection(final DtsDataSource dtsDataSource, final Connection connection) {
+  public DtsConnection(final DtsDataSource dtsDataSource, final Connection connection) throws SQLException {
     this.dtsDataSource = dtsDataSource;
     this.connection = connection;
-    this.undoLogDao = new UndoLogDao(this);
+    this.txcLogManager = new TxcLogManager();
   }
 
   @Override
@@ -41,9 +42,10 @@ public class DtsConnection extends AbstractDtsConnection {
     return new DtsStatement(this, getRawConnection().createStatement());
   }
 
+
   @Override
   public PreparedStatement prepareStatement(final String sql) throws SQLException {
-    return null;
+    return new DtsPrepareStatement(this, getRawConnection().prepareStatement(sql), sql);
   }
 
   @Override
@@ -54,10 +56,10 @@ public class DtsConnection extends AbstractDtsConnection {
 
   @Override
   public void setAutoCommit(final boolean autoCommit) throws SQLException {
+    getRawConnection().setAutoCommit(autoCommit);
     if (!autoCommit) {
       registerBranch();
     }
-    getRawConnection().setAutoCommit(autoCommit);
   }
 
   private void registerBranch() throws SQLException {
@@ -66,7 +68,7 @@ public class DtsConnection extends AbstractDtsConnection {
     }
 
     if (getAutoCommit() == true) {
-      throw new SQLException("should 'set autocommit false' first.");
+      throw new SQLException("should set autocommit false first.");
     }
     long branchId = dtsDataSource.getResourceManager().register(dtsDataSource.getDbName(), CommitMode.COMMIT_IN_PHASE1);
     txcContext = new TxcRuntimeContext();
@@ -86,7 +88,7 @@ public class DtsConnection extends AbstractDtsConnection {
         // 日志写库
         txcContext.setServer(TxcXID.getServerAddress(txcContext.getXid()));
         txcContext.setStatus(UndoLogMode.COMMON_LOG.getValue());
-        undoLogDao.insertUndoLog(txcContext);
+        txcLogManager.insertUndoLog(this.getRawConnection(), txcContext);
         getRawConnection().commit();
         reportBranchStatus(true);
       } else {
