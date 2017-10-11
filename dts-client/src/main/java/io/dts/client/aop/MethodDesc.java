@@ -4,9 +4,7 @@ import java.lang.reflect.Method;
 
 import io.dts.client.aop.annotation.DtsTransaction;
 
-/**
- * @author qinan.qn@taobao.com 2014年9月23日
- */
+
 public class MethodDesc {
   private DtsTransaction trasactionAnnotation;
   private Method m;
