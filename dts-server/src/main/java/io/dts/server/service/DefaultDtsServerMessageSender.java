@@ -16,9 +16,9 @@ package io.dts.server.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import io.dts.common.api.DtsServerMessageSender;
 import io.dts.common.common.exception.DtsException;
 import io.dts.common.protocol.RequestMessage;
+import io.dts.common.rpc.DtsServerMessageSender;
 import io.dts.remoting.exception.RemotingCommandException;
 import io.dts.remoting.exception.RemotingSendRequestException;
 import io.dts.remoting.exception.RemotingTimeoutException;

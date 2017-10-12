@@ -1,4 +1,4 @@
-package io.dts.common.api;
+package io.dts.common.rpc;
 
 import io.dts.common.protocol.body.DtsMultipleRequestMessage;
 import io.dts.common.protocol.body.DtsMultipleResonseMessage;
@@ -6,6 +6,8 @@ import io.dts.common.protocol.header.BeginMessage;
 import io.dts.common.protocol.header.BeginResultMessage;
 import io.dts.common.protocol.header.BeginRetryBranchMessage;
 import io.dts.common.protocol.header.BeginRetryBranchResultMessage;
+import io.dts.common.protocol.header.BranchCommitResultMessage;
+import io.dts.common.protocol.header.BranchRollbackResultMessage;
 import io.dts.common.protocol.header.GlobalCommitMessage;
 import io.dts.common.protocol.header.GlobalCommitResultMessage;
 import io.dts.common.protocol.header.GlobalRollbackMessage;
@@ -24,7 +26,7 @@ import io.dts.common.protocol.header.ReportUdataResultMessage;
  * 
  *         TXC 消息处理器
  */
-public interface DtsServerMessageHandler {
+public interface DtsMessageHandler {
 
   /**
    * 开始一个分布式事务
@@ -88,6 +90,18 @@ public interface DtsServerMessageHandler {
    */
   public void handleMessage(String clientIp, QueryLockMessage message,
       QueryLockResultMessage resultMessage);
+
+
+  /**
+   * 处理事务分支提交的反馈结果
+   */
+  public void handleMessage(String clientIp, BranchCommitResultMessage message);
+
+  /**
+   * 处理事务分支回滚的反馈结果。
+   */
+  public void handleMessage(String clientIp, BranchRollbackResultMessage message);
+
 
 
 }

@@ -18,7 +18,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import io.dts.common.api.DtsServerMessageHandler;
 import io.dts.common.protocol.RequestCode;
 import io.dts.common.protocol.RequestMessage;
 import io.dts.common.protocol.ResponseCode;
@@ -40,6 +39,7 @@ import io.dts.common.protocol.header.ReportStatusMessage;
 import io.dts.common.protocol.header.ReportStatusResultMessage;
 import io.dts.common.protocol.header.ReportUdataMessage;
 import io.dts.common.protocol.header.ReportUdataResultMessage;
+import io.dts.common.rpc.DtsServerMessageHandler;
 import io.dts.remoting.CommandCustomHeader;
 import io.dts.remoting.netty.NettyRequestProcessor;
 import io.dts.remoting.protocol.RemotingCommand;

@@ -3,7 +3,6 @@ package io.dts.resourcemanager.core.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.dts.common.api.DtsClientMessageSender;
 import io.dts.common.common.CommitMode;
 import io.dts.common.common.TxcXID;
 import io.dts.common.common.context.DtsContext;
@@ -12,6 +11,7 @@ import io.dts.common.protocol.header.RegisterMessage;
 import io.dts.common.protocol.header.RegisterResultMessage;
 import io.dts.common.protocol.header.ReportStatusMessage;
 import io.dts.common.protocol.header.ReportStatusResultMessage;
+import io.dts.common.rpc.DtsClientMessageSender;
 import io.dts.remoting.protocol.RemotingSysResponseCode;
 import io.dts.resourcemanager.core.ResourceManager;
 

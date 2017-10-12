@@ -1,4 +1,4 @@
-package io.dts.common.api;
+package io.dts.common.rpc;
 
 import io.dts.common.common.exception.DtsException;
 import io.dts.common.protocol.RequestMessage;

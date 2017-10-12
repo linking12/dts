@@ -21,8 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import io.dts.common.api.DtsServerMessageHandler;
-import io.dts.common.api.DtsServerMessageSender;
 import io.dts.common.protocol.RequestMessage;
 import io.dts.common.protocol.ResponseMessage;
 import io.dts.common.protocol.body.DtsMultipleRequestMessage;
@@ -43,6 +41,8 @@ import io.dts.common.protocol.header.ReportStatusMessage;
 import io.dts.common.protocol.header.ReportStatusResultMessage;
 import io.dts.common.protocol.header.ReportUdataMessage;
 import io.dts.common.protocol.header.ReportUdataResultMessage;
+import io.dts.common.rpc.DtsServerMessageHandler;
+import io.dts.common.rpc.DtsServerMessageSender;
 import io.dts.server.service.internal.ClientMessageHandler;
 import io.dts.server.service.internal.ResourceManagerMessageHandler;
 import io.dts.server.store.DtsLogDao;
