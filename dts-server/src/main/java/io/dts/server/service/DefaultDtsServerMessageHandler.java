@@ -43,8 +43,8 @@ import io.dts.common.protocol.header.ReportUdataMessage;
 import io.dts.common.protocol.header.ReportUdataResultMessage;
 import io.dts.common.rpc.DtsServerMessageHandler;
 import io.dts.common.rpc.DtsServerMessageSender;
-import io.dts.server.service.internal.ClientMessageHandler;
-import io.dts.server.service.internal.ResourceManagerMessageHandler;
+import io.dts.server.service.support.ClientMessageHandler;
+import io.dts.server.service.support.ResourceManagerMessageHandler;
 import io.dts.server.store.DtsLogDao;
 import io.dts.server.store.DtsTransStatusDao;
 

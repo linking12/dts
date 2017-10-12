@@ -39,7 +39,7 @@ public class DefaultDtsServerMessageSender implements DtsServerMessageSender {
   private ChannelRepository channelRepository;
 
   @Autowired
-  DtsServerContainer dtsServerContainer;
+  private DtsServerContainer dtsServerContainer;
 
 
   @Override
@@ -49,7 +49,8 @@ public class DefaultDtsServerMessageSender implements DtsServerMessageSender {
     if (channel != null) {
       RemotingCommand request = this.buildRequest(msg);
       try {
-        RemotingCommand response = dtsServerContainer.getRemotingServer().invokeSync(channel, request, timeout);
+        RemotingCommand response =
+            dtsServerContainer.getRemotingServer().invokeSync(channel, request, timeout);
         return this.buildResponse(response);
       } catch (RemotingSendRequestException | RemotingTimeoutException | InterruptedException
           | RemotingCommandException e) {
