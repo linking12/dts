@@ -32,7 +32,10 @@ public class DefaultDtsTransactionManager implements DtsTransactionManager {
   private DefaultDtsTransactionManager() {
     // 这里需要负载均衡
     final String serverAddress = "";
-    this.dtsClient = new DefaultDtsClientMessageSender(serverAddress);
+    DefaultDtsClientMessageSender clientMessageSender =
+        new DefaultDtsClientMessageSender(serverAddress);
+    clientMessageSender.start();
+    this.dtsClient = clientMessageSender;
   }
 
   public static DtsTransactionManager getInstance() {
