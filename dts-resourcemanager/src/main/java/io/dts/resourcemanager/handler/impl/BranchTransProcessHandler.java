@@ -10,7 +10,7 @@ import io.dts.common.common.TxcXID;
 import io.dts.common.context.ContextStep2;
 import io.dts.common.exception.DtsException;
 import io.dts.resourcemanager.handler.IBranchTransProcessHandler;
-import io.dts.resourcemanager.core.impl.TxcLogManager;
+import io.dts.resourcemanager.core.impl.DtsLogManager;
 
 /**
  * Created by guoyubo on 2017/9/27.
@@ -19,9 +19,9 @@ public class BranchTransProcessHandler implements IBranchTransProcessHandler {
 
   private static Map<String, TxcBranchStatus> currentTaskMap = new ConcurrentHashMap<String, TxcBranchStatus>();
 
-  private TxcLogManager txcLogManager;
+  private DtsLogManager txcLogManager;
 
-  public BranchTransProcessHandler(final TxcLogManager txcLogManager) {
+  public BranchTransProcessHandler(final DtsLogManager txcLogManager) {
     this.txcLogManager = txcLogManager;
   }
 

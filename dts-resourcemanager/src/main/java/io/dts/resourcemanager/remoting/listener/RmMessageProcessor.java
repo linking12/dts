@@ -1,9 +1,8 @@
-package io.dts.resourcemanager.remoting.receiver;
+package io.dts.resourcemanager.remoting.listener;
 
 import io.dts.common.protocol.RequestCode;
 import io.dts.common.protocol.RequestMessage;
 import io.dts.common.protocol.ResponseCode;
-import io.dts.common.protocol.header.BeginResultMessage;
 import io.dts.common.protocol.header.BranchCommitMessage;
 import io.dts.common.protocol.header.BranchCommitResultMessage;
 import io.dts.common.protocol.header.BranchRollBackMessage;
@@ -13,7 +12,7 @@ import io.dts.remoting.netty.NettyRequestProcessor;
 import io.dts.remoting.protocol.RemotingCommand;
 import io.dts.remoting.protocol.RemotingSerializable;
 import io.dts.resourcemanager.handler.impl.BranchTransProcessHandler;
-import io.dts.resourcemanager.core.impl.TxcLogManager;
+import io.dts.resourcemanager.core.impl.DtsLogManager;
 import io.dts.util.NetUtil;
 import io.netty.channel.ChannelHandlerContext;
 
@@ -75,7 +74,7 @@ public class RmMessageProcessor implements NettyRequestProcessor {
     return response;
   }
 
-  private DtsRmMessageHandler createMessageHandler() {
-    return new DtsRmMessageHandler(new BranchTransProcessHandler(new TxcLogManager()));
+  private RmMessageListener createMessageHandler() {
+    return new RmMessageListener(new BranchTransProcessHandler(new DtsLogManager()));
   }
 }

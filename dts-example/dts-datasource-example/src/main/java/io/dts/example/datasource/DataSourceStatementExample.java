@@ -43,7 +43,7 @@ public class DataSourceStatementExample {
 
     NettyClientConfig nettyClientConfig = new NettyClientConfig();
     nettyClientConfig.setConnectTimeoutMillis(30000);
-    DtsRemotingClient dtsClient = new DtsRemotingClient(nettyClientConfig, Collections.singletonList("10.9.25.218:10086"));
+    DtsRemotingClient dtsClient = new DtsRemotingClient(nettyClientConfig, Collections.singletonList("10.9.24.12:10086"));
 //     dtsClient.setAddressManager(new ZookeeperAddressManager("localhost:2181", "/dts"));
 //     dtsClient.setGroup("Default");
 //     dtsClient.setAppName("Demo");
@@ -60,10 +60,10 @@ public class DataSourceStatementExample {
         @Override
         public Object doInTransaction() throws Throwable {
           Stopwatch stopwatch = Stopwatch.createStarted();
+          executeInsertPrepareStatement(clientMessageSender);
           executeStatement(clientMessageSender);
           System.out.println("executePrepareStatement");
           executeUpdatePrepareStatement(clientMessageSender);
-          executeInsertPrepareStatement(clientMessageSender);
           stopwatch.stop();
           System.out.println(stopwatch.elapsed(TimeUnit.MILLISECONDS));
           return 1;

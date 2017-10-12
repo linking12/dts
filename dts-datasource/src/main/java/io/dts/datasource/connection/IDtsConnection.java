@@ -6,7 +6,7 @@ import java.sql.SQLException;
 import io.dts.datasource.core.IDtsDataSource;
 import io.dts.parser.model.TxcRuntimeContext;
 
-public interface ITxcConnection extends Connection {
+public interface IDtsConnection extends Connection {
 	/**
 	 * 获取不带事务的数据库连接
 	 * 

@@ -8,7 +8,7 @@ import java.sql.SQLWarning;
 /**
  * Created by guoyubo on 2017/9/20.
  */
-public abstract class AbstractDtsStatement implements ITxcStatement {
+public abstract class AbstractDtsStatement implements IDtsStatement {
 
   /**
    * 目标SQL

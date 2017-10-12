@@ -21,7 +21,7 @@ package io.dts.datasource.executor.statement;
 
 import io.dts.datasource.executor.BaseStatementUnit;
 import io.dts.datasource.executor.SQLExecutionUnit;
-import io.dts.datasource.statement.ITxcStatement;
+import io.dts.datasource.statement.IDtsStatement;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -36,7 +36,7 @@ public final class StatementUnit implements BaseStatementUnit {
     
     private final SQLExecutionUnit sqlExecutionUnit;
     
-    private final ITxcStatement statement;
+    private final IDtsStatement statement;
 
 
 

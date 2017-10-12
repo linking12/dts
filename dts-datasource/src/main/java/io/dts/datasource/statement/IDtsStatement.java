@@ -3,11 +3,11 @@ package io.dts.datasource.statement;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import io.dts.datasource.connection.ITxcConnection;
+import io.dts.datasource.connection.IDtsConnection;
 
-public interface ITxcStatement extends Statement {
+public interface IDtsStatement extends Statement {
 
-	ITxcConnection getTxcConnection() throws SQLException;
+	IDtsConnection getDtsConnection() throws SQLException;
 
 	Statement getRawStatement() throws SQLException;
 

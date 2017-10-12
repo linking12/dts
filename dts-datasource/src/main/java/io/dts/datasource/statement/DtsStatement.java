@@ -6,7 +6,7 @@ import java.sql.Statement;
 
 import io.dts.common.context.DtsContext;
 import io.dts.datasource.connection.DtsConnection;
-import io.dts.datasource.connection.ITxcConnection;
+import io.dts.datasource.connection.IDtsConnection;
 import io.dts.datasource.executor.ExecutorEngine;
 import io.dts.datasource.executor.SQLExecutionUnit;
 import io.dts.datasource.executor.statement.StatementExecutor;
@@ -157,7 +157,7 @@ public class DtsStatement extends AbstractDtsStatement {
   }
 
   @Override
-  public ITxcConnection getTxcConnection() throws SQLException {
+  public IDtsConnection getDtsConnection() throws SQLException {
     return dtsConnection;
   }
 

@@ -15,8 +15,8 @@ import io.dts.datasource.preparestatement.DtsPrepareStatement;
 import io.dts.datasource.statement.DtsStatement;
 import io.dts.parser.constant.UndoLogMode;
 import io.dts.parser.model.TxcRuntimeContext;
-import io.dts.resourcemanager.core.ITxcLogManager;
-import io.dts.resourcemanager.core.impl.TxcLogManager;
+import io.dts.resourcemanager.core.IDtsLogManager;
+import io.dts.resourcemanager.core.impl.DtsLogManager;
 
 /**
  * Created by guoyubo on 2017/9/20.
@@ -29,12 +29,12 @@ public class DtsConnection extends AbstractDtsConnection {
 
   private TxcRuntimeContext txcContext; // 事务SQL上下文
 
-  private ITxcLogManager txcLogManager;
+  private IDtsLogManager txcLogManager;
 
   public DtsConnection(final DtsDataSource dtsDataSource, final Connection connection) throws SQLException {
     this.dtsDataSource = dtsDataSource;
     this.connection = connection;
-    this.txcLogManager = new TxcLogManager();
+    this.txcLogManager = new DtsLogManager();
   }
 
   @Override

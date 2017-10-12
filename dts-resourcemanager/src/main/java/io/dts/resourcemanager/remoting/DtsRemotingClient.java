@@ -26,7 +26,7 @@ import io.dts.remoting.netty.NettyClientConfig;
 import io.dts.remoting.netty.NettyRemotingClient;
 import io.dts.remoting.netty.NettyRequestProcessor;
 import io.dts.remoting.protocol.RemotingCommand;
-import io.dts.resourcemanager.remoting.receiver.RmMessageProcessor;
+import io.dts.resourcemanager.remoting.listener.RmMessageProcessor;
 
 /**
  * Created by guoyubo on 2017/9/20.
@@ -81,7 +81,7 @@ public class DtsRemotingClient {
 
   @PreDestroy
   public void shutdown() {
-    scheduledExecutorService.shutdown();
+    scheduledExecutorService.shutdownNow();
     remotingClient.shutdown();
   }
 
