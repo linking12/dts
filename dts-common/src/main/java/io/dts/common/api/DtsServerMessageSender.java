@@ -1,6 +1,6 @@
 package io.dts.common.api;
 
-import io.dts.common.exception.DtsException;
+import io.dts.common.common.exception.DtsException;
 import io.dts.common.protocol.RequestMessage;
 
 /**

@@ -23,8 +23,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import io.dts.common.ThreadFactoryImpl;
-import io.dts.common.lifecycle.AbstractLifecycleComponent;
+import io.dts.common.component.AbstractLifecycleComponent;
+import io.dts.common.util.thread.ThreadFactoryImpl;
 import io.dts.remoting.ChannelEventListener;
 import io.netty.channel.Channel;
 

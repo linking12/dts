@@ -13,7 +13,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
-import io.dts.common.exception.DtsException;
+import io.dts.common.common.exception.DtsException;
 import io.dts.parser.hint.TxcHint;
 import io.dts.parser.model.TxcTable;
 import io.dts.parser.model.TxcTableMeta;

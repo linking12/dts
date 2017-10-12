@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import io.dts.common.util.EventBusInstance;
+import io.dts.common.util.event.EventBusInstance;
 import io.dts.datasource.executor.commiter.AtExecutorRUnCommiter;
 import io.dts.datasource.executor.event.AbstractExecutionEvent;
 import io.dts.datasource.executor.event.DMLExecutionEvent;

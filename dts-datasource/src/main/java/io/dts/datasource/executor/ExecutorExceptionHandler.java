@@ -17,7 +17,7 @@
 
 package io.dts.datasource.executor;
 
-import io.dts.common.exception.DtsException;
+import io.dts.common.common.exception.DtsException;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

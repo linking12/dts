@@ -1,6 +1,6 @@
-package io.dts.common.context;
+package io.dts.common.common.context;
 
-import io.dts.common.exception.DtsException;
+import io.dts.common.common.exception.DtsException;
 
 public class DtsContext {
 	

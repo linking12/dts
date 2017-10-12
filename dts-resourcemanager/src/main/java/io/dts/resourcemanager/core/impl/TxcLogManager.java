@@ -25,9 +25,9 @@ import java.util.Map;
 
 import io.dts.common.common.CommitMode;
 import io.dts.common.common.TxcXID;
-import io.dts.common.context.ContextStep2;
-import io.dts.common.exception.DtsException;
-import io.dts.common.util.BlobUtil;
+import io.dts.common.common.context.ContextStep2;
+import io.dts.common.common.exception.DtsException;
+import io.dts.common.util.blob.BlobUtil;
 import io.dts.parser.constant.SqlType;
 import io.dts.parser.constant.UndoLogMode;
 import io.dts.parser.model.RollbackInfor;

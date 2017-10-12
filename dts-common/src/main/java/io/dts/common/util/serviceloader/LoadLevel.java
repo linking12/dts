@@ -1,4 +1,4 @@
-package io.dts.common.serviceloader;
+package io.dts.common.util.serviceloader;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;

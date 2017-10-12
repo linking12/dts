@@ -14,7 +14,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-import io.dts.common.exception.DtsException;
+import io.dts.common.common.exception.DtsException;
 import io.dts.parser.model.IndexType;
 import io.dts.parser.model.TxcColumnMeta;
 import io.dts.parser.model.TxcIndex;

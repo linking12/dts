@@ -2,10 +2,10 @@ package io.dts.parser.model;
 
 import com.alibaba.fastjson.annotation.JSONField;
 
+import io.dts.common.common.exception.DtsException;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import io.dts.common.exception.DtsException;
 
 public class TxcTable {
 	@JSONField(serialize = false)

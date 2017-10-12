@@ -1,14 +1,14 @@
-package io.dts.common.util;
+package io.dts.common.util.blob;
 
 
 import javax.sql.rowset.serial.SerialBlob;
+
+import io.dts.common.common.exception.DtsException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Blob;
-
-import io.dts.common.exception.DtsException;
 
 public class BlobUtil {
 	public static Blob string2blob(String str) {

@@ -2,8 +2,8 @@ package io.dts.resourcemanager.remoting.sender;
 
 import io.dts.common.api.DtsClientMessageSender;
 import io.dts.common.common.TxcXID;
-import io.dts.common.context.DtsContext;
-import io.dts.common.exception.DtsException;
+import io.dts.common.common.context.DtsContext;
+import io.dts.common.common.exception.DtsException;
 import io.dts.common.protocol.RequestMessage;
 import io.dts.remoting.exception.RemotingCommandException;
 import io.dts.remoting.protocol.RemotingCommand;

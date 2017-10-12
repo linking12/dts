@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import io.dts.common.exception.DtsException;
+import io.dts.common.common.exception.DtsException;
 import io.dts.parser.constant.DatabaseType;
 import io.dts.parser.model.TxcColumnMeta;
 import io.dts.parser.model.TxcIndex;

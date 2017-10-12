@@ -1,4 +1,4 @@
-package io.dts.common.exception;
+package io.dts.common.common.exception;
 
 
 public class DtsException extends RuntimeException {

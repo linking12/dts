@@ -5,13 +5,13 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import io.dts.common.ThreadFactoryImpl;
 import io.dts.common.api.DtsClientMessageSender;
 import io.dts.common.common.TxcConstants;
-import io.dts.common.exception.DtsException;
-import io.dts.common.lifecycle.AbstractLifecycleComponent;
+import io.dts.common.common.exception.DtsException;
+import io.dts.common.component.AbstractLifecycleComponent;
 import io.dts.common.protocol.RequestMessage;
 import io.dts.common.protocol.heatbeat.HeartbeatRequestHeader;
+import io.dts.common.util.thread.ThreadFactoryImpl;
 import io.dts.remoting.RemotingClient;
 import io.dts.remoting.exception.RemotingCommandException;
 import io.dts.remoting.exception.RemotingConnectException;

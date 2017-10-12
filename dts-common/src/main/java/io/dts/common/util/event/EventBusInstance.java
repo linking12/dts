@@ -1,6 +1,6 @@
 /*
- * Copyright 2002-2012 the original author or authors.
- *
+ * Copyright 1999-2015 dangdang.com.
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,15 +12,28 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ * </p>
  */
 
-package io.dts.client.support;
+package io.dts.common.util.event;
 
-import io.dts.client.exception.DtsTransactionException;
+import com.google.common.eventbus.EventBus;
 
-public interface DtsTransactionOperations {
-
-
-	<T> T execute(DtsTransactionCallback<T> action, long timeout) throws DtsTransactionException;
-
+/**
+ * Event bus for singleton instance.
+ * 
+ * @author zhangliang
+ */
+public final class EventBusInstance {
+    
+    private static final EventBus INSTANCE = new EventBus();
+    
+    /**
+     * Get event bus instance.
+     * 
+     * @return event bus instance
+     */
+    public static EventBus getInstance() {
+        return INSTANCE;
+    }
 }

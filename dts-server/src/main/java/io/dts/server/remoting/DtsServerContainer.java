@@ -28,10 +28,10 @@ import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Queues;
 
-import io.dts.common.ThreadFactoryImpl;
 import io.dts.common.common.TxcXID;
-import io.dts.common.lifecycle.AbstractLifecycleComponent;
+import io.dts.common.component.AbstractLifecycleComponent;
 import io.dts.common.protocol.RequestCode;
+import io.dts.common.util.thread.ThreadFactoryImpl;
 import io.dts.remoting.RemotingServer;
 import io.dts.remoting.netty.NettyRemotingServer;
 import io.dts.remoting.netty.NettyServerConfig;

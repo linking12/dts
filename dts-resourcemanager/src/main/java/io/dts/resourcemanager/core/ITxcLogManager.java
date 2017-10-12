@@ -4,7 +4,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
-import io.dts.common.context.ContextStep2;
+import io.dts.common.common.context.ContextStep2;
 import io.dts.parser.model.TxcRuntimeContext;
 
 /**

@@ -15,7 +15,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import io.dts.common.exception.DtsException;
+import io.dts.common.common.exception.DtsException;
 import io.dts.parser.constant.SqlType;
 import io.dts.parser.model.TxcColumnMeta;
 import io.dts.parser.model.TxcField;

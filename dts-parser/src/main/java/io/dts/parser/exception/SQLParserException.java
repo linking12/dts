@@ -17,7 +17,7 @@
 
 package io.dts.parser.exception;
 
-import io.dts.common.exception.DtsException;
+import io.dts.common.common.exception.DtsException;
 
 /**
  * SQL解析异常.

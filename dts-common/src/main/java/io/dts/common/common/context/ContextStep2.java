@@ -1,4 +1,4 @@
-package io.dts.common.context;
+package io.dts.common.common.context;
 
 import io.dts.common.common.CommitMode;
 import io.dts.common.common.TrxLockMode;

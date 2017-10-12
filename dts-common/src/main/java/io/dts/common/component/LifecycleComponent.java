@@ -11,34 +11,23 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-package io.dts.common.lifecycle;
+package io.dts.common.component;
+
+import java.io.Closeable;
 
 /**
  * @author liushiming
- * @version LifecycleListener.java, v 0.0.1 2017年9月13日 下午1:47:21 liushiming
+ * @version LifecycleComponent.java, v 0.0.1 2017年9月13日 下午1:46:40 liushiming
  */
-public abstract class LifecycleListener {
-  public void beforeStart() {
+public interface LifecycleComponent extends Closeable {
 
-  }
+  Lifecycle.State lifecycleState();
 
-  public void afterStart() {
+  void addLifecycleListener(LifecycleListener listener);
 
-  }
+  void removeLifecycleListener(LifecycleListener listener);
 
-  public void beforeStop() {
+  void start();
 
-  }
-
-  public void afterStop() {
-
-  }
-
-  public void beforeClose() {
-
-  }
-
-  public void afterClose() {
-
-  }
+  void stop();
 }
