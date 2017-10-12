@@ -1,15 +1,15 @@
 package io.dts.datasource.executor.commiter;
 
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.sql.SQLException;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.dts.common.common.context.DtsContext;
 import io.dts.common.common.exception.DtsException;
-import io.dts.datasource.connection.ITxcConnection;
+import io.dts.datasource.connection.IDtsConnection;
 import io.dts.datasource.executor.BaseStatementUnit;
 import io.dts.parser.model.RollbackInfor;
 import io.dts.parser.model.TxcTable;
@@ -28,7 +28,7 @@ public class AtExecutorRUnCommiter {
   public AtExecutorRUnCommiter(BaseStatementUnit baseStatementUnit,
       final List<Object> parameterSet) throws SQLException {
     this.baseStatementUnit = baseStatementUnit;
-    ITxcConnection txcConnection = baseStatementUnit.getStatement().getTxcConnection();
+    IDtsConnection txcConnection = baseStatementUnit.getStatement().getDtsConnection();
     this.txcVisitor = TxcVisitorFactory.createSqlVisitor(
         txcConnection.getDataSource().getDatabaseType(),
         txcConnection.getRawConnection(),
@@ -109,7 +109,7 @@ public class AtExecutorRUnCommiter {
     }
     txcLog.txcLogChecker(); // json合法性检查
 
-    baseStatementUnit.getStatement().getTxcConnection().getTxcContext().addInfor(txcLog);
+    baseStatementUnit.getStatement().getDtsConnection().getTxcContext().addInfor(txcLog);
   }
 
 

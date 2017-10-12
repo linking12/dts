@@ -1,4 +1,4 @@
-package io.dts.resourcemanager.remoting.receiver;
+package io.dts.resourcemanager.remoting.listener;
 
 import io.dts.common.protocol.ResultCode;
 import io.dts.common.protocol.header.BranchCommitMessage;
@@ -8,11 +8,11 @@ import io.dts.common.protocol.header.BranchRollbackResultMessage;
 import io.dts.resourcemanager.handler.IBranchTransProcessHandler;
 
 
-public class DtsRmMessageHandler {
+public class RmMessageListener {
 
   private IBranchTransProcessHandler branchTransProcessHandler;
 
-  public DtsRmMessageHandler(final IBranchTransProcessHandler branchTransProcessHandler) {
+  public RmMessageListener(final IBranchTransProcessHandler branchTransProcessHandler) {
     this.branchTransProcessHandler = branchTransProcessHandler;
   }
 

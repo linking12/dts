@@ -18,7 +18,7 @@ import java.util.concurrent.Executor;
 /**
  * Created by guoyubo on 2017/9/20.
  */
-public abstract class AbstractDtsConnection implements ITxcConnection {
+public abstract class AbstractDtsConnection implements IDtsConnection {
 
   @Override
   public void rollback(final Savepoint savepoint) throws SQLException {

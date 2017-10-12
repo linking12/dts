@@ -10,7 +10,7 @@ import io.dts.parser.model.TxcRuntimeContext;
 /**
  * Created by guoyubo on 2017/9/27.
  */
-public interface ITxcLogManager {
+public interface IDtsLogManager {
 
   void branchCommit(List<ContextStep2> contexts) throws SQLException;
 

@@ -34,16 +34,16 @@ import io.dts.parser.model.RollbackInfor;
 import io.dts.parser.model.TxcField;
 import io.dts.parser.model.TxcRuntimeContext;
 import io.dts.parser.model.TxcTable;
-import io.dts.resourcemanager.core.ITxcLogManager;
+import io.dts.resourcemanager.core.IDtsLogManager;
 import io.dts.resourcemanager.support.DataSourceHolder;
 import io.dts.resourcemanager.support.SqlExecuteHelper;
 
 /**
  * Created by guoyubo on 2017/9/27.
  */
-public class TxcLogManager implements ITxcLogManager {
+public class DtsLogManager implements IDtsLogManager {
 
-  private static final Logger logger = LoggerFactory.getLogger(TxcLogManager.class);
+  private static final Logger logger = LoggerFactory.getLogger(DtsLogManager.class);
 
 
   private static String txcLogTableName = "txc_undo_log";

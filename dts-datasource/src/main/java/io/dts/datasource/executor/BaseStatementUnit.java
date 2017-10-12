@@ -17,7 +17,7 @@
 
 package io.dts.datasource.executor;
 
-import io.dts.datasource.statement.ITxcStatement;
+import io.dts.datasource.statement.IDtsStatement;
 
 /**
  * Statement execute unit interface.
@@ -38,5 +38,5 @@ public interface BaseStatementUnit {
      * 
      * @return statement
      */
-    ITxcStatement getStatement();
+    IDtsStatement getStatement();
 }
