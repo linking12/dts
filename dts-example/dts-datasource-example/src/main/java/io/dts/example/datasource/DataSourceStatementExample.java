@@ -23,10 +23,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import io.dts.client.DefaultDtsTransactionManager;
-import io.dts.client.DtsTransactionManager;
-import io.dts.client.support.DtsATTransactionTemplate;
-import io.dts.client.support.DtsTransactionCallback;
+import io.dts.client.api.DtsTransactionManager;
+import io.dts.client.api.impl.DefaultDtsTransactionManager;
+import io.dts.client.template.TxcCallback;
+import io.dts.client.template.TxcTransactionTemplate;
 import io.dts.datasource.core.DtsDataSource;
 import io.dts.remoting.netty.NettyClientConfig;
 import io.dts.resourcemanager.core.ResourceManager;
@@ -50,15 +50,15 @@ public class DataSourceStatementExample {
     dtsClient.start();
     DtsClientMessageSenderImpl clientMessageSender = new DtsClientMessageSenderImpl(dtsClient);
 
-    DtsTransactionManager  dtsTransactionManager = new DefaultDtsTransactionManager(clientMessageSender);
+    DtsTransactionManager dtsTransactionManager = DefaultDtsTransactionManager.getInstance();
 
     try {
 
-      DtsATTransactionTemplate transactionTemplate = new DtsATTransactionTemplate(dtsTransactionManager);
+      TxcTransactionTemplate transactionTemplate = new TxcTransactionTemplate();
 
-      DtsTransactionCallback<Object> dtsTransactionCallback = new DtsTransactionCallback<Object>() {
+      transactionTemplate.runATMT(new TxcCallback() {
         @Override
-        public Object doInTransaction() throws Throwable {
+        public Object callback() throws Throwable {
           Stopwatch stopwatch = Stopwatch.createStarted();
           executeInsertPrepareStatement(clientMessageSender);
           executeStatement(clientMessageSender);
@@ -68,9 +68,9 @@ public class DataSourceStatementExample {
           System.out.println(stopwatch.elapsed(TimeUnit.MILLISECONDS));
           return 1;
         }
-      };
+      }, 30000);
 
-      transactionTemplate.execute(dtsTransactionCallback, 30000l);
+
     } catch (Exception e) {
       e.printStackTrace();
     } finally {
@@ -99,7 +99,7 @@ public class DataSourceStatementExample {
     transactionTemplate.execute(new TransactionCallback<Integer>() {
       @Override
       public Integer doInTransaction(final TransactionStatus status) {
-        return jdbcTemplate.update("update example set value='boddi12345' where id=1");
+        return jdbcTemplate.update("update example set value='boddi' where id=1369");
       }
     });
   }
@@ -134,10 +134,10 @@ public class DataSourceStatementExample {
     transactionTemplate.execute(new TransactionCallback<Integer>() {
       @Override
       public Integer doInTransaction(final TransactionStatus status) {
-        return jdbcTemplate.update("update example set value='boddi222' where id=?", new PreparedStatementSetter() {
+        return jdbcTemplate.update("update example set value='boddi' where id=?", new PreparedStatementSetter() {
           @Override
           public void setValues(final PreparedStatement ps) throws SQLException {
-            ps.setInt(1, 1);
+            ps.setInt(1, 1369);
           }
         });
       }
@@ -162,7 +162,7 @@ public class DataSourceStatementExample {
         return jdbcTemplate.update("insert into example(name,value) values(?,?)", new PreparedStatementSetter() {
           @Override
           public void setValues(final PreparedStatement ps) throws SQLException {
-            ps.setString(1, "testadsf");
+            ps.setString(1, "boddi");
             ps.setString(2, "fds");
           }
         });

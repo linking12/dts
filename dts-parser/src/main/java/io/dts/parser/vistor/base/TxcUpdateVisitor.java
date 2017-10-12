@@ -70,9 +70,9 @@ public class TxcUpdateVisitor extends TxcBaseVisitor {
 			logger.info("beforeSqlExecute:" + sql);
 		}
 
-		if (tableOriginalValue.getLinesNum() == 0) {
-			throw new DtsException(2222, "null result for" + getInputSql());
-		}
+//		if (tableOriginalValue.getLinesNum() == 0) {
+//			throw new DtsException(2222, "null result for" + getInputSql());
+//		}
 		return tableOriginalValue;
 	}
 
