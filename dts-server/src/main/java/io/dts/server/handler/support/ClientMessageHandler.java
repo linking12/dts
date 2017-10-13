@@ -11,7 +11,7 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-package io.dts.server.service.support;
+package io.dts.server.handler.support;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -30,11 +30,11 @@ import io.dts.common.protocol.header.BranchRollbackResultMessage;
 import io.dts.common.protocol.header.GlobalCommitMessage;
 import io.dts.common.protocol.header.GlobalRollbackMessage;
 import io.dts.common.rpc.DtsServerMessageSender;
+import io.dts.server.handler.CommitingResultCode;
+import io.dts.server.handler.RollbackingResultCode;
 import io.dts.server.model.BranchLog;
 import io.dts.server.model.GlobalLog;
 import io.dts.server.model.GlobalTransactionState;
-import io.dts.server.service.CommitingResultCode;
-import io.dts.server.service.RollbackingResultCode;
 import io.dts.server.store.DtsLogDao;
 import io.dts.server.store.DtsTransStatusDao;
 

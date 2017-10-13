@@ -11,7 +11,7 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-package io.dts.server.service;
+package io.dts.server.handler;
 
 import java.util.List;
 
@@ -43,8 +43,8 @@ import io.dts.common.protocol.header.ReportUdataMessage;
 import io.dts.common.protocol.header.ReportUdataResultMessage;
 import io.dts.common.rpc.DtsServerMessageHandler;
 import io.dts.common.rpc.DtsServerMessageSender;
-import io.dts.server.service.support.ClientMessageHandler;
-import io.dts.server.service.support.ResourceManagerMessageHandler;
+import io.dts.server.handler.support.ClientMessageHandler;
+import io.dts.server.handler.support.ResourceManagerMessageHandler;
 import io.dts.server.store.DtsLogDao;
 import io.dts.server.store.DtsTransStatusDao;
 
