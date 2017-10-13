@@ -20,7 +20,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.event.ContextClosedEvent;
 
-import io.dts.server.remoting.DtsServerContainer;
+import io.dts.server.network.DtsServerContainer;
 
 /**
  * @author liushiming

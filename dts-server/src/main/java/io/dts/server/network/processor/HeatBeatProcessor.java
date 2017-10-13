@@ -1,4 +1,4 @@
-package io.dts.server.remoting.processor;
+package io.dts.server.network.processor;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -11,8 +11,8 @@ import io.dts.remoting.exception.RemotingCommandException;
 import io.dts.remoting.netty.NettyRequestProcessor;
 import io.dts.remoting.protocol.RemotingCommand;
 import io.dts.remoting.protocol.RemotingSysResponseCode;
-import io.dts.server.remoting.channel.ChannelInfo;
-import io.dts.server.remoting.channel.ChannelRepository;
+import io.dts.server.network.channel.ChannelInfo;
+import io.dts.server.network.channel.ChannelRepository;
 import io.netty.channel.ChannelHandlerContext;
 
 /**

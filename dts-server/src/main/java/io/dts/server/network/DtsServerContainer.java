@@ -11,7 +11,7 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-package io.dts.server.remoting;
+package io.dts.server.network;
 
 import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
@@ -36,10 +36,9 @@ import io.dts.remoting.RemotingServer;
 import io.dts.remoting.netty.NettyRemotingServer;
 import io.dts.remoting.netty.NettyServerConfig;
 import io.dts.server.DtsServerProperties;
-import io.dts.server.remoting.channel.ChannelkeepingComponent;
-import io.dts.server.remoting.latency.ServerFixedThreadPoolExecutor;
-import io.dts.server.remoting.processor.DtsMessageProcessor;
-import io.dts.server.remoting.processor.HeatBeatProcessor;
+import io.dts.server.network.channel.ChannelkeepingComponent;
+import io.dts.server.network.processor.DtsMessageProcessor;
+import io.dts.server.network.processor.HeatBeatProcessor;
 import io.dts.util.NetUtil;
 
 /**

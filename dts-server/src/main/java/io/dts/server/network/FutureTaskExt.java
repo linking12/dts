@@ -11,7 +11,7 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-package io.dts.server.remoting.latency;
+package io.dts.server.network;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
