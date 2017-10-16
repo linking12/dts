@@ -41,8 +41,8 @@ public class DefaultDtsResourcMessageSender extends AbstractLifecycleComponent
   public DefaultDtsResourcMessageSender(final String serverAddress) {
     final NettyClientConfig nettyClientConfig = new NettyClientConfig();
     this.remotingClient = new NettyRemotingClient(nettyClientConfig, null);
-    this.scheduledExecutorService =
-        Executors.newSingleThreadScheduledExecutor(new ThreadFactoryImpl("DtsClient Heartbeat"));
+    this.scheduledExecutorService = Executors
+        .newSingleThreadScheduledExecutor(new ThreadFactoryImpl("DtsResourceManager Heartbeat"));
     this.serverAddress = serverAddress;
     registerHeaderRequest(nettyClientConfig);
     registerBodyRequest(nettyClientConfig);
