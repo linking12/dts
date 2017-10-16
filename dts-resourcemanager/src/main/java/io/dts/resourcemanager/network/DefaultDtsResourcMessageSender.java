@@ -1,4 +1,4 @@
-package io.dts.resourcemanager;
+package io.dts.resourcemanager.network;
 
 import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
@@ -26,7 +26,7 @@ import io.dts.remoting.exception.RemotingTimeoutException;
 import io.dts.remoting.netty.NettyClientConfig;
 import io.dts.remoting.netty.NettyRemotingClient;
 import io.dts.remoting.protocol.RemotingCommand;
-import io.dts.resourcemanager.remoting.listener.RmMessageProcessor;
+import io.dts.resourcemanager.network.processor.RmMessageProcessor;
 
 /**
  * Created by guoyubo on 2017/9/13.
