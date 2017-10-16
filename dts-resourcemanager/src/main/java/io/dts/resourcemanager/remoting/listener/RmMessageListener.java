@@ -36,9 +36,23 @@ public class RmMessageListener {
     }
   }
 
-  public void handleMessage(final String serverAddressIP, final BranchRollBackMessage message,
+  public void handleMessage(final String serverAddressIP, final BranchRollBackMessage rollBackMessage,
       final BranchRollbackResultMessage resultMessage) {
+    Long branchId = rollBackMessage.getBranchId();
+    Long tranId = rollBackMessage.getTranId();
+    String servAddr = rollBackMessage.getServerAddr();
+    String dbName = rollBackMessage.getDbName();
+    String udata = rollBackMessage.getUdata();
+    int commitMode = rollBackMessage.getCommitMode();
 
+    resultMessage.setBranchId(branchId);
+    resultMessage.setTranId(tranId);
+    try {
+      branchTransProcessHandler.branchRollback(servAddr + ":" + tranId, branchId, dbName, udata, commitMode);
+      resultMessage.setResult(ResultCode.OK.getValue());
+    } catch (Exception e) {
+      resultMessage.setResult(ResultCode.SYSTEMERROR.getValue());
+    }
   }
 
 

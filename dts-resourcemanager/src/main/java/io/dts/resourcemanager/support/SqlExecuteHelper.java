@@ -22,21 +22,21 @@ public class SqlExecuteHelper {
   private static final Logger logger = LoggerFactory.getLogger(SqlExecuteHelper.class);
 
 
-  public static void executeSql(String dbName, String retrySql) throws SQLException {
-    if (retrySql == null) {
+  public static void executeSql(String dbName, String sql) throws SQLException {
+    if (sql == null) {
       return;
     }
     try {
       DataSource db = DataSourceHolder.getDataSource(dbName);
       JdbcTemplate jdbcTemplate = new JdbcTemplate(db);
-      jdbcTemplate.execute(retrySql);
+      jdbcTemplate.execute(sql);
     } catch (DataAccessException e) {
       // SQLState:23000
       // VendorCode:1062
       // Duplicate entry key 'PRIMARY'
       SQLException sqle = (SQLException) e.getCause();
       if (sqle.getErrorCode() == 1062) {
-        logger.info("RtExecutor retry sql:" + e.getMessage() + ":" + retrySql);
+        logger.info("RtExecutor retry sql:" + e.getMessage() + ":" + sql);
       } else {
         throw sqle;
       }

@@ -29,30 +29,10 @@ public class BranchTransProcessHandler implements IBranchTransProcessHandler {
   public void branchCommit(final String xid, final long branchId, final String key, final String udata,
       final int commitMode, final String retrySql)
       throws DtsException {
-    String branchName = TxcXID.getBranchName(xid, branchId);
-    if (currentTaskMap.containsKey(branchName)) {
-      throw new DtsException("Branch is working:" + currentTaskMap.get(branchName));
-    }
-
-    if (currentTaskMap.put(branchName, TxcBranchStatus.COMMITING) != null) {
-      throw new DtsException("Branch is working:" + currentTaskMap.get(branchName));
-    }
+    String branchName = checkBranch(xid, branchId);
 
     try {
-      ContextStep2 context = new ContextStep2();
-      context.setXid(xid);
-      context.setBranchId(branchId);
-      context.setDbname(key);
-      context.setUdata(udata);
-      if (commitMode == CommitMode.COMMIT_IN_PHASE1.getValue()) {
-        context.setCommitMode(CommitMode.COMMIT_IN_PHASE1);
-      } else if (commitMode == CommitMode.COMMIT_IN_PHASE2.getValue()) {
-        context.setCommitMode(CommitMode.COMMIT_IN_PHASE2);
-      } else if (commitMode == CommitMode.COMMIT_RETRY_MODE.getValue()) {
-        context.setCommitMode(CommitMode.COMMIT_RETRY_MODE);
-      }
-      context.setRetrySql(retrySql);
-      context.setGlobalXid(TxcXID.getGlobalXID(xid, branchId));
+      ContextStep2 context = buildContextStep2(xid, branchId, key, udata, commitMode, retrySql);
 
       txcLogManager.branchCommit(Arrays.asList(context));
 
@@ -65,10 +45,48 @@ public class BranchTransProcessHandler implements IBranchTransProcessHandler {
     }
   }
 
+  private ContextStep2 buildContextStep2(final String xid, final long branchId, final String key, final String udata,
+      final int commitMode, final String retrySql) {
+    ContextStep2 context = new ContextStep2();
+    context.setXid(xid);
+    context.setBranchId(branchId);
+    context.setDbname(key);
+    context.setUdata(udata);
+    context.setCommitMode(CommitMode.to(commitMode));
+    context.setRetrySql(retrySql);
+    context.setGlobalXid(TxcXID.getGlobalXID(xid, branchId));
+    return context;
+  }
+
   @Override
   public void branchRollback(final String xid, final long branchId, final String key, final String udata,
       final int commitMode) throws DtsException {
+    String branchName = checkBranch(xid, branchId);
 
+    try {
+      ContextStep2 context = buildContextStep2(xid, branchId, key, udata, commitMode, null);
+
+      txcLogManager.branchRollback(context);
+
+    } catch (DtsException e) {
+      throw e;
+    } catch (SQLException e) {
+      throw new DtsException(e);
+    } finally {
+      currentTaskMap.remove(branchName);
+    }
+  }
+
+  private String checkBranch(final String xid, final long branchId) {
+    String branchName = TxcXID.getBranchName(xid, branchId);
+    if (currentTaskMap.containsKey(branchName)) {
+      throw new DtsException("Branch is working:" + currentTaskMap.get(branchName));
+    }
+
+    if (currentTaskMap.put(branchName, TxcBranchStatus.COMMITING) != null) {
+      throw new DtsException("Branch is working:" + currentTaskMap.get(branchName));
+    }
+    return branchName;
   }
 
   @Override

@@ -31,4 +31,13 @@ public enum CommitMode {
 	}
 
 	private int value;
+
+	public static CommitMode to(Integer code) {
+		for (CommitMode commitMode : CommitMode.values()) {
+			if (commitMode.getValue() ==  code) {
+				return commitMode;
+			}
+		}
+		return null;
+	}
 }

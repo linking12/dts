@@ -126,7 +126,6 @@ public class TxcInsertVisitor extends TxcBaseVisitor {
 
 	private ValuePair evalExpression(final DatabaseType databaseType, final SQLObject sqlObject, final List<Object> parameters) {
 		if (sqlObject instanceof SQLMethodInvokeExpr) {
-			// TODO 解析函数中的sharingValue不支持
 			return null;
 		}
 		SQLEvalVisitor visitor;

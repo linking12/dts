@@ -15,4 +15,6 @@ public interface IDtsLogManager {
   void branchCommit(List<ContextStep2> contexts) throws SQLException;
 
   Integer insertUndoLog(Connection connection, TxcRuntimeContext txcContext) throws SQLException;
+
+  void branchRollback(ContextStep2 contextStep2s) throws SQLException;
 }
