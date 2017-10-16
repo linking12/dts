@@ -44,8 +44,8 @@ import io.dts.parser.model.TxcTableMeta;
 import io.dts.parser.undo.ITxcUndoSqlBuilder;
 import io.dts.parser.vistor.support.TxcTableMetaTools;
 import io.dts.resourcemanager.api.ITxcLogManager;
-import io.dts.resourcemanager.support.DataSourceHolder;
-import io.dts.resourcemanager.support.SqlExecuteHelper;
+import io.dts.resourcemanager.help.DataSourceHolder;
+import io.dts.resourcemanager.help.SqlExecuteHelper;
 
 /**
  * Created by guoyubo on 2017/9/27.
@@ -58,8 +58,8 @@ public class DtsLogManager implements ITxcLogManager {
   private static String txcLogTableName = "txc_undo_log";
 
 
-  public Integer insertUndoLog(final Connection connection, final TxcRuntimeContext txcContext)
-      throws SQLException {
+  public static Integer insertUndoLog(final Connection connection,
+      final TxcRuntimeContext txcContext) throws SQLException {
     String xid = txcContext.getXid();
     long branchID = txcContext.getBranchId();
     long globalXid = TxcXID.getGlobalXID(xid, branchID);
