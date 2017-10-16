@@ -1,13 +1,19 @@
 package io.dts.resourcemanager;
 
 import java.io.IOException;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+
+import com.google.common.collect.Queues;
 
 import io.dts.common.common.TxcConstants;
 import io.dts.common.common.exception.DtsException;
 import io.dts.common.component.AbstractLifecycleComponent;
+import io.dts.common.protocol.RequestCode;
 import io.dts.common.protocol.RequestMessage;
 import io.dts.common.protocol.heatbeat.HeartbeatRequestHeader;
 import io.dts.common.rpc.DtsClientMessageSender;
@@ -20,6 +26,7 @@ import io.dts.remoting.exception.RemotingTimeoutException;
 import io.dts.remoting.netty.NettyClientConfig;
 import io.dts.remoting.netty.NettyRemotingClient;
 import io.dts.remoting.protocol.RemotingCommand;
+import io.dts.resourcemanager.remoting.listener.RmMessageProcessor;
 
 /**
  * Created by guoyubo on 2017/9/13.
@@ -37,6 +44,31 @@ public class DefaultDtsResourcMessageSender extends AbstractLifecycleComponent
     this.scheduledExecutorService =
         Executors.newSingleThreadScheduledExecutor(new ThreadFactoryImpl("DtsClient Heartbeat"));
     this.serverAddress = serverAddress;
+    registerHeaderRequest(nettyClientConfig);
+    registerBodyRequest(nettyClientConfig);
+  }
+
+
+  private void registerHeaderRequest(NettyClientConfig nettyClientConfig) {
+    RmMessageProcessor messageProcessor = null;
+    BlockingQueue<Runnable> clientThreadPoolQueue = Queues.newLinkedBlockingDeque(100);
+    ExecutorService clientMessageExecutor =
+        new ThreadPoolExecutor(nettyClientConfig.getClientCallbackExecutorThreads(),
+            nettyClientConfig.getClientCallbackExecutorThreads(), 1000 * 60, TimeUnit.MILLISECONDS,
+            clientThreadPoolQueue, new ThreadFactoryImpl("ResourceMessageThread_"));
+    this.remotingClient.registerProcessor(RequestCode.HEADER_REQUEST, messageProcessor,
+        clientMessageExecutor);
+  }
+
+  private void registerBodyRequest(NettyClientConfig nettyClientConfig) {
+    RmMessageProcessor messageProcessor = null;
+    BlockingQueue<Runnable> clientThreadPoolQueue = Queues.newLinkedBlockingDeque(100);
+    ExecutorService clientMessageExecutor =
+        new ThreadPoolExecutor(nettyClientConfig.getClientCallbackExecutorThreads(),
+            nettyClientConfig.getClientCallbackExecutorThreads(), 1000 * 60, TimeUnit.MILLISECONDS,
+            clientThreadPoolQueue, new ThreadFactoryImpl("ResourceMessageThread_"));
+    this.remotingClient.registerProcessor(RequestCode.BODY_REQUEST, messageProcessor,
+        clientMessageExecutor);
   }
 
   @Override
