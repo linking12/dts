@@ -74,7 +74,7 @@ public class RmMessageProcessor implements NettyRequestProcessor {
     return response;
   }
 
-  private RmMessageListener createMessageHandler() {
-    return new RmMessageListener(new BranchTransProcessHandler(new DtsLogManager()));
+  private RmMessageHandlerWrap createMessageHandler() {
+    return new RmMessageHandlerWrap(new BranchTransProcessHandler(new DtsLogManager()));
   }
 }

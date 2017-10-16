@@ -8,11 +8,11 @@ import io.dts.common.protocol.header.BranchRollbackResultMessage;
 import io.dts.resourcemanager.handler.IBranchTransProcessHandler;
 
 
-public class RmMessageListener {
+public class RmMessageHandlerWrap {
 
   private IBranchTransProcessHandler branchTransProcessHandler;
 
-  public RmMessageListener(final IBranchTransProcessHandler branchTransProcessHandler) {
+  public RmMessageHandlerWrap(final IBranchTransProcessHandler branchTransProcessHandler) {
     this.branchTransProcessHandler = branchTransProcessHandler;
   }
 
@@ -29,14 +29,16 @@ public class RmMessageListener {
     resultMessage.setBranchId(branchId);
     resultMessage.setTranId(tranId);
     try {
-      branchTransProcessHandler.branchCommit(servAddr + ":" + tranId, branchId, dbName, udata, commitMode, retrySql);
+      branchTransProcessHandler.branchCommit(servAddr + ":" + tranId, branchId, dbName, udata,
+          commitMode, retrySql);
       resultMessage.setResult(ResultCode.OK.getValue());
     } catch (Exception e) {
       resultMessage.setResult(ResultCode.SYSTEMERROR.getValue());
     }
   }
 
-  public void handleMessage(final String serverAddressIP, final BranchRollBackMessage rollBackMessage,
+  public void handleMessage(final String serverAddressIP,
+      final BranchRollBackMessage rollBackMessage,
       final BranchRollbackResultMessage resultMessage) {
     Long branchId = rollBackMessage.getBranchId();
     Long tranId = rollBackMessage.getTranId();
@@ -48,7 +50,8 @@ public class RmMessageListener {
     resultMessage.setBranchId(branchId);
     resultMessage.setTranId(tranId);
     try {
-      branchTransProcessHandler.branchRollback(servAddr + ":" + tranId, branchId, dbName, udata, commitMode);
+      branchTransProcessHandler.branchRollback(servAddr + ":" + tranId, branchId, dbName, udata,
+          commitMode);
       resultMessage.setResult(ResultCode.OK.getValue());
     } catch (Exception e) {
       resultMessage.setResult(ResultCode.SYSTEMERROR.getValue());
