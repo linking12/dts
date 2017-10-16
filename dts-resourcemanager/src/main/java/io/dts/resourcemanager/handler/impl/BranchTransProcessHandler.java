@@ -9,8 +9,8 @@ import io.dts.common.common.CommitMode;
 import io.dts.common.common.TxcXID;
 import io.dts.common.common.context.ContextStep2;
 import io.dts.common.common.exception.DtsException;
+import io.dts.resourcemanager.executor.DtsLogManager;
 import io.dts.resourcemanager.handler.IBranchTransProcessHandler;
-import io.dts.resourcemanager.core.impl.DtsLogManager;
 
 /**
  * Created by guoyubo on 2017/9/27.
