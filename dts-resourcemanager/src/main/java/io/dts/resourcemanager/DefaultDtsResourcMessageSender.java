@@ -1,4 +1,4 @@
-package io.dts.resourcemanager.api.impl;
+package io.dts.resourcemanager;
 
 import java.io.IOException;
 import java.util.concurrent.Executors;

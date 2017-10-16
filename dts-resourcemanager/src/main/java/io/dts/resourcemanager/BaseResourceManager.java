@@ -32,13 +32,13 @@ import io.dts.common.rpc.DtsClientMessageSender;
  * @author liushiming
  * @version BaseResourceManager.java, v 0.0.1 2017年10月13日 下午2:28:51 liushiming
  */
-public abstract class DtsBaseResourceManager implements ResourceManager {
-  private static final Logger logger = LoggerFactory.getLogger(DtsBaseResourceManager.class);
+public abstract class BaseResourceManager implements ResourceManager {
+  private static final Logger logger = LoggerFactory.getLogger(BaseResourceManager.class);
 
   static private HashMap<String, ResourceManager> m_registry =
       new HashMap<String, ResourceManager>();
 
-  protected DtsBaseResourceManager() {}
+  protected BaseResourceManager() {}
 
   static public ResourceManager getInstance(String name) {
     if (name == null) {
