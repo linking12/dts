@@ -7,7 +7,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import io.dts.common.common.context.ContextStep2;
 
-public interface ITxcLogManager {
+public interface IDtsLogManager {
   /**
    * 分支事务提交，仅删除UndoLog
    */

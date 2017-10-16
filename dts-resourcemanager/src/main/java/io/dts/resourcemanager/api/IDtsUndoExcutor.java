@@ -5,7 +5,7 @@ import java.sql.SQLException;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 
-public interface ITxcUndoExcutor {
+public interface IDtsUndoExcutor {
   /**
    * 对用户输入SQL产生的作用进行补偿\回滚
    * 

@@ -43,14 +43,14 @@ import io.dts.parser.model.TxcTable;
 import io.dts.parser.model.TxcTableMeta;
 import io.dts.parser.undo.ITxcUndoSqlBuilder;
 import io.dts.parser.vistor.support.TxcTableMetaTools;
-import io.dts.resourcemanager.api.ITxcLogManager;
+import io.dts.resourcemanager.api.IDtsLogManager;
 import io.dts.resourcemanager.help.DataSourceHolder;
 import io.dts.resourcemanager.help.SqlExecuteHelper;
 
 /**
  * Created by guoyubo on 2017/9/27.
  */
-public class DtsLogManager implements ITxcLogManager {
+public class DtsLogManager implements IDtsLogManager {
 
   private static final Logger logger = LoggerFactory.getLogger(DtsLogManager.class);
 
