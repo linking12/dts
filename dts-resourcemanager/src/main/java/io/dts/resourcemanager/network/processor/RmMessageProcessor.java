@@ -3,6 +3,7 @@ package io.dts.resourcemanager.network.processor;
 import io.dts.common.protocol.RequestCode;
 import io.dts.common.protocol.RequestMessage;
 import io.dts.common.protocol.ResponseCode;
+import io.dts.common.protocol.ResultCode;
 import io.dts.common.protocol.header.BranchCommitMessage;
 import io.dts.common.protocol.header.BranchCommitResultMessage;
 import io.dts.common.protocol.header.BranchRollBackMessage;
@@ -11,8 +12,7 @@ import io.dts.remoting.CommandCustomHeader;
 import io.dts.remoting.netty.NettyRequestProcessor;
 import io.dts.remoting.protocol.RemotingCommand;
 import io.dts.remoting.protocol.RemotingSerializable;
-import io.dts.resourcemanager.executor.DtsLogManager;
-import io.dts.resourcemanager.handler.impl.BranchTransProcessHandler;
+import io.dts.resourcemanager.ResourceManager;
 import io.dts.util.NetUtil;
 import io.netty.channel.ChannelHandlerContext;
 
@@ -21,9 +21,15 @@ import io.netty.channel.ChannelHandlerContext;
  */
 public class RmMessageProcessor implements NettyRequestProcessor {
 
+  private final ResourceManager rm;
+
+  public RmMessageProcessor(ResourceManager rm) {
+    this.rm = rm;
+  }
+
   @Override
-  public RemotingCommand processRequest(final ChannelHandlerContext ctx, final RemotingCommand request)
-      throws Exception {
+  public RemotingCommand processRequest(final ChannelHandlerContext ctx,
+      final RemotingCommand request) throws Exception {
     final String serverAddressIp = NetUtil.toStringAddress(ctx.channel().remoteAddress());
     switch (request.getCode()) {
       case RequestCode.HEADER_REQUEST:
@@ -51,15 +57,15 @@ public class RmMessageProcessor implements NettyRequestProcessor {
         // 提交分支事务
         response = RemotingCommand.createResponseCommand(BranchCommitResultMessage.class);
         responseHeader = response.readCustomHeader();
-        createMessageHandler().handleMessage(serverAddressIp, (BranchCommitMessage) dtsMessage,
+        handleMessage(serverAddressIp, (BranchCommitMessage) dtsMessage,
             (BranchCommitResultMessage) responseHeader);
         response.setCode(ResponseCode.SUCCESS);
         return response;
-      } else  if (dtsMessage instanceof BranchRollBackMessage) {
+      } else if (dtsMessage instanceof BranchRollBackMessage) {
         // 回滚分支事务
         response = RemotingCommand.createResponseCommand(BranchRollbackResultMessage.class);
         responseHeader = response.readCustomHeader();
-        createMessageHandler().handleMessage(serverAddressIp, (BranchRollBackMessage) dtsMessage,
+        handleMessage(serverAddressIp, (BranchRollBackMessage) dtsMessage,
             (BranchRollbackResultMessage) responseHeader);
         response.setCode(ResponseCode.SUCCESS);
         return response;
@@ -74,7 +80,45 @@ public class RmMessageProcessor implements NettyRequestProcessor {
     return response;
   }
 
-  private RmMessageHandlerWrap createMessageHandler() {
-    return new RmMessageHandlerWrap(new BranchTransProcessHandler(new DtsLogManager()));
+  private void handleMessage(final String serverAddressIp, final BranchCommitMessage commitMessage,
+      final BranchCommitResultMessage resultMessage) {
+    Long branchId = commitMessage.getBranchId();
+    Long tranId = commitMessage.getTranId();
+    String servAddr = commitMessage.getServerAddr();
+    String dbName = commitMessage.getDbName();
+    String udata = commitMessage.getUdata();
+    int commitMode = commitMessage.getCommitMode();
+    String retrySql = commitMessage.getRetrySql();
+
+    resultMessage.setBranchId(branchId);
+    resultMessage.setTranId(tranId);
+    try {
+      rm.branchCommit(servAddr + ":" + tranId, branchId, dbName, udata, commitMode, retrySql);
+      resultMessage.setResult(ResultCode.OK.getValue());
+    } catch (Exception e) {
+      resultMessage.setResult(ResultCode.SYSTEMERROR.getValue());
+    }
   }
+
+  private void handleMessage(final String serverAddressIP,
+      final BranchRollBackMessage rollBackMessage,
+      final BranchRollbackResultMessage resultMessage) {
+    Long branchId = rollBackMessage.getBranchId();
+    Long tranId = rollBackMessage.getTranId();
+    String servAddr = rollBackMessage.getServerAddr();
+    String dbName = rollBackMessage.getDbName();
+    String udata = rollBackMessage.getUdata();
+    int commitMode = rollBackMessage.getCommitMode();
+
+    resultMessage.setBranchId(branchId);
+    resultMessage.setTranId(tranId);
+    try {
+      rm.branchRollback(servAddr + ":" + tranId, branchId, dbName, udata, commitMode);
+      resultMessage.setResult(ResultCode.OK.getValue());
+    } catch (Exception e) {
+      resultMessage.setResult(ResultCode.SYSTEMERROR.getValue());
+    }
+  }
+
+
 }

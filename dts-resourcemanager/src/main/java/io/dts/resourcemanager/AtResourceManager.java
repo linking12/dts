@@ -13,40 +13,67 @@
  */
 package io.dts.resourcemanager;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+
+import io.dts.common.common.context.ContextStep2;
 import io.dts.common.common.exception.DtsException;
+import io.dts.resourcemanager.api.IDtsLogManager;
+import io.dts.resourcemanager.help.TxcTrxConfig;
+import io.dts.resourcemanager.struct.TxcBranchStatus;
+import io.dts.resourcemanager.struct.TxcIsolation;
 
 /**
  * @author liushiming
  * @version AtResourceManager.java, v 0.0.1 2017年10月16日 下午3:18:14 liushiming
  */
 public class AtResourceManager extends BaseResourceManager {
+  private static Map<String, TxcBranchStatus> currentTaskMap =
+      new ConcurrentHashMap<String, TxcBranchStatus>();
+
+  private static ScheduledExecutorService timerExecutor = Executors.newScheduledThreadPool(1);
+
+  private static Map<Long, ContextStep2> currentTaskCommitedAt =
+      new ConcurrentHashMap<Long, ContextStep2>();
+
+  private IDtsLogManager txcSqlLogManager = null;
+  /**
+   * 隔离级别
+   */
+  private TxcIsolation trxLevel = TxcIsolation.READ_UNCOMMITED;
+  /**
+   * 事务配置
+   */
+  private TxcTrxConfig trxConfig = new TxcTrxConfig();
 
   @Override
   public void reportUdata(String xid, long branchId, String key, String udata, boolean delay)
       throws DtsException {
     // TODO Auto-generated method stub
-    
+
   }
 
   @Override
-  public void branchCommit(String xid, long branchId, String key, String udata, byte commitMode,
+  public void branchCommit(String xid, long branchId, String key, String udata, int commitMode,
       String retrySql) throws DtsException {
     // TODO Auto-generated method stub
-    
+
   }
 
   @Override
-  public void branchRollback(String xid, long branchId, String key, String udata, byte commitMode)
+  public void branchRollback(String xid, long branchId, String key, String udata, int commitMode)
       throws DtsException {
     // TODO Auto-generated method stub
-    
+
   }
 
   @Override
-  public void branchRollback(String xid, long branchId, String key, String udata, byte commitMode,
+  public void branchRollback(String xid, long branchId, String key, String udata, int commitMode,
       int isDelKey) throws DtsException {
     // TODO Auto-generated method stub
-    
+
   }
 
 }

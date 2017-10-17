@@ -26,6 +26,7 @@ import io.dts.remoting.exception.RemotingTimeoutException;
 import io.dts.remoting.netty.NettyClientConfig;
 import io.dts.remoting.netty.NettyRemotingClient;
 import io.dts.remoting.protocol.RemotingCommand;
+import io.dts.resourcemanager.ResourceManager;
 import io.dts.resourcemanager.network.processor.RmMessageProcessor;
 
 /**
@@ -37,20 +38,24 @@ public class DefaultDtsResourcMessageSender extends AbstractLifecycleComponent
   private final RemotingClient remotingClient;
   private final ScheduledExecutorService scheduledExecutorService;
   private final String serverAddress;
+  private final NettyClientConfig nettyClientConfig;
 
   public DefaultDtsResourcMessageSender(final String serverAddress) {
-    final NettyClientConfig nettyClientConfig = new NettyClientConfig();
+    this.nettyClientConfig = new NettyClientConfig();
     this.remotingClient = new NettyRemotingClient(nettyClientConfig, null);
     this.scheduledExecutorService = Executors
         .newSingleThreadScheduledExecutor(new ThreadFactoryImpl("DtsResourceManager Heartbeat"));
     this.serverAddress = serverAddress;
-    registerHeaderRequest(nettyClientConfig);
-    registerBodyRequest(nettyClientConfig);
   }
 
 
-  private void registerHeaderRequest(NettyClientConfig nettyClientConfig) {
-    RmMessageProcessor messageProcessor = null;
+  public void registerResourceManager(ResourceManager rm) {
+    registerHeaderRequest(rm);
+    registerBodyRequest(rm);
+  }
+
+  private void registerHeaderRequest(ResourceManager rm) {
+    RmMessageProcessor messageProcessor = new RmMessageProcessor(rm);
     BlockingQueue<Runnable> clientThreadPoolQueue = Queues.newLinkedBlockingDeque(100);
     ExecutorService clientMessageExecutor =
         new ThreadPoolExecutor(nettyClientConfig.getClientCallbackExecutorThreads(),
@@ -60,8 +65,8 @@ public class DefaultDtsResourcMessageSender extends AbstractLifecycleComponent
         clientMessageExecutor);
   }
 
-  private void registerBodyRequest(NettyClientConfig nettyClientConfig) {
-    RmMessageProcessor messageProcessor = null;
+  private void registerBodyRequest(ResourceManager rm) {
+    RmMessageProcessor messageProcessor = new RmMessageProcessor(rm);
     BlockingQueue<Runnable> clientThreadPoolQueue = Queues.newLinkedBlockingDeque(100);
     ExecutorService clientMessageExecutor =
         new ThreadPoolExecutor(nettyClientConfig.getClientCallbackExecutorThreads(),

@@ -29,21 +29,21 @@ public class RtResourceManager extends BaseResourceManager {
   }
 
   @Override
-  public void branchCommit(String xid, long branchId, String key, String udata, byte commitMode,
+  public void branchCommit(String xid, long branchId, String key, String udata, int commitMode,
       String retrySql) throws DtsException {
     // TODO Auto-generated method stub
 
   }
 
   @Override
-  public void branchRollback(String xid, long branchId, String key, String udata, byte commitMode)
+  public void branchRollback(String xid, long branchId, String key, String udata, int commitMode)
       throws DtsException {
     // TODO Auto-generated method stub
 
   }
 
   @Override
-  public void branchRollback(String xid, long branchId, String key, String udata, byte commitMode,
+  public void branchRollback(String xid, long branchId, String key, String udata, int commitMode,
       int isDelKey) throws DtsException {
     // TODO Auto-generated method stub
 

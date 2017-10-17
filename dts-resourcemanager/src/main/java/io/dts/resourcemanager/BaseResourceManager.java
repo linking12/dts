@@ -26,7 +26,7 @@ import io.dts.common.common.exception.DtsException;
 import io.dts.common.protocol.header.RegisterMessage;
 import io.dts.common.protocol.header.RegisterResultMessage;
 import io.dts.common.protocol.header.ReportStatusMessage;
-import io.dts.common.rpc.DtsClientMessageSender;
+import io.dts.resourcemanager.network.DefaultDtsResourcMessageSender;
 
 /**
  * @author liushiming
@@ -56,7 +56,7 @@ public abstract class BaseResourceManager implements ResourceManager {
   }
 
 
-  public DtsClientMessageSender resourceMessageSender;
+  public DefaultDtsResourcMessageSender resourceMessageSender;
   private int reportRetryTime = 5; // 分支汇报状态时，如果失败，则进行重试
 
   public int getReportRetryTime() {
@@ -67,12 +67,14 @@ public abstract class BaseResourceManager implements ResourceManager {
     this.reportRetryTime = reportRetryTime;
   }
 
-  public DtsClientMessageSender getResourceMessageSender() {
+  public DefaultDtsResourcMessageSender getResourceMessageSender() {
     return resourceMessageSender;
   }
 
-  public void setResourceMessageSender(DtsClientMessageSender resourceMessageSender) {
+  public void setResourceMessageSender(DefaultDtsResourcMessageSender resourceMessageSender) {
     this.resourceMessageSender = resourceMessageSender;
+    this.resourceMessageSender.registerResourceManager(this);
+    this.resourceMessageSender.start();
   }
 
   @Override
