@@ -1,7 +1,7 @@
 package io.dts.common.rpc;
 
+import io.dts.common.cluster.ServerCluster;
 import io.dts.common.common.exception.DtsException;
-import io.dts.common.lb.ServerCluster;
 import io.dts.common.protocol.RequestMessage;
 
 /**
