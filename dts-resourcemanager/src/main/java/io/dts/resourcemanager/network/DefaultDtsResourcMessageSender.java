@@ -38,14 +38,19 @@ public class DefaultDtsResourcMessageSender extends AbstractLifecycleComponent
   private final RemotingClient remotingClient;
   private final ScheduledExecutorService scheduledExecutorService;
   private final NettyClientConfig nettyClientConfig;
+  private static DefaultDtsResourcMessageSender resourceManagerSender =
+      new DefaultDtsResourcMessageSender();
 
-  public DefaultDtsResourcMessageSender() {
+  private DefaultDtsResourcMessageSender() {
     this.nettyClientConfig = new NettyClientConfig();
     this.remotingClient = new NettyRemotingClient(nettyClientConfig, null);
     this.scheduledExecutorService = Executors
         .newSingleThreadScheduledExecutor(new ThreadFactoryImpl("DtsResourceManager Heartbeat"));
   }
 
+  public static final DefaultDtsResourcMessageSender getInstance() {
+    return resourceManagerSender;
+  }
 
   public void registerResourceManager(ResourceManager rm) {
     registerHeaderRequest(rm);
