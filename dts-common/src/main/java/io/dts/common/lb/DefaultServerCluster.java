@@ -83,7 +83,6 @@ public class DefaultServerCluster implements ServerCluster {
       if (value < 0) {
         value = Math.abs(value);
       }
-
       value = value % serverNodes.size();
       return serverNodes.get(value);
     }
