@@ -16,7 +16,6 @@ import io.dts.common.protocol.header.GlobalCommitResultMessage;
 import io.dts.common.protocol.header.GlobalRollbackMessage;
 import io.dts.common.protocol.header.GlobalRollbackResultMessage;
 import io.dts.common.rpc.DtsClientMessageSender;
-import io.dts.util.NetUtil;
 
 /**
  * Created by guoyubo on 2017/8/24.
@@ -31,10 +30,7 @@ public class DefaultDtsTransactionManager implements DtsTransactionManager {
       new DefaultDtsTransactionManager();
 
   private DefaultDtsTransactionManager() {
-    // 这里需要负载均衡
-    final String serverAddress = NetUtil.getLocalIp() + ":10086";
-    DefaultDtsClientMessageSender clientMessageSender =
-        new DefaultDtsClientMessageSender(serverAddress);
+    DefaultDtsClientMessageSender clientMessageSender = new DefaultDtsClientMessageSender();
     clientMessageSender.start();
     this.dtsClient = clientMessageSender;
   }

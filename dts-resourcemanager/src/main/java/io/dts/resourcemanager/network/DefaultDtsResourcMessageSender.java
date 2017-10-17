@@ -37,15 +37,13 @@ public class DefaultDtsResourcMessageSender extends AbstractLifecycleComponent
 
   private final RemotingClient remotingClient;
   private final ScheduledExecutorService scheduledExecutorService;
-  private final String serverAddress;
   private final NettyClientConfig nettyClientConfig;
 
-  public DefaultDtsResourcMessageSender(final String serverAddress) {
+  public DefaultDtsResourcMessageSender() {
     this.nettyClientConfig = new NettyClientConfig();
     this.remotingClient = new NettyRemotingClient(nettyClientConfig, null);
     this.scheduledExecutorService = Executors
         .newSingleThreadScheduledExecutor(new ThreadFactoryImpl("DtsResourceManager Heartbeat"));
-    this.serverAddress = serverAddress;
   }
 
 
@@ -100,6 +98,7 @@ public class DefaultDtsResourcMessageSender extends AbstractLifecycleComponent
 
   @Override
   public <T> T invoke(RequestMessage msg, long timeout) throws DtsException {
+    String serverAddress = selectAddress();
     return this.invoke(serverAddress, msg, timeout);
   }
 

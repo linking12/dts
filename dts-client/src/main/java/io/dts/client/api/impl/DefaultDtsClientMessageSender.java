@@ -29,14 +29,12 @@ public class DefaultDtsClientMessageSender extends AbstractLifecycleComponent
 
   private final RemotingClient remotingClient;
   private final ScheduledExecutorService scheduledExecutorService;
-  private final String serverAddress;
 
-  public DefaultDtsClientMessageSender(final String serverAddress) {
+  public DefaultDtsClientMessageSender() {
     final NettyClientConfig nettyClientConfig = new NettyClientConfig();
     this.remotingClient = new NettyRemotingClient(nettyClientConfig, null);
     this.scheduledExecutorService =
         Executors.newSingleThreadScheduledExecutor(new ThreadFactoryImpl("DtsClient Heartbeat"));
-    this.serverAddress = serverAddress;
   }
 
   @Override
@@ -63,6 +61,7 @@ public class DefaultDtsClientMessageSender extends AbstractLifecycleComponent
 
   @Override
   public <T> T invoke(RequestMessage msg, long timeout) throws DtsException {
+    String serverAddress = selectAddress();
     return this.invoke(serverAddress, msg, timeout);
   }
 
@@ -77,6 +76,7 @@ public class DefaultDtsClientMessageSender extends AbstractLifecycleComponent
       throw new DtsException(e);
     }
   }
+
 
   @Override
   public <T> T invoke(RequestMessage msg) throws DtsException {
