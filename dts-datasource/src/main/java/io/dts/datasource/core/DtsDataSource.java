@@ -44,7 +44,8 @@ public class DtsDataSource extends AbstractDtsDataSource {
   }
 
   @Override
-  public Connection getConnection(final String username, final String password) throws SQLException {
+  public Connection getConnection(final String username, final String password)
+      throws SQLException {
     return new DtsConnection(this, dataSource.getConnection(username, password));
   }
 
@@ -57,7 +58,6 @@ public class DtsDataSource extends AbstractDtsDataSource {
     return dbName;
   }
 
-  @Override
   public ResourceManager getResourceManager() {
     return resourceManager;
   }

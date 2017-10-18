@@ -13,40 +13,48 @@
  */
 package io.dts.resourcemanager;
 
-import io.dts.common.common.exception.DtsException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import io.dts.common.common.CommitMode;
+import io.dts.common.common.context.DtsContext;
+import io.dts.common.protocol.header.BeginRetryBranchMessage;
+import io.dts.common.protocol.header.BeginRetryBranchResultMessage;
+import io.dts.parser.api.IDtsDataSource;
 
 /**
  * @author liushiming
  * @version RtResourceManager.java, v 0.0.1 2017年10月16日 下午3:18:54 liushiming
  */
-public class RtResourceManager extends BaseResourceManager {
+public class RtResourceManager extends AtResourceManager {
+  private static final Logger logger = LoggerFactory.getLogger(RtResourceManager.class);
 
-  @Override
-  public void reportUdata(String xid, long branchId, String key, String udata, boolean delay)
-      throws DtsException {
-    // TODO Auto-generated method stub
-
+  public BeginRetryBranchResultMessage beginRtBranch(IDtsDataSource dataSource, String sql) {
+    return this.beginRtBranch(dataSource, sql, 10);
   }
 
-  @Override
-  public void branchCommit(String xid, long branchId, String key, String udata, int commitMode,
-      String retrySql) throws DtsException {
-    // TODO Auto-generated method stub
+  public BeginRetryBranchResultMessage beginRtBranch(IDtsDataSource dataSource, String sql,
+      int retryTimes) {
+    BeginRetryBranchMessage message = new BeginRetryBranchMessage();
+    BeginRetryBranchResultMessage resultMessage = null;
+    message.setDbName(dataSource.getDbName());
+    message.setSql(sql);
+    long l = DtsContext.getEffectiveTime();
+    if (l < 0)
+      return null;
+    message.setEffectiveTime(l);
+    message.setCommitMode((byte) CommitMode.COMMIT_RETRY_MODE.getValue());
+    int i = 0;
+    while (i < retryTimes) {
+      try {
+        resultMessage = (BeginRetryBranchResultMessage) super.invoke(message);
+        return resultMessage;
+      } catch (Exception e) {
+        logger.error(e.getMessage(), e);
+      }
+    }
 
-  }
-
-  @Override
-  public void branchRollback(String xid, long branchId, String key, String udata, int commitMode)
-      throws DtsException {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
-  public void branchRollback(String xid, long branchId, String key, String udata, int commitMode,
-      int isDelKey) throws DtsException {
-    // TODO Auto-generated method stub
-
+    return resultMessage;
   }
 
 }

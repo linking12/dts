@@ -5,6 +5,8 @@ import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
 import java.util.logging.Logger;
 
+import io.dts.parser.api.IDtsDataSource;
+
 
 /**
  * Created by guoyubo on 2017/9/20.

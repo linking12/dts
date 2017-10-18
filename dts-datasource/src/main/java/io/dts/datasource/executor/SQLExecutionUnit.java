@@ -2,7 +2,7 @@ package io.dts.datasource.executor;
 
 import java.sql.SQLException;
 
-import io.dts.datasource.core.IDtsDataSource;
+import io.dts.parser.api.IDtsDataSource;
 import io.dts.parser.constant.SqlType;
 import io.dts.parser.util.SqlTypeParser;
 import lombok.EqualsAndHashCode;

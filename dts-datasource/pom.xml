@@ -1,35 +1,35 @@
 <?xml version="1.0"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>io.dts</groupId>
-    <artifactId>dts</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-  </parent>
-  <groupId>io.dts</groupId>
-  <artifactId>dts-datasource</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
-  <name>dts-datasource</name>
-  <url>http://maven.apache.org</url>
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
-  <dependencies>
-    <dependency>
-      <groupId>io.dts</groupId>
-      <artifactId>dts-common</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.dts</groupId>
-      <artifactId>dts-resourcemanager</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-      <groupId>io.dts</groupId>
-      <artifactId>dts-parser</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
-    </dependency>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>io.dts</groupId>
+		<artifactId>dts</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
+	<groupId>io.dts</groupId>
+	<artifactId>dts-datasource</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>dts-datasource</name>
+	<url>http://maven.apache.org</url>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+	<dependencies>
+		<dependency>
+			<groupId>io.dts</groupId>
+			<artifactId>dts-common</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.dts</groupId>
+			<artifactId>dts-resourcemanager</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>io.dts</groupId>
+			<artifactId>dts-parser</artifactId>
+		</dependency>
 
-  </dependencies>
+	</dependencies>
 </project>

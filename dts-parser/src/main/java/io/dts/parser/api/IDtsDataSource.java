@@ -1,11 +1,10 @@
-package io.dts.datasource.core;
+package io.dts.parser.api;
 
 import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
 import io.dts.parser.constant.DatabaseType;
-import io.dts.resourcemanager.ResourceManager;
 
 public interface IDtsDataSource extends DataSource {
   /**
@@ -23,7 +22,6 @@ public interface IDtsDataSource extends DataSource {
    */
   String getDbName();
 
-  ResourceManager getResourceManager();
 
   DatabaseType getDatabaseType() throws SQLException;
 

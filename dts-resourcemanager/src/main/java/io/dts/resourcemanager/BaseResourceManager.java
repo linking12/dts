@@ -23,6 +23,7 @@ import io.dts.common.common.TxcConstants;
 import io.dts.common.common.TxcXID;
 import io.dts.common.common.context.DtsContext;
 import io.dts.common.common.exception.DtsException;
+import io.dts.common.protocol.RequestMessage;
 import io.dts.common.protocol.header.RegisterMessage;
 import io.dts.common.protocol.header.RegisterResultMessage;
 import io.dts.common.protocol.header.ReportStatusMessage;
@@ -46,7 +47,6 @@ public abstract class BaseResourceManager implements ResourceManager {
     messageSender.registerResourceManager(this);
     this.resourceMessageSender = messageSender;
     messageSender.start();
-
   }
 
   static public ResourceManager getInstance(String name) {
@@ -142,5 +142,9 @@ public abstract class BaseResourceManager implements ResourceManager {
     } else {
       throw new IllegalStateException("current thread is not bind to txc transaction.");
     }
+  }
+
+  protected <T> T invoke(RequestMessage msg) throws DtsException {
+    return resourceMessageSender.invoke(msg, TxcConstants.RPC_INVOKE_TIMEOUT);
   }
 }
