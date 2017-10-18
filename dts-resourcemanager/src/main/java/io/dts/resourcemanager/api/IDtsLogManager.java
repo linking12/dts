@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import io.dts.common.common.context.ContextStep2;
+import io.dts.resourcemanager.executor.DtsLogManager;
 
 public interface IDtsLogManager {
   /**
@@ -24,4 +25,9 @@ public interface IDtsLogManager {
   void deleteUndoLog(ContextStep2 context, JdbcTemplate template) throws SQLException;
 
   void deleteUndoLog(List<ContextStep2> contexts, JdbcTemplate template) throws SQLException;
+
+
+  public static IDtsLogManager getInstance() {
+    return DtsLogManager.getInstance();
+  }
 }

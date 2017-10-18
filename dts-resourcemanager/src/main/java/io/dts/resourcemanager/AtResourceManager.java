@@ -13,11 +13,22 @@
  */
 package io.dts.resourcemanager;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Map.Entry;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
+import com.google.common.collect.Maps;
+
+import io.dts.common.common.CommitMode;
+import io.dts.common.common.TrxLockMode;
+import io.dts.common.common.TxcXID;
 import io.dts.common.common.context.ContextStep2;
 import io.dts.common.common.exception.DtsException;
 import io.dts.resourcemanager.api.IDtsLogManager;
@@ -30,15 +41,13 @@ import io.dts.resourcemanager.struct.TxcIsolation;
  * @version AtResourceManager.java, v 0.0.1 2017年10月16日 下午3:18:14 liushiming
  */
 public class AtResourceManager extends BaseResourceManager {
-  private static Map<String, TxcBranchStatus> currentTaskMap =
-      new ConcurrentHashMap<String, TxcBranchStatus>();
 
   private static ScheduledExecutorService timerExecutor = Executors.newScheduledThreadPool(1);
 
-  private static Map<Long, ContextStep2> currentTaskCommitedAt =
-      new ConcurrentHashMap<Long, ContextStep2>();
+  private static Map<Long, ContextStep2> currentTaskCommitedAt = Maps.newConcurrentMap();
 
-  private IDtsLogManager txcSqlLogManager = null;
+  private static Map<String, TxcBranchStatus> currentTaskMap = Maps.newConcurrentMap();
+  private IDtsLogManager txcSqlLogManager = IDtsLogManager.getInstance();
   /**
    * 隔离级别
    */
@@ -48,32 +57,155 @@ public class AtResourceManager extends BaseResourceManager {
    */
   private TxcTrxConfig trxConfig = new TxcTrxConfig();
 
-  @Override
-  public void reportUdata(String xid, long branchId, String key, String udata, boolean delay)
-      throws DtsException {
-    // TODO Auto-generated method stub
+  public TxcTrxConfig getTrxConfig() {
+    return trxConfig;
+  }
 
+  public void setTrxConfig(TxcTrxConfig trxConfig) {
+    this.trxConfig = trxConfig;
+  }
+
+  public TxcIsolation getIsolationLevel() {
+    switch (trxLevel) {
+      case READ_COMMITED:
+      case READ_UNCOMMITED:
+        break;
+      case READ_COMMITED_REDO:
+        break;
+      case repeatable:
+        throw new DtsException("unsupported repeatable isolation.");
+      case serializable:
+        throw new DtsException("unsupported serializable isolation.");
+      default:
+        throw new DtsException("undefined TxcIsolation:" + trxLevel.value());
+    }
+    return trxLevel;
+  }
+
+  public void setTrxLevel(TxcIsolation trxLevel) {
+    this.trxLevel = trxLevel;
+  }
+
+  public void init() {
+    try {
+      timerExecutor.scheduleAtFixedRate(new Runnable() {
+        @Override
+        public void run() {
+          List<ContextStep2> list = new ArrayList<ContextStep2>();
+          Iterator<Entry<Long, ContextStep2>> it = currentTaskCommitedAt.entrySet().iterator();
+          while (it.hasNext()) {
+            Entry<Long, ContextStep2> entry = it.next();
+            ContextStep2 context = entry.getValue();
+            it.remove();
+            list.add(context);
+          }
+          try {
+            txcSqlLogManager.branchCommit(list);
+          } catch (SQLException e) {
+            throw new DtsException(e);
+          }
+        }
+      }, 10, 1000 * 5, TimeUnit.MILLISECONDS);
+    } catch (Exception e) {
+      throw new DtsException(e);
+    }
   }
 
   @Override
   public void branchCommit(String xid, long branchId, String key, String udata, int commitMode,
       String retrySql) throws DtsException {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
-  public void branchRollback(String xid, long branchId, String key, String udata, int commitMode)
-      throws DtsException {
-    // TODO Auto-generated method stub
-
+    String branchName = TxcXID.getBranchName(xid, branchId);
+    if (currentTaskMap.containsKey(branchName)) {
+      throw new DtsException("Branch is working:" + currentTaskMap.get(branchName));
+    }
+    if (currentTaskMap.put(branchName, TxcBranchStatus.COMMITING) != null) {
+      throw new DtsException("Branch is working:" + currentTaskMap.get(branchName));
+    }
+    try {
+      ContextStep2 context = new ContextStep2();
+      context.setXid(xid);
+      context.setBranchId(branchId);
+      context.setDbname(key);
+      context.setUdata(udata);
+      if (commitMode == CommitMode.COMMIT_IN_PHASE1.getValue()) {
+        context.setCommitMode(CommitMode.COMMIT_IN_PHASE1);
+      } else if (commitMode == CommitMode.COMMIT_IN_PHASE2.getValue()) {
+        context.setCommitMode(CommitMode.COMMIT_IN_PHASE2);
+      } else if (commitMode == CommitMode.COMMIT_RETRY_MODE.getValue()) {
+        context.setCommitMode(CommitMode.COMMIT_RETRY_MODE);
+      }
+      context.setRetrySql(retrySql);
+      context.setGlobalXid(TxcXID.getGlobalXID(xid, branchId));
+      switch (context.getCommitMode()) {
+        case COMMIT_IN_PHASE1:
+        case COMMIT_IN_PHASE2:
+          currentTaskCommitedAt.put(context.getGlobalXid(), context);
+          break;
+        case COMMIT_RETRY_MODE:
+          txcSqlLogManager.branchCommit(Arrays.asList(context));
+          break;
+        default:
+          break;
+      }
+    } catch (DtsException e) {
+      throw e;
+    } catch (SQLException e) {
+      throw new DtsException(e);
+    } finally {
+      currentTaskMap.remove(branchName);
+    }
   }
 
   @Override
   public void branchRollback(String xid, long branchId, String key, String udata, int commitMode,
       int isDelKey) throws DtsException {
-    // TODO Auto-generated method stub
+    String branchName = TxcXID.getBranchName(xid, branchId);
+    if (currentTaskMap.containsKey(branchName)) {
+      throw new DtsException("Branch is working:" + currentTaskMap.get(branchName));
+    }
 
+    if (currentTaskMap.put(branchName, TxcBranchStatus.ROLLBACKING) != null) {
+      throw new DtsException("Branch is working:" + currentTaskMap.get(branchName));
+    }
+
+    ContextStep2 context = new ContextStep2();
+    context.setXid(xid);
+    context.setBranchId(branchId);
+    context.setDbname(key);
+    context.setUdata(udata);
+    if (commitMode == CommitMode.COMMIT_IN_PHASE1.getValue()) {
+      context.setCommitMode(CommitMode.COMMIT_IN_PHASE1);
+    } else if (commitMode == CommitMode.COMMIT_IN_PHASE2.getValue()) {
+      context.setCommitMode(CommitMode.COMMIT_IN_PHASE2);
+    } else if (commitMode == CommitMode.COMMIT_RETRY_MODE.getValue()) {
+      context.setCommitMode(CommitMode.COMMIT_RETRY_MODE);
+    }
+    if (isDelKey == TrxLockMode.DELETE_TRX_LOCK.getValue()) {
+      context.setLockMode(TrxLockMode.DELETE_TRX_LOCK);
+    } else if (isDelKey == TrxLockMode.NOT_DELETE_TRX_LOCK.getValue()) {
+      context.setLockMode(TrxLockMode.NOT_DELETE_TRX_LOCK);
+    }
+    context.setGlobalXid(TxcXID.getGlobalXID(xid, branchId));
+    try {
+      txcSqlLogManager.branchRollback(context);
+    } catch (DtsException e) {
+      throw e;
+    } catch (SQLException e) {
+      throw new DtsException(e);
+    } finally {
+      currentTaskMap.remove(branchName);
+    }
   }
 
+  @Override
+  public void reportUdata(String xid, long branchId, String key, String udata, boolean delay)
+      throws DtsException {
+    throw new UnsupportedOperationException("method not support");
+  }
+
+  @Override
+  public void branchRollback(String xid, long branchId, String key, String udata, int commitMode)
+      throws DtsException {
+    throw new UnsupportedOperationException("method not support");
+  }
 }

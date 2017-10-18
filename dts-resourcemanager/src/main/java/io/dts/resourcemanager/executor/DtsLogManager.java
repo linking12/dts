@@ -57,6 +57,14 @@ public class DtsLogManager implements IDtsLogManager {
 
   private static String txcLogTableName = "txc_undo_log";
 
+  private static final IDtsLogManager logManager = new DtsLogManager();
+
+  private DtsLogManager() {}
+
+
+  public static IDtsLogManager getInstance() {
+    return logManager;
+  }
 
   public static Integer insertUndoLog(final Connection connection,
       final TxcRuntimeContext txcContext) throws SQLException {
