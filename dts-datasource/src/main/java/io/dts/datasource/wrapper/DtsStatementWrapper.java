@@ -1,15 +1,15 @@
-package io.dts.datasource.jdbc.wrapper;
+package io.dts.datasource.wrapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
 import io.dts.common.common.context.DtsContext;
+import io.dts.datasource.DtsConnection;
 import io.dts.datasource.executor.ExecutorEngine;
 import io.dts.datasource.executor.SQLExecutionUnit;
 import io.dts.datasource.executor.statement.StatementExecutor;
 import io.dts.datasource.executor.statement.StatementUnit;
-import io.dts.datasource.jdbc.DtsConnection;
 import io.dts.resourcemanager.api.IDtsConnection;
 
 /**

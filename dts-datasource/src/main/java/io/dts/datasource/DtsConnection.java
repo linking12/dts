@@ -1,4 +1,4 @@
-package io.dts.datasource.jdbc;
+package io.dts.datasource;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -9,8 +9,8 @@ import java.sql.Statement;
 import io.dts.common.common.CommitMode;
 import io.dts.common.common.TxcXID;
 import io.dts.common.common.context.DtsContext;
-import io.dts.datasource.jdbc.wrapper.DtsPrepareStatementWrapper;
-import io.dts.datasource.jdbc.wrapper.DtsStatementWrapper;
+import io.dts.datasource.wrapper.DtsPrepareStatementWrapper;
+import io.dts.datasource.wrapper.DtsStatementWrapper;
 import io.dts.parser.constant.UndoLogMode;
 import io.dts.parser.model.TxcRuntimeContext;
 import io.dts.resourcemanager.api.IDtsDataSource;

@@ -1,4 +1,4 @@
-package io.dts.datasource.jdbc;
+package io.dts.datasource;
 
 import java.sql.Connection;
 import java.sql.SQLException;

@@ -1,4 +1,4 @@
-package io.dts.datasource.jdbc.wrapper;
+package io.dts.datasource.wrapper;
 
 import java.sql.Connection;
 import java.sql.ResultSet;

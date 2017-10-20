@@ -1,4 +1,4 @@
-package io.dts.datasource.jdbc.wrapper;
+package io.dts.datasource.wrapper;
 
 import java.io.InputStream;
 import java.io.Reader;
