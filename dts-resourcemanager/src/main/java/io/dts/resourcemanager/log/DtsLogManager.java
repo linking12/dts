@@ -1,4 +1,4 @@
-package io.dts.resourcemanager.executor;
+package io.dts.resourcemanager.log;
 
 import java.sql.Blob;
 import java.sql.Connection;
@@ -43,7 +43,6 @@ import io.dts.parser.model.TxcTable;
 import io.dts.parser.model.TxcTableMeta;
 import io.dts.parser.undo.ITxcUndoSqlBuilder;
 import io.dts.parser.vistor.support.TxcTableMetaTools;
-import io.dts.resourcemanager.api.IDtsLogManager;
 import io.dts.resourcemanager.help.DataSourceHolder;
 import io.dts.resourcemanager.help.SqlExecuteHelper;
 

@@ -15,7 +15,7 @@ import io.dts.datasource.statement.DtsStatement;
 import io.dts.parser.api.IDtsDataSource;
 import io.dts.parser.constant.UndoLogMode;
 import io.dts.parser.model.TxcRuntimeContext;
-import io.dts.resourcemanager.executor.DtsLogManager;
+import io.dts.resourcemanager.log.DtsLogManager;
 
 /**
  * Created by guoyubo on 2017/9/20.

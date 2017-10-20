@@ -1,4 +1,4 @@
-package io.dts.resourcemanager.api;
+package io.dts.resourcemanager.log;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -6,7 +6,6 @@ import java.util.List;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import io.dts.common.common.context.ContextStep2;
-import io.dts.resourcemanager.executor.DtsLogManager;
 
 public interface IDtsLogManager {
   /**
