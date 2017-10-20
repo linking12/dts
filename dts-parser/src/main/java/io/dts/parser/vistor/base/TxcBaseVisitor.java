@@ -122,6 +122,10 @@ public abstract class TxcBaseVisitor extends MySqlOutputVisitor implements ITxcV
 		appendable.append(printColumns());
 		appendable.append(" FROM ");
 		appendable.append(getTableName());
+		appendable.append(" ");
+		if (getTableNameAlias() != null) {
+			appendable.append(getTableNameAlias());
+		}
 		return appendable.toString();
 	}
 
@@ -137,8 +141,10 @@ public abstract class TxcBaseVisitor extends MySqlOutputVisitor implements ITxcV
 			} else if (obj instanceof TxcColumnMeta) {
 				appender.append(",");
 			}
-			appender.append(getTableName());
-			appender.append(".");
+			if (getTableNameAlias() != null) {
+				appender.append(getTableNameAlias());
+				appender.append(".");
+			}
 
 			appender.append(((TxcColumnMeta) obj).getColumnName());
 		}
@@ -239,6 +245,10 @@ public abstract class TxcBaseVisitor extends MySqlOutputVisitor implements ITxcV
 	}
 	public void setTableNameAlias(final String tableNameAlias) {
 		this.tableNameAlias = tableNameAlias;
+	}
+
+	public String getTableNameAlias() {
+		return tableNameAlias;
 	}
 
 	@Override
