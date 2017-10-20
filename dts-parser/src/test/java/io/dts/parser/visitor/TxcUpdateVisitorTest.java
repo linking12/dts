@@ -5,6 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.alibaba.druid.pool.DruidDataSource;
+import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
 
 import javax.sql.DataSource;
@@ -26,7 +27,7 @@ public class TxcUpdateVisitorTest {
 
   @Before
   public void init() throws SQLException {
-     connection = dataSource().getConnection();
+    connection = dataSource().getConnection();
   }
 
   private static DataSource dataSource() {
@@ -34,7 +35,7 @@ public class TxcUpdateVisitorTest {
     dataSource.setDriverClassName("com.mysql.jdbc.Driver");
     dataSource.setUrl("jdbc:mysql://127.0.0.1:3306/dts");
     dataSource.setUsername("root");
-    dataSource.setPassword("123456");
+    dataSource.setPassword("123");
     dataSource.setMaxActive(15);
     return dataSource;
   }
@@ -44,18 +45,15 @@ public class TxcUpdateVisitorTest {
   public void parse() throws SQLException {
     Statement statement = connection.createStatement();
     String sql = "update txc_global_log l set l.state = 5 where l.tx_id=2";
-    ITxcVisitor visitor = TxcVisitorFactory.createSqlVisitor(
-        DatabaseType.MySQL,
-        connection,
-        sql,
+    ITxcVisitor visitor = TxcVisitorFactory.createSqlVisitor(DatabaseType.MySQL, connection, sql,
         Lists.newArrayList());
     visitor.buildTableMeta();
     visitor.executeAndGetFrontImage(statement);
     System.out.println(visitor.getSelectSql());
-    System.out.println(visitor.getTableOriginalValue());
+    System.out.println(JSON.toJSON(visitor.getTableOriginalValue()));
     statement.execute(sql);
     visitor.executeAndGetRearImage(statement);
-    System.out.println(visitor.getTablePresentValue());
+    System.out.println(JSON.toJSON(visitor.getTablePresentValue()));
   }
 
 

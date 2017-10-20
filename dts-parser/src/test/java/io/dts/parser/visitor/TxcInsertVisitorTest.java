@@ -29,7 +29,7 @@ public class TxcInsertVisitorTest {
 
   @Before
   public void init() throws SQLException {
-     connection = dataSource().getConnection();
+    connection = dataSource().getConnection();
   }
 
   private static DataSource dataSource() {
@@ -37,7 +37,7 @@ public class TxcInsertVisitorTest {
     dataSource.setDriverClassName("com.mysql.jdbc.Driver");
     dataSource.setUrl("jdbc:mysql://127.0.0.1:3306/dts");
     dataSource.setUsername("root");
-    dataSource.setPassword("123456");
+    dataSource.setPassword("123");
     dataSource.setMaxActive(15);
     return dataSource;
   }
@@ -46,14 +46,12 @@ public class TxcInsertVisitorTest {
   @Test
   public void parse() throws SQLException {
     List<Object> parameters = Lists.newArrayList(1, 2);
-    String sql = "insert into txc_global_log (state,mid,gmt_created,gmt_modified) values (?,?,now(),now())";
+    String sql =
+        "insert into txc_global_log (state,mid,gmt_created,gmt_modified) values (?,?,now(),now())";
     PreparedStatement statement = connection.prepareStatement(sql);
 
-    ITxcVisitor visitor = TxcVisitorFactory.createSqlVisitor(
-        DatabaseType.MySQL,
-        connection,
-        sql,
-        parameters);
+    ITxcVisitor visitor =
+        TxcVisitorFactory.createSqlVisitor(DatabaseType.MySQL, connection, sql, parameters);
     visitor.buildTableMeta();
     visitor.executeAndGetFrontImage(statement);
     System.out.println(visitor.getSelectSql());
