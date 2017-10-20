@@ -1,4 +1,4 @@
-package io.dts.datasource.connection;
+package io.dts.datasource.jdbc;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -9,12 +9,11 @@ import java.sql.Statement;
 import io.dts.common.common.CommitMode;
 import io.dts.common.common.TxcXID;
 import io.dts.common.common.context.DtsContext;
-import io.dts.datasource.core.DtsDataSource;
-import io.dts.datasource.preparestatement.DtsPrepareStatement;
-import io.dts.datasource.statement.DtsStatement;
-import io.dts.parser.api.IDtsDataSource;
+import io.dts.datasource.jdbc.wrapper.DtsPrepareStatementWrapper;
+import io.dts.datasource.jdbc.wrapper.DtsStatementWrapper;
 import io.dts.parser.constant.UndoLogMode;
 import io.dts.parser.model.TxcRuntimeContext;
+import io.dts.resourcemanager.api.IDtsDataSource;
 import io.dts.resourcemanager.log.DtsLogManager;
 
 /**
@@ -37,13 +36,13 @@ public class DtsConnection extends AbstractDtsConnection {
 
   @Override
   public Statement createStatement() throws SQLException {
-    return new DtsStatement(this, getRawConnection().createStatement());
+    return new DtsStatementWrapper(this, getRawConnection().createStatement());
   }
 
 
   @Override
   public PreparedStatement prepareStatement(final String sql) throws SQLException {
-    return new DtsPrepareStatement(this, getRawConnection().prepareStatement(sql), sql);
+    return new DtsPrepareStatementWrapper(this, getRawConnection().prepareStatement(sql), sql);
   }
 
   @Override
@@ -64,7 +63,6 @@ public class DtsConnection extends AbstractDtsConnection {
     if (!DtsContext.inTxcTransaction()) {
       return;
     }
-
     if (getAutoCommit() == true) {
       throw new SQLException("should set autocommit false first.");
     }
@@ -136,7 +134,7 @@ public class DtsConnection extends AbstractDtsConnection {
   @Override
   public Statement createStatement(final int resultSetType, final int resultSetConcurrency)
       throws SQLException {
-    return new DtsStatement(this,
+    return new DtsStatementWrapper(this,
         getRawConnection().createStatement(resultSetType, resultSetConcurrency));
   }
 
@@ -155,7 +153,7 @@ public class DtsConnection extends AbstractDtsConnection {
   @Override
   public Statement createStatement(final int resultSetType, final int resultSetConcurrency,
       final int resultSetHoldability) throws SQLException {
-    return new DtsStatement(this, getRawConnection().createStatement(resultSetType,
+    return new DtsStatementWrapper(this, getRawConnection().createStatement(resultSetType,
         resultSetConcurrency, resultSetHoldability));
   }
 

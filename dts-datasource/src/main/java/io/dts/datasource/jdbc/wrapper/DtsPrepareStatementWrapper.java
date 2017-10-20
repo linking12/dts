@@ -1,27 +1,28 @@
-package io.dts.datasource.preparestatement;
+package io.dts.datasource.jdbc.wrapper;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import io.dts.common.common.context.DtsContext;
-import io.dts.datasource.connection.DtsConnection;
-import io.dts.datasource.connection.IDtsConnection;
 import io.dts.datasource.executor.ExecutorEngine;
 import io.dts.datasource.executor.SQLExecutionUnit;
 import io.dts.datasource.executor.prepared.PreparedStatementExecutor;
 import io.dts.datasource.executor.prepared.PreparedStatementUnit;
+import io.dts.datasource.jdbc.DtsConnection;
+import io.dts.resourcemanager.api.IDtsConnection;
 
 /**
  * Created by guoyubo on 2017/9/26.
  */
-public class DtsPrepareStatement extends AbstractDtsPrepareStatement {
+public class DtsPrepareStatementWrapper extends AbstractDtsPrepareStatement {
 
   private DtsConnection dtsConnection;
 
   private PreparedStatement statement;
 
-  public DtsPrepareStatement(final DtsConnection dtsConnection, final PreparedStatement statement, String sql) {
+  public DtsPrepareStatementWrapper(final DtsConnection dtsConnection,
+      final PreparedStatement statement, String sql) {
     this.dtsConnection = dtsConnection;
     this.statement = statement;
     setTargetSql(sql);
@@ -41,8 +42,8 @@ public class DtsPrepareStatement extends AbstractDtsPrepareStatement {
   @Override
   public ResultSet executeQuery() throws SQLException {
     try {
-      return new PreparedStatementExecutor(ExecutorEngine.getInstance(), getStatementUnit(getTargetSql()),
-          getParameters()).executeQuery();
+      return new PreparedStatementExecutor(ExecutorEngine.getInstance(),
+          getStatementUnit(getTargetSql()), getParameters()).executeQuery();
     } catch (Exception e) {
       throw new SQLException(e);
     }
@@ -50,7 +51,8 @@ public class DtsPrepareStatement extends AbstractDtsPrepareStatement {
 
 
   private PreparedStatementUnit getStatementUnit(final String sql) throws SQLException {
-    final SQLExecutionUnit sqlExecutionUnit = new SQLExecutionUnit(dtsConnection.getDataSource(), sql);
+    final SQLExecutionUnit sqlExecutionUnit =
+        new SQLExecutionUnit(dtsConnection.getDataSource(), sql);
     return new PreparedStatementUnit(sqlExecutionUnit, this);
   }
 
@@ -58,8 +60,8 @@ public class DtsPrepareStatement extends AbstractDtsPrepareStatement {
   @Override
   public int executeUpdate() throws SQLException {
     try {
-      return new PreparedStatementExecutor(ExecutorEngine.getInstance(), getStatementUnit(getTargetSql()),
-          getParameters()).executeUpdate();
+      return new PreparedStatementExecutor(ExecutorEngine.getInstance(),
+          getStatementUnit(getTargetSql()), getParameters()).executeUpdate();
     } catch (Exception e) {
       throw new SQLException(e);
     }
@@ -68,8 +70,8 @@ public class DtsPrepareStatement extends AbstractDtsPrepareStatement {
   @Override
   public boolean execute() throws SQLException {
     try {
-      return new PreparedStatementExecutor(ExecutorEngine.getInstance(), getStatementUnit(getTargetSql()),
-          getParameters()).execute();
+      return new PreparedStatementExecutor(ExecutorEngine.getInstance(),
+          getStatementUnit(getTargetSql()), getParameters()).execute();
     } catch (Exception e) {
       throw new SQLException(e);
     }

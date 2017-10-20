@@ -1,10 +1,8 @@
-package io.dts.datasource.preparestatement;
+package io.dts.resourcemanager.api;
 
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-
-import io.dts.datasource.statement.IDtsStatement;
 
 public interface IDtsPrepareStatement extends IDtsStatement, PreparedStatement {
 

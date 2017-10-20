@@ -1,4 +1,4 @@
-package io.dts.parser.api;
+package io.dts.resourcemanager.api;
 
 import java.sql.SQLException;
 

@@ -8,9 +8,7 @@
 		<artifactId>dts</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
-	<groupId>io.dts</groupId>
 	<artifactId>dts-datasource</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
 	<name>dts-datasource</name>
 	<url>http://maven.apache.org</url>
 	<properties>
@@ -24,12 +22,10 @@
 		<dependency>
 			<groupId>io.dts</groupId>
 			<artifactId>dts-resourcemanager</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>io.dts</groupId>
 			<artifactId>dts-parser</artifactId>
 		</dependency>
-
 	</dependencies>
 </project>

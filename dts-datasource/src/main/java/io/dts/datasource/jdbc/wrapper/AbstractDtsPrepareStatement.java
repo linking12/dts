@@ -1,4 +1,4 @@
-package io.dts.datasource.preparestatement;
+package io.dts.datasource.jdbc.wrapper;
 
 import java.io.InputStream;
 import java.io.Reader;
@@ -23,13 +23,14 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import io.dts.datasource.statement.AbstractDtsStatement;
+import io.dts.resourcemanager.api.IDtsPrepareStatement;
 import lombok.Getter;
 
 /**
  * Created by guoyubo on 2017/9/20.
  */
-public abstract class AbstractDtsPrepareStatement extends AbstractDtsStatement implements IDtsPrepareStatement {
+public abstract class AbstractDtsPrepareStatement extends AbstractDtsStatement
+    implements IDtsPrepareStatement {
 
   @Getter
   private final List<Object> parameters = new ArrayList<>();
@@ -41,7 +42,8 @@ public abstract class AbstractDtsPrepareStatement extends AbstractDtsStatement i
   }
 
   @Override
-  public final void setNull(final int parameterIndex, final int sqlType, final String typeName) throws SQLException {
+  public final void setNull(final int parameterIndex, final int sqlType, final String typeName)
+      throws SQLException {
     setParameter(parameterIndex, null);
     getRawStatement().setNull(parameterIndex, sqlType, typeName);
   }
@@ -97,7 +99,8 @@ public abstract class AbstractDtsPrepareStatement extends AbstractDtsStatement i
   }
 
   @Override
-  public final void setBigDecimal(final int parameterIndex, final BigDecimal x) throws SQLException {
+  public final void setBigDecimal(final int parameterIndex, final BigDecimal x)
+      throws SQLException {
     setParameter(parameterIndex, x);
     getRawStatement().setBigDecimal(parameterIndex, x);
   }
@@ -110,7 +113,8 @@ public abstract class AbstractDtsPrepareStatement extends AbstractDtsStatement i
   }
 
   @Override
-  public final void setDate(final int parameterIndex, final Date x, final Calendar cal) throws SQLException {
+  public final void setDate(final int parameterIndex, final Date x, final Calendar cal)
+      throws SQLException {
     setParameter(parameterIndex, x);
     getRawStatement().setDate(parameterIndex, x, cal);
 
@@ -123,7 +127,8 @@ public abstract class AbstractDtsPrepareStatement extends AbstractDtsStatement i
   }
 
   @Override
-  public final void setTime(final int parameterIndex, final Time x, final Calendar cal) throws SQLException {
+  public final void setTime(final int parameterIndex, final Time x, final Calendar cal)
+      throws SQLException {
     setParameter(parameterIndex, x);
     getRawStatement().setTime(parameterIndex, x, cal);
   }
@@ -135,7 +140,8 @@ public abstract class AbstractDtsPrepareStatement extends AbstractDtsStatement i
   }
 
   @Override
-  public final void setTimestamp(final int parameterIndex, final Timestamp x, final Calendar cal) throws SQLException {
+  public final void setTimestamp(final int parameterIndex, final Timestamp x, final Calendar cal)
+      throws SQLException {
     setParameter(parameterIndex, x);
     getRawStatement().setTimestamp(parameterIndex, x, cal);
   }
@@ -159,7 +165,8 @@ public abstract class AbstractDtsPrepareStatement extends AbstractDtsStatement i
   }
 
   @Override
-  public final void setBlob(final int parameterIndex, final InputStream x, final long length) throws SQLException {
+  public final void setBlob(final int parameterIndex, final InputStream x, final long length)
+      throws SQLException {
     setParameter(parameterIndex, x);
     getRawStatement().setBlob(parameterIndex, x, length);
   }
@@ -177,67 +184,79 @@ public abstract class AbstractDtsPrepareStatement extends AbstractDtsStatement i
   }
 
   @Override
-  public final void setClob(final int parameterIndex, final Reader x, final long length) throws SQLException {
+  public final void setClob(final int parameterIndex, final Reader x, final long length)
+      throws SQLException {
     setParameter(parameterIndex, x);
     getRawStatement().setClob(parameterIndex, x, length);
   }
 
   @Override
-  public final void setAsciiStream(final int parameterIndex, final InputStream x) throws SQLException {
+  public final void setAsciiStream(final int parameterIndex, final InputStream x)
+      throws SQLException {
     setParameter(parameterIndex, x);
     getRawStatement().setAsciiStream(parameterIndex, x);
   }
 
   @Override
-  public final void setAsciiStream(final int parameterIndex, final InputStream x, final int length) throws SQLException {
+  public final void setAsciiStream(final int parameterIndex, final InputStream x, final int length)
+      throws SQLException {
     setParameter(parameterIndex, x);
     getRawStatement().setAsciiStream(parameterIndex, x, length);
   }
 
   @Override
-  public final void setAsciiStream(final int parameterIndex, final InputStream x, final long length) throws SQLException {
+  public final void setAsciiStream(final int parameterIndex, final InputStream x, final long length)
+      throws SQLException {
     setParameter(parameterIndex, x);
     getRawStatement().setAsciiStream(parameterIndex, x, length);
   }
 
+  @SuppressWarnings("deprecation")
   @Override
-  public final void setUnicodeStream(final int parameterIndex, final InputStream x, final int length) throws SQLException {
+  public final void setUnicodeStream(final int parameterIndex, final InputStream x,
+      final int length) throws SQLException {
     setParameter(parameterIndex, x);
     getRawStatement().setUnicodeStream(parameterIndex, x, length);
   }
 
   @Override
-  public final void setBinaryStream(final int parameterIndex, final InputStream x) throws SQLException {
+  public final void setBinaryStream(final int parameterIndex, final InputStream x)
+      throws SQLException {
     setParameter(parameterIndex, x);
     getRawStatement().setBinaryStream(parameterIndex, x);
   }
 
   @Override
-  public final void setBinaryStream(final int parameterIndex, final InputStream x, final int length) throws SQLException {
+  public final void setBinaryStream(final int parameterIndex, final InputStream x, final int length)
+      throws SQLException {
     setParameter(parameterIndex, x);
     getRawStatement().setBinaryStream(parameterIndex, x, length);
   }
 
   @Override
-  public final void setBinaryStream(final int parameterIndex, final InputStream x, final long length) throws SQLException {
+  public final void setBinaryStream(final int parameterIndex, final InputStream x,
+      final long length) throws SQLException {
     setParameter(parameterIndex, x);
     getRawStatement().setBinaryStream(parameterIndex, x, length);
   }
 
   @Override
-  public final void setCharacterStream(final int parameterIndex, final Reader x) throws SQLException {
+  public final void setCharacterStream(final int parameterIndex, final Reader x)
+      throws SQLException {
     setParameter(parameterIndex, x);
     getRawStatement().setCharacterStream(parameterIndex, x);
   }
 
   @Override
-  public final void setCharacterStream(final int parameterIndex, final Reader x, final int length) throws SQLException {
+  public final void setCharacterStream(final int parameterIndex, final Reader x, final int length)
+      throws SQLException {
     setParameter(parameterIndex, x);
     getRawStatement().setCharacterStream(parameterIndex, x, length);
   }
 
   @Override
-  public final void setCharacterStream(final int parameterIndex, final Reader x, final long length) throws SQLException {
+  public final void setCharacterStream(final int parameterIndex, final Reader x, final long length)
+      throws SQLException {
     setParameter(parameterIndex, x);
     getRawStatement().setCharacterStream(parameterIndex, x, length);
   }
@@ -262,13 +281,15 @@ public abstract class AbstractDtsPrepareStatement extends AbstractDtsStatement i
   }
 
   @Override
-  public final void setObject(final int parameterIndex, final Object x, final int targetSqlType) throws SQLException {
+  public final void setObject(final int parameterIndex, final Object x, final int targetSqlType)
+      throws SQLException {
     setParameter(parameterIndex, x);
     getRawStatement().setObject(parameterIndex, x, targetSqlType);
   }
 
   @Override
-  public final void setObject(final int parameterIndex, final Object x, final int targetSqlType, final int scaleOrLength) throws SQLException {
+  public final void setObject(final int parameterIndex, final Object x, final int targetSqlType,
+      final int scaleOrLength) throws SQLException {
     setParameter(parameterIndex, x);
     getRawStatement().setObject(parameterIndex, x, targetSqlType, scaleOrLength);
   }
@@ -308,7 +329,8 @@ public abstract class AbstractDtsPrepareStatement extends AbstractDtsStatement i
   }
 
   @Override
-  public void setNCharacterStream(final int parameterIndex, final Reader value, final long length) throws SQLException {
+  public void setNCharacterStream(final int parameterIndex, final Reader value, final long length)
+      throws SQLException {
     setParameter(parameterIndex, value);
     getRawStatement().setNCharacterStream(parameterIndex, value, length);
   }
@@ -320,13 +342,15 @@ public abstract class AbstractDtsPrepareStatement extends AbstractDtsStatement i
   }
 
   @Override
-  public void setNClob(final int parameterIndex, final Reader reader, final long length) throws SQLException {
+  public void setNClob(final int parameterIndex, final Reader reader, final long length)
+      throws SQLException {
     setParameter(parameterIndex, reader);
     getRawStatement().setNClob(parameterIndex, reader, length);
   }
 
   @Override
-  public void setNCharacterStream(final int parameterIndex, final Reader value) throws SQLException {
+  public void setNCharacterStream(final int parameterIndex, final Reader value)
+      throws SQLException {
     setParameter(parameterIndex, value);
     getRawStatement().setNCharacterStream(parameterIndex, value);
   }
@@ -348,7 +372,8 @@ public abstract class AbstractDtsPrepareStatement extends AbstractDtsStatement i
   }
 
   @Override
-  public final int executeUpdate(final String sql, final int autoGeneratedKeys) throws SQLException {
+  public final int executeUpdate(final String sql, final int autoGeneratedKeys)
+      throws SQLException {
     throw new SQLFeatureNotSupportedException("executeUpdate with SQL for PreparedStatement");
   }
 

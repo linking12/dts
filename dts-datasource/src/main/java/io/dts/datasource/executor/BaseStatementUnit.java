@@ -17,7 +17,7 @@
 
 package io.dts.datasource.executor;
 
-import io.dts.datasource.statement.IDtsStatement;
+import io.dts.resourcemanager.api.IDtsStatement;
 
 /**
  * Statement execute unit interface.

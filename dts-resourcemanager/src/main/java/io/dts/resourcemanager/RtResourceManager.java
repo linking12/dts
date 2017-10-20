@@ -20,7 +20,7 @@ import io.dts.common.common.CommitMode;
 import io.dts.common.common.context.DtsContext;
 import io.dts.common.protocol.header.BeginRetryBranchMessage;
 import io.dts.common.protocol.header.BeginRetryBranchResultMessage;
-import io.dts.parser.api.IDtsDataSource;
+import io.dts.resourcemanager.api.IDtsDataSource;
 
 /**
  * @author liushiming

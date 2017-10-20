@@ -1,11 +1,10 @@
-package io.dts.datasource.core;
+package io.dts.datasource.jdbc;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
-import io.dts.datasource.connection.DtsConnection;
 import io.dts.parser.constant.DatabaseType;
 import io.dts.resourcemanager.ResourceManager;
 import io.dts.resourcemanager.help.DataSourceHolder;

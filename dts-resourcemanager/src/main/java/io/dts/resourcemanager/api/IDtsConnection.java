@@ -1,9 +1,8 @@
-package io.dts.datasource.connection;
+package io.dts.resourcemanager.api;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import io.dts.parser.api.IDtsDataSource;
 import io.dts.parser.model.TxcRuntimeContext;
 
 public interface IDtsConnection extends Connection {

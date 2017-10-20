@@ -9,12 +9,12 @@ import org.slf4j.LoggerFactory;
 
 import io.dts.common.common.context.DtsContext;
 import io.dts.common.common.exception.DtsException;
-import io.dts.datasource.connection.IDtsConnection;
 import io.dts.datasource.executor.BaseStatementUnit;
 import io.dts.parser.model.RollbackInfor;
 import io.dts.parser.model.TxcTable;
 import io.dts.parser.vistor.ITxcVisitor;
 import io.dts.parser.vistor.TxcVisitorFactory;
+import io.dts.resourcemanager.api.IDtsConnection;
 
 public class AtExecutorRUnCommiter {
 
@@ -25,15 +25,13 @@ public class AtExecutorRUnCommiter {
   private BaseStatementUnit baseStatementUnit;
 
 
-  public AtExecutorRUnCommiter(BaseStatementUnit baseStatementUnit,
-      final List<Object> parameterSet) throws SQLException {
+  public AtExecutorRUnCommiter(BaseStatementUnit baseStatementUnit, final List<Object> parameterSet)
+      throws SQLException {
     this.baseStatementUnit = baseStatementUnit;
     IDtsConnection txcConnection = baseStatementUnit.getStatement().getDtsConnection();
     this.txcVisitor = TxcVisitorFactory.createSqlVisitor(
-        txcConnection.getDataSource().getDatabaseType(),
-        txcConnection.getRawConnection(),
-        baseStatementUnit.getSqlExecutionUnit().getSql(),
-        parameterSet);
+        txcConnection.getDataSource().getDatabaseType(), txcConnection.getRawConnection(),
+        baseStatementUnit.getSqlExecutionUnit().getSql(), parameterSet);
 
   }
 
@@ -80,7 +78,9 @@ public class AtExecutorRUnCommiter {
 
   private void insertUndoLog() throws SQLException {
     // 对于空操作，直接返回成功，不写Log
-    if (txcVisitor.getTableOriginalValue().getLinesNum() == 0 && txcVisitor.getTablePresentValue().getLinesNum() == 0 && txcVisitor.getRollbackRule() == null) {
+    if (txcVisitor.getTableOriginalValue().getLinesNum() == 0
+        && txcVisitor.getTablePresentValue().getLinesNum() == 0
+        && txcVisitor.getRollbackRule() == null) {
       String errorInfo = "null result error:" + txcVisitor.getInputSql();
       logger.error("insertUndoLog", errorInfo);
       throw new DtsException(3333, errorInfo);
@@ -111,7 +111,6 @@ public class AtExecutorRUnCommiter {
 
     baseStatementUnit.getStatement().getDtsConnection().getTxcContext().addInfor(txcLog);
   }
-
 
 
 

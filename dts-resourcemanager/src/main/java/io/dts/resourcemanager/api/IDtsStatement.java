@@ -1,9 +1,7 @@
-package io.dts.datasource.statement;
+package io.dts.resourcemanager.api;
 
 import java.sql.SQLException;
 import java.sql.Statement;
-
-import io.dts.datasource.connection.IDtsConnection;
 
 public interface IDtsStatement extends Statement {
 

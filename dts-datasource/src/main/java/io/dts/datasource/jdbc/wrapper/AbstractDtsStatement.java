@@ -1,9 +1,11 @@
-package io.dts.datasource.statement;
+package io.dts.datasource.jdbc.wrapper;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
+
+import io.dts.resourcemanager.api.IDtsStatement;
 
 /**
  * Created by guoyubo on 2017/9/20.

@@ -1,11 +1,11 @@
-package io.dts.datasource.core;
+package io.dts.datasource.jdbc;
 
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
 import java.util.logging.Logger;
 
-import io.dts.parser.api.IDtsDataSource;
+import io.dts.resourcemanager.api.IDtsDataSource;
 
 
 /**
@@ -45,6 +45,6 @@ public abstract class AbstractDtsDataSource implements IDtsDataSource {
 
   @Override
   public Logger getParentLogger() throws SQLFeatureNotSupportedException {
-    throw  new SQLFeatureNotSupportedException();
+    throw new SQLFeatureNotSupportedException();
   }
 }

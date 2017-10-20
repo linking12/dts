@@ -1,4 +1,4 @@
-package io.dts.datasource.connection;
+package io.dts.datasource.jdbc;
 
 import java.sql.Array;
 import java.sql.Blob;
@@ -14,6 +14,8 @@ import java.sql.Struct;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Executor;
+
+import io.dts.resourcemanager.api.IDtsConnection;
 
 /**
  * Created by guoyubo on 2017/9/20.
@@ -39,7 +41,7 @@ public abstract class AbstractDtsConnection implements IDtsConnection {
   public void clearWarnings() throws SQLException {
     getRawConnection().clearWarnings();
   }
-  
+
 
   @Override
   public Array createArrayOf(String typeName, Object[] elements) throws SQLException {
@@ -160,7 +162,7 @@ public abstract class AbstractDtsConnection implements IDtsConnection {
     try {
       getRawConnection().setClientInfo(properties);
     } catch (SQLException e) {
-      throw  new SQLClientInfoException();
+      throw new SQLClientInfoException();
     }
   }
 
