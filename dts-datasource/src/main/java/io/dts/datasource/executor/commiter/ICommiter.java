@@ -6,5 +6,4 @@ package io.dts.datasource.executor.commiter;
 public interface ICommiter {
 
 
-
 }
