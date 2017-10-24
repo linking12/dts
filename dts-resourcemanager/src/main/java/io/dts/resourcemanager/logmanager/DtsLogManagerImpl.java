@@ -47,6 +47,10 @@ public class DtsLogManagerImpl implements DtsLogManager {
 
   protected static DtsLogManager logManager = new DtsLogManagerImpl();
 
+  private volatile BranchRollbackLogManager rollbackLogManager;
+
+  private volatile BranchCommitLogManager commitLogManager;
+
   protected DtsLogManagerImpl() {}
 
   /**
@@ -54,7 +58,10 @@ public class DtsLogManagerImpl implements DtsLogManager {
    */
   @Override
   public void branchCommit(List<ContextStep2> contexts) throws SQLException {
-    new BranchCommitLogManager().branchCommit(contexts);
+    if (commitLogManager == null) {
+      commitLogManager = new BranchCommitLogManager();
+    }
+    commitLogManager.branchCommit(contexts);
   }
 
   /**
@@ -62,7 +69,10 @@ public class DtsLogManagerImpl implements DtsLogManager {
    */
   @Override
   public void branchRollback(ContextStep2 context) throws SQLException {
-    new BranchRollbackLogManager().branchRollback(context);
+    if (rollbackLogManager == null) {
+      rollbackLogManager = new BranchRollbackLogManager();
+    }
+    rollbackLogManager.branchRollback(context);
   }
 
   protected TxcRuntimeContext getTxcRuntimeContexts(final long gid, final JdbcTemplate template) {
