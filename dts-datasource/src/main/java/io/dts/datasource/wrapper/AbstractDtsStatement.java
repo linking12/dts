@@ -15,13 +15,11 @@ import io.dts.resourcemanager.api.IDtsStatement;
  */
 public abstract class AbstractDtsStatement implements IDtsStatement {
 
-  /**
-   * 目标SQL
-   */
   protected String targetSql;
 
   private final IDtsConnection dtsConnection;
 
+  // 原始的statement
   private final Statement statement;
 
   AbstractDtsStatement(final IDtsConnection dtsConnection, final Statement statement) {
