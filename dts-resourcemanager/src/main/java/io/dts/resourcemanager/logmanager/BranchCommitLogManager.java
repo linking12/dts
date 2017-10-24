@@ -40,7 +40,7 @@ import io.dts.parser.model.RollbackInfor;
 import io.dts.parser.model.TxcField;
 import io.dts.parser.model.TxcRuntimeContext;
 import io.dts.parser.model.TxcTable;
-import io.dts.resourcemanager.help.DataSourceHolder;
+import io.dts.resourcemanager.helper.DataSourceHolder;
 
 /**
  * @author liushiming

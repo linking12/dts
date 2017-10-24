@@ -46,7 +46,7 @@ import io.dts.parser.model.TxcTable;
 import io.dts.parser.model.TxcTableMeta;
 import io.dts.parser.undo.ITxcUndoSqlBuilder;
 import io.dts.parser.vistor.support.TxcTableMetaTools;
-import io.dts.resourcemanager.help.DataSourceHolder;
+import io.dts.resourcemanager.helper.DataSourceHolder;
 
 /**
  * @author liushiming

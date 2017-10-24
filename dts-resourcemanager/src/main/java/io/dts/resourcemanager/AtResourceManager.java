@@ -31,7 +31,7 @@ import io.dts.common.common.TrxLockMode;
 import io.dts.common.common.TxcXID;
 import io.dts.common.common.context.ContextStep2;
 import io.dts.common.common.exception.DtsException;
-import io.dts.resourcemanager.help.TxcTrxConfig;
+import io.dts.resourcemanager.helper.TxcTrxConfig;
 import io.dts.resourcemanager.logmanager.DtsLogManager;
 import io.dts.resourcemanager.struct.TxcBranchStatus;
 import io.dts.resourcemanager.struct.TxcIsolation;

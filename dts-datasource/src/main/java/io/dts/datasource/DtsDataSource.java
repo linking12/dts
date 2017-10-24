@@ -7,7 +7,7 @@ import javax.sql.DataSource;
 
 import io.dts.parser.constant.DatabaseType;
 import io.dts.resourcemanager.ResourceManager;
-import io.dts.resourcemanager.help.DataSourceHolder;
+import io.dts.resourcemanager.helper.DataSourceHolder;
 
 /**
  * Created by guoyubo on 2017/9/20.
