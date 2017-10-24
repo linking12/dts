@@ -1,4 +1,4 @@
-package io.dts.datasource.executor.commiter;
+package io.dts.datasource.commiter;
 
 
 import java.sql.SQLException;
@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import io.dts.common.common.context.DtsContext;
 import io.dts.common.common.exception.DtsException;
-import io.dts.datasource.executor.BaseStatementUnit;
+import io.dts.datasource.wrapper.executor.StatementUnit;
 import io.dts.parser.model.RollbackInfor;
 import io.dts.parser.model.TxcTable;
 import io.dts.parser.vistor.ITxcVisitor;
@@ -22,10 +22,10 @@ public class AtExecutorRUnCommiter {
 
   private ITxcVisitor txcVisitor;
 
-  private BaseStatementUnit baseStatementUnit;
+  private StatementUnit baseStatementUnit;
 
 
-  public AtExecutorRUnCommiter(BaseStatementUnit baseStatementUnit, final List<Object> parameterSet)
+  public AtExecutorRUnCommiter(StatementUnit baseStatementUnit, final List<Object> parameterSet)
       throws SQLException {
     this.baseStatementUnit = baseStatementUnit;
     IDtsConnection txcConnection = baseStatementUnit.getStatement().getDtsConnection();
