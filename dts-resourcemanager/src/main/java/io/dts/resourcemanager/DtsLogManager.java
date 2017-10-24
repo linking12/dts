@@ -1,4 +1,4 @@
-package io.dts.resourcemanager.log;
+package io.dts.resourcemanager;
 
 import java.sql.Blob;
 import java.sql.Connection;
@@ -16,6 +16,7 @@ import javax.sql.DataSource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCallback;
 import org.springframework.jdbc.core.RowCallbackHandler;
@@ -44,26 +45,17 @@ import io.dts.parser.model.TxcTableMeta;
 import io.dts.parser.undo.ITxcUndoSqlBuilder;
 import io.dts.parser.vistor.support.TxcTableMetaTools;
 import io.dts.resourcemanager.help.DataSourceHolder;
-import io.dts.resourcemanager.help.SqlExecuteHelper;
 
 /**
  * Created by guoyubo on 2017/9/27.
  */
-public class DtsLogManager implements IDtsLogManager {
+public abstract class DtsLogManager {
 
   private static final Logger logger = LoggerFactory.getLogger(DtsLogManager.class);
 
-
-  private static String txcLogTableName = "txc_undo_log";
-
-  private static final IDtsLogManager logManager = new DtsLogManager();
+  private static final String txcLogTableName = "txc_undo_log";
 
   private DtsLogManager() {}
-
-
-  public static IDtsLogManager getInstance() {
-    return logManager;
-  }
 
   public static Integer insertUndoLog(final Connection connection,
       final TxcRuntimeContext txcContext) throws SQLException {
@@ -71,7 +63,6 @@ public class DtsLogManager implements IDtsLogManager {
     long branchID = txcContext.getBranchId();
     long globalXid = TxcXID.getGlobalXID(xid, branchID);
     String serverAddr = txcContext.getServer();
-
     StringBuilder insertSql = new StringBuilder("INSERT INTO ");
     insertSql.append(txcLogTableName);
     insertSql.append("(id, xid, branch_id, rollback_info, ");
@@ -85,7 +76,6 @@ public class DtsLogManager implements IDtsLogManager {
     insertSql.append("?,"); // gmt_modified
     insertSql.append(txcContext.getStatus()); // status
     insertSql.append(",?)"); // server
-
     return SqlExecuteHelper.executeSql(connection, insertSql.toString(),
         new PreparedStatementCallback<Integer>() {
           @Override
@@ -104,8 +94,7 @@ public class DtsLogManager implements IDtsLogManager {
 
   }
 
-  @Override
-  public void branchRollback(final ContextStep2 context) throws SQLException {
+  public static void branchRollback(final ContextStep2 context) throws SQLException {
     // 根据dbName取注册的datasource
     DataSource datasource = DataSourceHolder.getDataSource(context.getDbname());
     DataSourceTransactionManager tm = new DataSourceTransactionManager(datasource);
@@ -135,7 +124,6 @@ public class DtsLogManager implements IDtsLogManager {
             } catch (Exception e) {
               ; // 吞掉
             }
-
             if (tablemeta == null) {
               DataSource datasource = null;
               Connection conn = null;
@@ -149,11 +137,9 @@ public class DtsLogManager implements IDtsLogManager {
                 }
               }
             }
-
             o.setTableMeta(tablemeta);
             p.setTableMeta(tablemeta);
           }
-
           logger.info(String.format("[logid:%d:xid:%s:branch:%d]", undolog.getId(),
               undolog.getXid(), undolog.getBranchId()));
           for (int i = undolog.getInfor().size(); i > 0; i--) {
@@ -204,7 +190,7 @@ public class DtsLogManager implements IDtsLogManager {
 
   }
 
-  private void checkDirtyRead(final JdbcTemplate template, final RollbackInfor info) {
+  private static void checkDirtyRead(final JdbcTemplate template, final RollbackInfor info) {
     String selectSql =
         String.format("%s %s FOR UPDATE", info.getSelectSql(), info.getWhereCondition());
     StringBuilder retLog = new StringBuilder();
@@ -240,7 +226,7 @@ public class DtsLogManager implements IDtsLogManager {
 
   }
 
-  private TxcTable getDBTxcTable(final JdbcTemplate template, final String selectSql,
+  private static TxcTable getDBTxcTable(final JdbcTemplate template, final String selectSql,
       final TxcTable p) {
     TxcTable t = new TxcTable();
     t.setTableMeta(p.getTableMeta());
@@ -267,8 +253,7 @@ public class DtsLogManager implements IDtsLogManager {
     return t;
   }
 
-  @Override
-  public void branchCommit(List<ContextStep2> contexts) throws SQLException {
+  public static void branchCommit(List<ContextStep2> contexts) throws SQLException {
     // RT
     Iterator<ContextStep2> it = contexts.iterator();
     while (it.hasNext()) {
@@ -297,7 +282,7 @@ public class DtsLogManager implements IDtsLogManager {
     }
   }
 
-  private void branchCommit(List<ContextStep2> contexts, String dbName) throws SQLException {
+  private static void branchCommit(List<ContextStep2> contexts, String dbName) throws SQLException {
     // 根据dbName取注册的datasource
     DataSource datasource = DataSourceHolder.getDataSource(dbName);
     DataSourceTransactionManager tm = new DataSourceTransactionManager(datasource);
@@ -349,7 +334,8 @@ public class DtsLogManager implements IDtsLogManager {
     });
   }
 
-  private TxcRuntimeContext getTxcRuntimeContexts(final long gid, final JdbcTemplate template) {
+  private static TxcRuntimeContext getTxcRuntimeContexts(final long gid,
+      final JdbcTemplate template) {
     String sql = String.format("select * from %s where status = 0 && " + "id = %d order by id desc",
         txcLogTableName, gid);
     List<TxcRuntimeContext> undos = SqlExecuteHelper.querySql(template, new RowMapper() {
@@ -413,16 +399,71 @@ public class DtsLogManager implements IDtsLogManager {
         sb.toString(), UndoLogMode.COMMON_LOG.getValue());
   }
 
-  @Override
-  public void deleteUndoLog(ContextStep2 context, JdbcTemplate template) throws SQLException {
+  public static void deleteUndoLog(ContextStep2 context, JdbcTemplate template)
+      throws SQLException {
     // TODO Auto-generated method stub
 
   }
 
-  @Override
-  public void deleteUndoLog(List<ContextStep2> contexts, JdbcTemplate template)
+  public static void deleteUndoLog(List<ContextStep2> contexts, JdbcTemplate template)
       throws SQLException {
     // TODO Auto-generated method stub
+
+  }
+
+  private static class SqlExecuteHelper {
+
+    private static final Logger logger = LoggerFactory.getLogger(SqlExecuteHelper.class);
+
+    public static void executeSql(String dbName, String sql) throws SQLException {
+      if (sql == null) {
+        return;
+      }
+      try {
+        DataSource db = DataSourceHolder.getDataSource(dbName);
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(db);
+        jdbcTemplate.execute(sql);
+      } catch (DataAccessException e) {
+        SQLException sqle = (SQLException) e.getCause();
+        if (sqle.getErrorCode() == 1062) {
+          logger.info("RtExecutor retry sql:" + e.getMessage() + ":" + sql);
+        } else {
+          throw sqle;
+        }
+      }
+    }
+
+    public static <T> List<T> querySql(final JdbcTemplate template, final RowMapper rowMapper,
+        final String sql) {
+      List<T> contents;
+      long start = 0;
+      if (logger.isDebugEnabled())
+        start = System.currentTimeMillis();
+      try {
+        contents = template.query(sql, rowMapper);
+      } finally {
+        if (logger.isDebugEnabled()) {
+          long end = System.currentTimeMillis();
+          logger.info(String.format("query:[%s] cost %d ms.", sql, (end - start)));
+        }
+      }
+
+      return contents;
+    }
+
+
+    public static <T> T executeSql(final Connection connection, String sql,
+        PreparedStatementCallback<T> callback) throws SQLException {
+      PreparedStatement pst = null;
+      try {
+        pst = connection.prepareStatement(sql);
+        return callback.doInPreparedStatement(pst);
+      } finally {
+        if (pst != null) {
+          pst.close();
+        }
+      }
+    }
 
   }
 

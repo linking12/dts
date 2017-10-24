@@ -13,8 +13,8 @@ import io.dts.datasource.wrapper.DtsPrepareStatementWrapper;
 import io.dts.datasource.wrapper.DtsStatementWrapper;
 import io.dts.parser.constant.UndoLogMode;
 import io.dts.parser.model.TxcRuntimeContext;
+import io.dts.resourcemanager.DtsLogManager;
 import io.dts.resourcemanager.api.IDtsDataSource;
-import io.dts.resourcemanager.log.DtsLogManager;
 
 /**
  * Created by guoyubo on 2017/9/20.
