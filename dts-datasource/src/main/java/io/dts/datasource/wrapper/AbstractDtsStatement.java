@@ -28,7 +28,7 @@ public abstract class AbstractDtsStatement implements IDtsStatement {
   }
 
   protected StatementModel createStatementModel(final String sql) throws SQLException {
-    return new StatementModel(dtsConnection.getDataSource(), this, sql);
+    return new StatementModel(dtsConnection.getDataSource(), AbstractDtsStatement.this, sql);
   }
 
   @Override
