@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import io.dts.common.common.context.DtsContext;
 import io.dts.common.common.exception.DtsException;
-import io.dts.datasource.wrapper.executor.StatementUnit;
+import io.dts.datasource.wrapper.executor.StatementModel;
 import io.dts.parser.model.RollbackInfor;
 import io.dts.parser.model.TxcTable;
 import io.dts.parser.vistor.ITxcVisitor;
@@ -22,16 +22,16 @@ public class AtExecutorRUnCommiter {
 
   private ITxcVisitor txcVisitor;
 
-  private StatementUnit baseStatementUnit;
+  private StatementModel stateModel;
 
 
-  public AtExecutorRUnCommiter(StatementUnit baseStatementUnit, final List<Object> parameterSet)
+  public AtExecutorRUnCommiter(StatementModel stateModel, final List<Object> parameterSet)
       throws SQLException {
-    this.baseStatementUnit = baseStatementUnit;
-    IDtsConnection txcConnection = baseStatementUnit.getStatement().getDtsConnection();
-    this.txcVisitor = TxcVisitorFactory.createSqlVisitor(
-        txcConnection.getDataSource().getDatabaseType(), txcConnection.getRawConnection(),
-        baseStatementUnit.getSqlExecutionUnit().getSql(), parameterSet);
+    this.stateModel = stateModel;
+    IDtsConnection txcConnection = stateModel.getStatement().getDtsConnection();
+    this.txcVisitor =
+        TxcVisitorFactory.createSqlVisitor(txcConnection.getDataSource().getDatabaseType(),
+            txcConnection.getRawConnection(), stateModel.getSql(), parameterSet);
 
   }
 
@@ -40,15 +40,14 @@ public class AtExecutorRUnCommiter {
     if (!DtsContext.inTxcTransaction()) {
       return null;
     }
-
     TxcTable nRet = null;
-    switch (baseStatementUnit.getSqlExecutionUnit().getSqlType()) {
+    switch (stateModel.getSqlType()) {
       case DELETE:
       case UPDATE:
       case INSERT:
         this.txcVisitor.buildTableMeta();
         // 获取前置镜像
-        txcVisitor.executeAndGetFrontImage(baseStatementUnit.getStatement().getRawStatement());
+        txcVisitor.executeAndGetFrontImage(stateModel.getStatement().getRawStatement());
         break;
       default:
         break;
@@ -62,12 +61,12 @@ public class AtExecutorRUnCommiter {
     }
 
     TxcTable nRet = null;
-    switch (baseStatementUnit.getSqlExecutionUnit().getSqlType()) {
+    switch (stateModel.getSqlType()) {
       case DELETE:
       case UPDATE:
       case INSERT:
         // 获取前置镜像
-        txcVisitor.executeAndGetRearImage(baseStatementUnit.getStatement().getRawStatement());
+        txcVisitor.executeAndGetRearImage(stateModel.getStatement().getRawStatement());
         insertUndoLog();
         break;
       default:
@@ -85,7 +84,6 @@ public class AtExecutorRUnCommiter {
       logger.error("insertUndoLog", errorInfo);
       throw new DtsException(3333, errorInfo);
     }
-
     // 写入UndoLog
     RollbackInfor txcLog = new RollbackInfor();
     txcLog.setSql(txcVisitor.getInputSql());
@@ -108,8 +106,7 @@ public class AtExecutorRUnCommiter {
         throw new DtsException("unknown error");
     }
     txcLog.txcLogChecker(); // json合法性检查
-
-    baseStatementUnit.getStatement().getDtsConnection().getTxcContext().addInfor(txcLog);
+    stateModel.getStatement().getDtsConnection().getTxcContext().addInfor(txcLog);
   }
 
 

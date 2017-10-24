@@ -12,25 +12,25 @@ import io.dts.datasource.commiter.AtExecutorRUnCommiter;
  */
 public abstract class AbstractExecutor {
 
-  public <T> T executeStatement(final StatementUnit statementUnit,
+  public <T> T executeStatement(final StatementModel statementUnit,
       final ExecuteCallback<T> executeCallback) throws Exception {
     return execute(statementUnit, Collections.emptyList(), executeCallback);
   }
 
-  public <T> T executePreparedStatement(final StatementUnit preparedStatementUnits,
+  public <T> T executePreparedStatement(final StatementModel preparedStatementUnits,
       final List<Object> parameters, final ExecuteCallback<T> executeCallback)
 
       throws Exception {
     return execute(preparedStatementUnits, parameters, executeCallback);
   }
 
-  private <T> T execute(StatementUnit baseStatementUnit, final List<Object> parameterSet,
+  private <T> T execute(StatementModel baseStatementUnit, final List<Object> parameterSet,
       final ExecuteCallback<T> executeCallback) throws Exception {
     T result = executeInternal(baseStatementUnit, parameterSet, executeCallback);
     return result;
   }
 
-  private <T> T executeInternal(final StatementUnit baseStatementUnit,
+  private <T> T executeInternal(final StatementModel baseStatementUnit,
       final List<Object> parameterSet, final ExecuteCallback<T> executeCallback) throws Exception {
     try {
       AtExecutorRUnCommiter commiter = new AtExecutorRUnCommiter(baseStatementUnit, parameterSet);
@@ -47,7 +47,7 @@ public abstract class AbstractExecutor {
 
   static interface ExecuteCallback<T> {
 
-    T execute(StatementUnit baseStatementUnit) throws Exception;
+    T execute(StatementModel baseStatementUnit) throws Exception;
   }
 
 

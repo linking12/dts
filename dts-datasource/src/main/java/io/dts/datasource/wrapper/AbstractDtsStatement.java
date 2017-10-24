@@ -4,7 +4,10 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
+import java.sql.Statement;
 
+import io.dts.datasource.wrapper.executor.StatementModel;
+import io.dts.resourcemanager.api.IDtsConnection;
 import io.dts.resourcemanager.api.IDtsStatement;
 
 /**
@@ -16,6 +19,29 @@ public abstract class AbstractDtsStatement implements IDtsStatement {
    * 目标SQL
    */
   protected String targetSql;
+
+  private final IDtsConnection dtsConnection;
+
+  private final Statement statement;
+
+  AbstractDtsStatement(final IDtsConnection dtsConnection, final Statement statement) {
+    this.dtsConnection = dtsConnection;
+    this.statement = statement;
+  }
+
+  protected StatementModel createStatementModel(final String sql) throws SQLException {
+    return new StatementModel(dtsConnection.getDataSource(), this, sql);
+  }
+
+  @Override
+  public IDtsConnection getDtsConnection() {
+    return dtsConnection;
+  }
+
+  @Override
+  public Statement getRawStatement() {
+    return statement;
+  }
 
   @Override
   public String getTargetSql() {

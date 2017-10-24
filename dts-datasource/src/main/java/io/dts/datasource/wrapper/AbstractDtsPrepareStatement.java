@@ -10,6 +10,7 @@ import java.sql.Clob;
 import java.sql.Date;
 import java.sql.NClob;
 import java.sql.ParameterMetaData;
+import java.sql.PreparedStatement;
 import java.sql.Ref;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -17,12 +18,15 @@ import java.sql.RowId;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
 import java.sql.SQLXML;
+import java.sql.Statement;
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import org.apache.curator.shaded.com.google.common.collect.Lists;
+
+import io.dts.datasource.DtsConnection;
 import io.dts.resourcemanager.api.IDtsPrepareStatement;
 
 /**
@@ -31,8 +35,17 @@ import io.dts.resourcemanager.api.IDtsPrepareStatement;
 public abstract class AbstractDtsPrepareStatement extends AbstractDtsStatement
     implements IDtsPrepareStatement {
 
-  private final List<Object> parameters = new ArrayList<>();
+  private final List<Object> parameters;
 
+  AbstractDtsPrepareStatement(DtsConnection dtsConnection, Statement statement) {
+    super(dtsConnection, statement);
+    this.parameters = Lists.newArrayList();
+  }
+
+  @Override
+  public PreparedStatement getRawStatement() {
+    return (PreparedStatement) super.getRawStatement();
+  }
 
   public final void setNull(final int parameterIndex, final int sqlType) throws SQLException {
     setParameter(parameterIndex, null);

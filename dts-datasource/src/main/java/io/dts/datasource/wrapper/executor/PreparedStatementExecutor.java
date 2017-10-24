@@ -8,11 +8,11 @@ import java.util.List;
 
 public final class PreparedStatementExecutor extends AbstractExecutor {
 
-  private final StatementUnit preparedStatementUnit;
+  private final StatementModel preparedStatementUnit;
 
   private final List<Object> parameters;
 
-  public PreparedStatementExecutor(StatementUnit preparedStatementUnit, List<Object> parameters) {
+  public PreparedStatementExecutor(StatementModel preparedStatementUnit, List<Object> parameters) {
     super();
     this.preparedStatementUnit = preparedStatementUnit;
     this.parameters = parameters;
@@ -23,7 +23,7 @@ public final class PreparedStatementExecutor extends AbstractExecutor {
         new ExecuteCallback<ResultSet>() {
 
           @Override
-          public ResultSet execute(final StatementUnit baseStatementUnit) throws Exception {
+          public ResultSet execute(final StatementModel baseStatementUnit) throws Exception {
             return ((PreparedStatement) baseStatementUnit.getStatement().getRawStatement())
                 .executeQuery();
           }
@@ -35,7 +35,7 @@ public final class PreparedStatementExecutor extends AbstractExecutor {
         new ExecuteCallback<Integer>() {
 
           @Override
-          public Integer execute(final StatementUnit baseStatementUnit) throws Exception {
+          public Integer execute(final StatementModel baseStatementUnit) throws Exception {
             return ((PreparedStatement) baseStatementUnit.getStatement().getRawStatement())
                 .executeUpdate();
           }
@@ -49,7 +49,7 @@ public final class PreparedStatementExecutor extends AbstractExecutor {
         new ExecuteCallback<Boolean>() {
 
           @Override
-          public Boolean execute(final StatementUnit baseStatementUnit) throws Exception {
+          public Boolean execute(final StatementModel baseStatementUnit) throws Exception {
             return ((PreparedStatement) baseStatementUnit.getStatement().getRawStatement())
                 .execute();
           }
