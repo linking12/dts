@@ -32,6 +32,7 @@ import io.dts.common.common.TxcXID;
 import io.dts.common.common.context.ContextStep2;
 import io.dts.common.common.exception.DtsException;
 import io.dts.resourcemanager.help.TxcTrxConfig;
+import io.dts.resourcemanager.logmanager.DtsLogManager;
 import io.dts.resourcemanager.struct.TxcBranchStatus;
 import io.dts.resourcemanager.struct.TxcIsolation;
 
@@ -98,7 +99,7 @@ public class AtResourceManager extends BaseResourceManager {
             list.add(context);
           }
           try {
-            DtsLogManager.branchCommit(list);
+            DtsLogManager.getInstance().branchCommit(list);
           } catch (SQLException e) {
             throw new DtsException(e);
           }
@@ -140,7 +141,7 @@ public class AtResourceManager extends BaseResourceManager {
           currentTaskCommitedAt.put(context.getGlobalXid(), context);
           break;
         case COMMIT_RETRY_MODE:
-          DtsLogManager.branchCommit(Arrays.asList(context));
+          DtsLogManager.getInstance().branchCommit(Arrays.asList(context));
           break;
         default:
           break;
@@ -185,7 +186,7 @@ public class AtResourceManager extends BaseResourceManager {
     }
     context.setGlobalXid(TxcXID.getGlobalXID(xid, branchId));
     try {
-      DtsLogManager.branchRollback(context);
+      DtsLogManager.getInstance().branchRollback(context);
     } catch (DtsException e) {
       throw e;
     } catch (SQLException e) {

@@ -13,8 +13,8 @@ import io.dts.datasource.wrapper.DtsPrepareStatementWrapper;
 import io.dts.datasource.wrapper.DtsStatementWrapper;
 import io.dts.parser.constant.UndoLogMode;
 import io.dts.parser.model.TxcRuntimeContext;
-import io.dts.resourcemanager.DtsLogManager;
 import io.dts.resourcemanager.api.IDtsDataSource;
+import io.dts.resourcemanager.logmanager.DtsLogManagerImpl;
 
 /**
  * Created by guoyubo on 2017/9/20.
@@ -85,7 +85,7 @@ public class DtsConnection extends AbstractDtsConnection {
         // 日志写库
         txcContext.setServer(TxcXID.getServerAddress(txcContext.getXid()));
         txcContext.setStatus(UndoLogMode.COMMON_LOG.getValue());
-        DtsLogManager.insertUndoLog(this.getRawConnection(), txcContext);
+        DtsLogManagerImpl.insertUndoLog(this.getRawConnection(), txcContext);
         getRawConnection().commit();
         reportBranchStatus(true);
       } else {
