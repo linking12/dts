@@ -20,22 +20,26 @@ import java.util.List;
 import io.dts.datasource.executor.BaseStatementUnit;
 import io.dts.datasource.executor.ExecuteCallback;
 import io.dts.datasource.executor.ExecutorEngine;
-import lombok.RequiredArgsConstructor;
 
-/**
- * PreparedStatement Executor for multiple threads.
- * 
- * @author zhangliang
- * @author caohao
- */
-@RequiredArgsConstructor
+
 public final class PreparedStatementExecutor {
+
 
   private final ExecutorEngine executorEngine;
 
   private final PreparedStatementUnit preparedStatementUnit;
 
   private final List<Object> parameters;
+
+  public PreparedStatementExecutor(ExecutorEngine executorEngine,
+      PreparedStatementUnit preparedStatementUnit, List<Object> parameters) {
+    super();
+    this.executorEngine = executorEngine;
+    this.preparedStatementUnit = preparedStatementUnit;
+    this.parameters = parameters;
+  }
+
+
 
   /**
    * Execute query.

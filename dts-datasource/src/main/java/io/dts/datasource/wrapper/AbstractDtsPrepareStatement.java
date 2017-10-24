@@ -24,7 +24,6 @@ import java.util.Calendar;
 import java.util.List;
 
 import io.dts.resourcemanager.api.IDtsPrepareStatement;
-import lombok.Getter;
 
 /**
  * Created by guoyubo on 2017/9/20.
@@ -32,10 +31,9 @@ import lombok.Getter;
 public abstract class AbstractDtsPrepareStatement extends AbstractDtsStatement
     implements IDtsPrepareStatement {
 
-  @Getter
   private final List<Object> parameters = new ArrayList<>();
 
-  @Override
+
   public final void setNull(final int parameterIndex, final int sqlType) throws SQLException {
     setParameter(parameterIndex, null);
     getRawStatement().setNull(parameterIndex, sqlType);
@@ -419,6 +417,11 @@ public abstract class AbstractDtsPrepareStatement extends AbstractDtsStatement
     parameters.set(parameterIndex - 1, value);
   }
 
+
+
+  public List<Object> getParameters() {
+    return parameters;
+  }
 
   @Override
   public final void clearParameters() throws SQLException {

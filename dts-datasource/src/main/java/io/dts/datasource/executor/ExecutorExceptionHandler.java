@@ -1,65 +1,45 @@
-/*
- * Copyright 1999-2015 dangdang.com.
- * <p>
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * </p>
- */
 
 package io.dts.datasource.executor;
 
-import io.dts.common.common.exception.DtsException;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
-/**
- * Executor runtime exception handler.
- * 
- * @author zhangliang
- */
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-@Slf4j
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import io.dts.common.common.exception.DtsException;
+
 public final class ExecutorExceptionHandler {
-    
-    private static final ThreadLocal<Boolean> IS_EXCEPTION_THROWN = new ThreadLocal<>();
-    
-    /**
-     * Set throw exception if error occur or not.
-     *
-     * @param isExceptionThrown throw exception if error occur or not
-     */
-    public static void setExceptionThrown(final boolean isExceptionThrown) {
-        ExecutorExceptionHandler.IS_EXCEPTION_THROWN.set(isExceptionThrown);
+
+  private static final Logger log = LoggerFactory.getLogger(ExecutorExceptionHandler.class);
+
+  private static final ThreadLocal<Boolean> IS_EXCEPTION_THROWN = new ThreadLocal<>();
+
+  /**
+   * Set throw exception if error occur or not.
+   *
+   * @param isExceptionThrown throw exception if error occur or not
+   */
+  public static void setExceptionThrown(final boolean isExceptionThrown) {
+    ExecutorExceptionHandler.IS_EXCEPTION_THROWN.set(isExceptionThrown);
+  }
+
+  /**
+   * Get throw exception if error occur or not.
+   * 
+   * @return throw exception if error occur or not
+   */
+  public static boolean isExceptionThrown() {
+    return null == IS_EXCEPTION_THROWN.get() ? true : IS_EXCEPTION_THROWN.get();
+  }
+
+  /**
+   * Handle exception.
+   * 
+   * @param exception to be handled exception
+   */
+  public static void handleException(final Exception exception) {
+    if (isExceptionThrown()) {
+      throw new DtsException(exception);
     }
-    
-    /**
-     * Get throw exception if error occur or not.
-     * 
-     * @return throw exception if error occur or not
-     */
-    public static boolean isExceptionThrown() {
-        return null == IS_EXCEPTION_THROWN.get() ? true : IS_EXCEPTION_THROWN.get();
-    }
-    
-    /**
-     * Handle exception. 
-     * 
-     * @param exception to be handled exception
-     */
-    public static void handleException(final Exception exception) {
-        if (isExceptionThrown()) {
-            throw new DtsException(exception);
-        }
-        log.error("exception occur: ", exception);
-    }
+    log.error("exception occur: ", exception);
+  }
 }
