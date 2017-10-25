@@ -37,7 +37,6 @@ import io.dts.common.common.TxcXID;
 import io.dts.common.common.context.ContextStep2;
 import io.dts.common.common.exception.DtsException;
 import io.dts.common.protocol.ResultCode;
-import io.dts.parser.constant.UndoLogMode;
 import io.dts.parser.struct.RollbackInfor;
 import io.dts.parser.struct.TxcField;
 import io.dts.parser.struct.TxcLine;
@@ -46,6 +45,7 @@ import io.dts.parser.struct.TxcTable;
 import io.dts.parser.struct.TxcTableMeta;
 import io.dts.parser.vistor.DtsTableMetaTools;
 import io.dts.resourcemanager.helper.DataSourceHolder;
+import io.dts.resourcemanager.struct.UndoLogMode;
 import io.dts.resourcemanager.undo.DtsUndo;
 
 /**
@@ -109,8 +109,7 @@ public class BranchRollbackLogManager extends DtsLogManagerImpl {
             // 检查脏写
             checkDirtyRead(template, info);
 
-            List<String> rollbackSqls =
-                DtsUndo.createDtsundo(info).buildRollbackSql();
+            List<String> rollbackSqls = DtsUndo.createDtsundo(info).buildRollbackSql();
             logger.info("the rollback sql is " + rollbackSqls);
             if (!CollectionUtils.isEmpty(rollbackSqls)) {
               template.batchUpdate(rollbackSqls.toArray(new String[rollbackSqls.size()]));

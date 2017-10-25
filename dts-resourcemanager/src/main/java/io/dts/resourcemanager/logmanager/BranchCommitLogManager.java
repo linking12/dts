@@ -34,13 +34,13 @@ import io.dts.common.common.CommitMode;
 import io.dts.common.common.TxcXID;
 import io.dts.common.common.context.ContextStep2;
 import io.dts.common.common.exception.DtsException;
-import io.dts.parser.constant.UndoLogMode;
 import io.dts.parser.struct.RollbackInfor;
 import io.dts.parser.struct.SqlType;
 import io.dts.parser.struct.TxcField;
 import io.dts.parser.struct.TxcRuntimeContext;
 import io.dts.parser.struct.TxcTable;
 import io.dts.resourcemanager.helper.DataSourceHolder;
+import io.dts.resourcemanager.struct.UndoLogMode;
 
 /**
  * @author liushiming
