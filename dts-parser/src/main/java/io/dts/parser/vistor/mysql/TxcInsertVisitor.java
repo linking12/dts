@@ -1,4 +1,4 @@
-package io.dts.parser.vistor.impl;
+package io.dts.parser.vistor.mysql;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -21,6 +21,7 @@ import com.alibaba.druid.sql.visitor.SQLEvalVisitorUtils;
 import com.alibaba.druid.util.JdbcUtils;
 
 import io.dts.common.common.exception.DtsException;
+import io.dts.parser.DtsSQLStatement;
 import io.dts.parser.constant.DatabaseType;
 import io.dts.parser.model.TxcColumnMeta;
 import io.dts.parser.model.TxcIndex;
@@ -29,7 +30,6 @@ import io.dts.parser.model.TxcTableMeta;
 import io.dts.parser.util.SQLUtil;
 import io.dts.parser.vistor.MySQLEvalVisitor;
 import io.dts.parser.vistor.TxcBaseVisitor;
-import io.dts.parser.vistor.support.ISQLStatement;
 import io.dts.parser.vistor.support.TxcObjectWapper;
 
 
@@ -38,7 +38,7 @@ public class TxcInsertVisitor extends TxcBaseVisitor {
   private static final Logger logger = LoggerFactory.getLogger(TxcInsertVisitor.class);
 
 
-  public TxcInsertVisitor(ISQLStatement node, List<Object> parameterSet) {
+  public TxcInsertVisitor(DtsSQLStatement node, List<Object> parameterSet) {
     super(node, parameterSet);
   }
 

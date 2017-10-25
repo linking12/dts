@@ -19,7 +19,6 @@ import io.dts.common.common.exception.DtsException;
 import io.dts.parser.constant.DatabaseType;
 import io.dts.parser.constant.SqlType;
 import io.dts.parser.vistor.ITxcVisitor;
-import io.dts.parser.vistor.support.DtsSQLStatement;
 
 public class TxcVisitorFactory {
 

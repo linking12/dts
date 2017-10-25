@@ -7,10 +7,10 @@ import java.util.Map;
 
 import io.dts.parser.constant.DatabaseType;
 import io.dts.parser.vistor.ITxcVisitor;
-import io.dts.parser.vistor.impl.TxcDeleteVisitor;
-import io.dts.parser.vistor.impl.TxcInsertVisitor;
-import io.dts.parser.vistor.impl.TxcSelectVisitor;
-import io.dts.parser.vistor.impl.TxcUpdateVisitor;
+import io.dts.parser.vistor.mysql.TxcDeleteVisitor;
+import io.dts.parser.vistor.mysql.TxcInsertVisitor;
+import io.dts.parser.vistor.mysql.TxcSelectVisitor;
+import io.dts.parser.vistor.mysql.TxcUpdateVisitor;
 
 
 public final class SQLVisitorRegistry {

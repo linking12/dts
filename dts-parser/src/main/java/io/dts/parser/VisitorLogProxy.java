@@ -22,7 +22,6 @@ import org.slf4j.LoggerFactory;
 
 import io.dts.common.common.exception.DtsException;
 import io.dts.parser.vistor.ITxcVisitor;
-import io.dts.parser.vistor.support.ISQLStatement;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
@@ -41,17 +40,17 @@ public final class VisitorLogProxy {
    * @return 增强后的新类的对象
    */
   @SuppressWarnings("unchecked")
-  public static <T> T enhance(final Class<T> target, final ISQLStatement sqlStatement,
+  public static <T> T enhance(final Class<T> target, final DtsSQLStatement sqlStatement,
       final List<Object> parameterSet) {
     if (log.isTraceEnabled()) {
       Enhancer result = new Enhancer();
       result.setSuperclass(target);
       result.setCallback(new VisitorHandler());
-      return (T) result.create(new Class[] {ISQLStatement.class, List.class},
+      return (T) result.create(new Class[] {DtsSQLStatement.class, List.class},
           new Object[] {sqlStatement, parameterSet});
     } else {
       try {
-        return target.getDeclaredConstructor(ISQLStatement.class, List.class)
+        return target.getDeclaredConstructor(DtsSQLStatement.class, List.class)
             .newInstance(sqlStatement, parameterSet);
       } catch (final InstantiationException | IllegalAccessException | NoSuchMethodException
           | InvocationTargetException ex) {

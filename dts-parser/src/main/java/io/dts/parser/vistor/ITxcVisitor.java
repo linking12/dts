@@ -16,13 +16,11 @@ package io.dts.parser.vistor;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.List;
 
+import io.dts.parser.DtsSQLStatement;
 import io.dts.parser.constant.SqlType;
 import io.dts.parser.model.TxcTable;
 import io.dts.parser.model.TxcTableMeta;
-import io.dts.parser.vistor.support.ISQLStatement;
-import io.dts.parser.vistor.support.PlaceHolderManager;
 
 /**
  * SQL解析基础访问器接口.
@@ -87,7 +85,7 @@ public interface ITxcVisitor {
 
   TxcTableMeta getTableMeta();
 
-  ISQLStatement getSQLStatement();
+  DtsSQLStatement getSQLStatement();
 
 
 }

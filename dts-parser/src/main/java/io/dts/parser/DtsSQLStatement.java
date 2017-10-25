@@ -1,4 +1,4 @@
-package io.dts.parser.vistor.support;
+package io.dts.parser;
 
 import com.alibaba.druid.sql.ast.SQLStatement;
 
@@ -8,7 +8,7 @@ import io.dts.parser.constant.SqlType;
 /**
  * Created by guoyubo on 2017/9/23.
  */
-public class DtsSQLStatement implements ISQLStatement {
+public class DtsSQLStatement {
 
   private String sql;
 
@@ -26,22 +26,18 @@ public class DtsSQLStatement implements ISQLStatement {
     this.sqlStatement = sqlStatement;
   }
 
-  @Override
   public SQLStatement getSQLStatement() {
     return sqlStatement;
   }
 
-  @Override
   public SqlType getType() {
     return sqlType;
   }
 
-  @Override
   public DatabaseType getDatabaseType() {
     return databaseType;
   }
 
-  @Override
   public String getSql() {
     return sql;
   }

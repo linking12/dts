@@ -1,4 +1,4 @@
-package io.dts.parser.vistor.impl;
+package io.dts.parser.vistor.mysql;
 
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -10,10 +10,10 @@ import org.slf4j.LoggerFactory;
 import com.alibaba.druid.sql.ast.statement.SQLUpdateStatement;
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlUpdateStatement;
 
+import io.dts.parser.DtsSQLStatement;
 import io.dts.parser.model.TxcTable;
 import io.dts.parser.model.TxcTableMeta;
 import io.dts.parser.vistor.TxcBaseVisitor;
-import io.dts.parser.vistor.support.ISQLStatement;
 
 /**
  * @author xiaoyan
@@ -24,7 +24,7 @@ public class TxcUpdateVisitor extends TxcBaseVisitor {
   private static final Logger logger = LoggerFactory.getLogger(TxcUpdateVisitor.class);
 
 
-  public TxcUpdateVisitor(ISQLStatement node, List<Object> parameterSet) {
+  public TxcUpdateVisitor(DtsSQLStatement node, List<Object> parameterSet) {
     super(node, parameterSet);
   }
 
