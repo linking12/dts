@@ -1,4 +1,4 @@
-package io.dts.parser.vistor.base;
+package io.dts.parser.vistor.impl;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -27,6 +27,8 @@ import io.dts.parser.model.TxcIndex;
 import io.dts.parser.model.TxcTable;
 import io.dts.parser.model.TxcTableMeta;
 import io.dts.parser.util.SQLUtil;
+import io.dts.parser.vistor.MySQLEvalVisitor;
+import io.dts.parser.vistor.TxcBaseVisitor;
 import io.dts.parser.vistor.support.ISQLStatement;
 import io.dts.parser.vistor.support.TxcObjectWapper;
 

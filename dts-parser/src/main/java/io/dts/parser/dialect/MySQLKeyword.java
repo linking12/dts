@@ -15,16 +15,14 @@
  * </p>
  */
 
-package io.dts.parser.dialect.mysql;
-
-import io.dts.parser.dialect.Keyword;
+package io.dts.parser.dialect;
 
 /**
  * MySQL keyword.
  * 
  * @author zhangliang 
  */
-public enum MySQLKeyword implements Keyword {
+public enum MySQLKeyword  {
     
     SHOW, 
     DUAL, 

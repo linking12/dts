@@ -11,7 +11,7 @@
  * the License. </p>
  */
 
-package io.dts.parser.vistor;
+package io.dts.parser;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.dts.common.common.exception.DtsException;
+import io.dts.parser.vistor.ITxcVisitor;
 import io.dts.parser.vistor.support.ISQLStatement;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;

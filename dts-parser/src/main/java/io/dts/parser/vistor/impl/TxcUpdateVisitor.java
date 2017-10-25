@@ -1,4 +1,4 @@
-package io.dts.parser.vistor.base;
+package io.dts.parser.vistor.impl;
 
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -12,6 +12,7 @@ import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlUpdateStatement;
 
 import io.dts.parser.model.TxcTable;
 import io.dts.parser.model.TxcTableMeta;
+import io.dts.parser.vistor.TxcBaseVisitor;
 import io.dts.parser.vistor.support.ISQLStatement;
 
 /**

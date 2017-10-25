@@ -10,10 +10,10 @@ import org.slf4j.LoggerFactory;
 import io.dts.common.common.context.DtsContext;
 import io.dts.common.common.exception.DtsException;
 import io.dts.datasource.wrapper.executor.StatementModel;
+import io.dts.parser.TxcVisitorFactory;
 import io.dts.parser.model.RollbackInfor;
 import io.dts.parser.model.TxcTable;
 import io.dts.parser.vistor.ITxcVisitor;
-import io.dts.parser.vistor.TxcVisitorFactory;
 import io.dts.resourcemanager.api.IDtsConnection;
 
 public class AtExecutorRUnCommiter {

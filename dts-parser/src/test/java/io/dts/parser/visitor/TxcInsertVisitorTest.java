@@ -15,9 +15,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
+import io.dts.parser.TxcVisitorFactory;
 import io.dts.parser.constant.DatabaseType;
 import io.dts.parser.vistor.ITxcVisitor;
-import io.dts.parser.vistor.TxcVisitorFactory;
 import sun.swing.BakedArrayList;
 
 /**

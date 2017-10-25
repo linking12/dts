@@ -22,7 +22,7 @@ package io.dts.parser.dialect;
  * 
  * @author zhangliang 
  */
-public enum DefaultKeyword implements Keyword {
+public enum DefaultKeyword   {
     
     /*
     Common

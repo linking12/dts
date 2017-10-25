@@ -1,4 +1,4 @@
-package io.dts.parser.vistor.base;
+package io.dts.parser.vistor;
 
 import com.alibaba.druid.sql.SQLUtils;
 import com.alibaba.druid.sql.ast.SQLExpr;
@@ -22,7 +22,6 @@ import io.dts.parser.model.TxcField;
 import io.dts.parser.model.TxcLine;
 import io.dts.parser.model.TxcTable;
 import io.dts.parser.model.TxcTableMeta;
-import io.dts.parser.vistor.ITxcVisitor;
 import io.dts.parser.vistor.support.ISQLStatement;
 import io.dts.parser.vistor.support.TxcObjectWapper;
 import io.dts.parser.vistor.support.TxcTableMetaTools;

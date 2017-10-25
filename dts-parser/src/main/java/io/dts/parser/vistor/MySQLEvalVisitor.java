@@ -15,7 +15,7 @@
  * </p>
  */
 
-package io.dts.parser.vistor.base;
+package io.dts.parser.vistor;
 
 import com.alibaba.druid.sql.ast.expr.SQLVariantRefExpr;
 import com.alibaba.druid.sql.dialect.mysql.visitor.MySqlEvalVisitorImpl;

@@ -1,4 +1,4 @@
-package io.dts.parser.vistor.base;
+package io.dts.parser.vistor.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +14,7 @@ import java.util.List;
 
 import io.dts.parser.model.TxcTable;
 import io.dts.parser.model.TxcTableMeta;
+import io.dts.parser.vistor.TxcBaseVisitor;
 import io.dts.parser.vistor.support.ISQLStatement;
 
 /**

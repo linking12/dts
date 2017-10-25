@@ -14,9 +14,9 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import io.dts.parser.TxcVisitorFactory;
 import io.dts.parser.constant.DatabaseType;
 import io.dts.parser.vistor.ITxcVisitor;
-import io.dts.parser.vistor.TxcVisitorFactory;
 
 /**
  * Created by guoyubo on 2017/10/20.

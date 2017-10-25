@@ -11,8 +11,18 @@ import java.util.Arrays;
  * Created by guoyubo on 2017/9/20.
  */
 public enum DatabaseType {
-  H2("H2", JdbcUtils.H2), MySQL("MySQL", JdbcUtils.MYSQL), Oracle("Oracle", JdbcUtils.ORACLE),
-  SQLServer("Microsoft SQL Server", JdbcUtils.SQL_SERVER), PostgreSQL("PostgreSQL", JdbcUtils.POSTGRESQL), DB2("DB2", JdbcUtils.DB2);
+  
+  H2("H2", JdbcUtils.H2),
+  
+  MySQL("MySQL", JdbcUtils.MYSQL), 
+  
+  Oracle("Oracle", JdbcUtils.ORACLE),
+  
+  SQLServer("Microsoft SQL Server", JdbcUtils.SQL_SERVER),
+  
+  PostgreSQL("PostgreSQL", JdbcUtils.POSTGRESQL),
+  
+  DB2("DB2", JdbcUtils.DB2);
 
   private final String productName;
   private final String druidSqlType;
@@ -26,12 +36,7 @@ public enum DatabaseType {
     return druidSqlType;
   }
 
-  /**
-   * Get database type enum via database name string.
-   *
-   * @param databaseProductName database name string
-   * @return database enum
-   */
+  
   public static DatabaseType valueFrom(final String databaseProductName) {
     Optional<DatabaseType> databaseTypeOptional = Iterators.tryFind(Arrays.asList(DatabaseType.values()).iterator(), new Predicate<DatabaseType>() {
 
