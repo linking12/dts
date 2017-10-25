@@ -6,7 +6,7 @@ import io.dts.parser.model.RollbackInfor;
 import io.dts.parser.model.TxcField;
 import io.dts.parser.model.TxcLine;
 import io.dts.parser.model.TxcTable;
-import io.dts.parser.vistor.support.TxcObjectWapper;
+import io.dts.parser.vistor.mysql.TxcObjectWapper;
 
 public abstract class AbstractDtsUndo implements DtsUndo {
 

@@ -44,7 +44,7 @@ import io.dts.parser.model.TxcLine;
 import io.dts.parser.model.TxcRuntimeContext;
 import io.dts.parser.model.TxcTable;
 import io.dts.parser.model.TxcTableMeta;
-import io.dts.parser.vistor.support.TxcTableMetaTools;
+import io.dts.parser.vistor.mysql.TxcTableMetaTools;
 import io.dts.resourcemanager.helper.DataSourceHolder;
 import io.dts.resourcemanager.undo.DtsUndo;
 

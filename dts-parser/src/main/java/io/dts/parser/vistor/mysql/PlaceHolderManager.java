@@ -1,4 +1,4 @@
-package io.dts.parser.vistor.support;
+package io.dts.parser.vistor.mysql;
 
 import java.util.ArrayList;
 import java.util.HashMap;

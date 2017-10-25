@@ -4,9 +4,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.alibaba.druid.sql.ast.statement.SQLExprTableSource;
 import com.alibaba.druid.sql.ast.statement.SQLSelectItem;
 import com.alibaba.druid.sql.ast.statement.SQLSelectQueryBlock;
@@ -19,14 +16,9 @@ import io.dts.parser.vistor.TxcBaseVisitor;
 
 public class TxcSelectVisitor extends TxcBaseVisitor {
 
-  private static final Logger logger = LoggerFactory.getLogger(TxcSelectVisitor.class);
-
-
-
   public TxcSelectVisitor(DtsSQLStatement node, List<Object> parameterSet) {
     super(node, parameterSet);
   }
-
 
   @Override
   public String parseWhereCondition(Statement st) {

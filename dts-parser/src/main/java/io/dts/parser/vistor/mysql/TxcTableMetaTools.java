@@ -1,10 +1,4 @@
-package io.dts.parser.vistor.support;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
+package io.dts.parser.vistor.mysql;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -13,6 +7,12 @@ import java.sql.SQLException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 
 import io.dts.common.common.exception.DtsException;
 import io.dts.parser.model.IndexType;
@@ -94,6 +94,7 @@ public class TxcTableMetaTools {
     return fetchSchema0(conn, tableName);
   }
 
+  @SuppressWarnings("resource")
   private static TxcTableMeta fetchSchema0(Connection conn, String tableName) throws SQLException {
     java.sql.Statement stmt = null;
     java.sql.ResultSet rs = null;

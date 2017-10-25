@@ -4,9 +4,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.alibaba.druid.sql.ast.statement.SQLDeleteStatement;
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlDeleteStatement;
 
@@ -19,7 +16,6 @@ import io.dts.parser.vistor.TxcBaseVisitor;
  * @author xiaoyan
  */
 public class TxcDeleteVisitor extends TxcBaseVisitor {
-  private static final Logger logger = LoggerFactory.getLogger(TxcDeleteVisitor.class);
 
   public TxcDeleteVisitor(DtsSQLStatement node, List<Object> parameterSet) {
     super(node, parameterSet);
@@ -44,7 +40,6 @@ public class TxcDeleteVisitor extends TxcBaseVisitor {
     tableOriginalValue.setAlias(tableMeta.getAlias());
     tableOriginalValue.setSchemaName(tableMeta.getSchemaName());
     tableOriginalValue.setLines(addLines(sql));
-    logger.info("executeAndGetFrontImage:" + sql);
     return tableOriginalValue;
   }
 

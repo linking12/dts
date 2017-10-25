@@ -23,8 +23,8 @@ import io.dts.parser.model.TxcField;
 import io.dts.parser.model.TxcLine;
 import io.dts.parser.model.TxcTable;
 import io.dts.parser.model.TxcTableMeta;
-import io.dts.parser.vistor.support.TxcObjectWapper;
-import io.dts.parser.vistor.support.TxcTableMetaTools;
+import io.dts.parser.vistor.mysql.TxcObjectWapper;
+import io.dts.parser.vistor.mysql.TxcTableMetaTools;
 
 /**
  * 

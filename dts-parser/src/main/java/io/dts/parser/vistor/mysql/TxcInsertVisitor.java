@@ -7,9 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.alibaba.druid.sql.ast.SQLExpr;
 import com.alibaba.druid.sql.ast.SQLObject;
 import com.alibaba.druid.sql.ast.expr.SQLIdentifierExpr;
@@ -24,18 +21,14 @@ import io.dts.common.common.exception.DtsException;
 import io.dts.parser.DtsSQLStatement;
 import io.dts.parser.constant.DatabaseType;
 import io.dts.parser.model.TxcColumnMeta;
-import io.dts.parser.model.TxcIndex;
 import io.dts.parser.model.TxcTable;
 import io.dts.parser.model.TxcTableMeta;
 import io.dts.parser.util.SQLUtil;
 import io.dts.parser.vistor.MySQLEvalVisitor;
 import io.dts.parser.vistor.TxcBaseVisitor;
-import io.dts.parser.vistor.support.TxcObjectWapper;
 
 
 public class TxcInsertVisitor extends TxcBaseVisitor {
-
-  private static final Logger logger = LoggerFactory.getLogger(TxcInsertVisitor.class);
 
 
   public TxcInsertVisitor(DtsSQLStatement node, List<Object> parameterSet) {
@@ -68,12 +61,6 @@ public class TxcInsertVisitor extends TxcBaseVisitor {
 
     TxcTable tablePresentValue = getTablePresentValue();
     TxcTableMeta tableMeta = getTableMeta();
-
-    Map<String/* 索引名 */, TxcIndex> allIndexes = tableMeta.getAllIndexes();
-    for (Map.Entry<String, TxcIndex> entry : allIndexes.entrySet()) {
-      logger.info(" [" + entry.getKey() + "--->" + entry.getValue() + "] ");
-    }
-
     // SQL执行后查询DB行现值，用户脏读检查
     // 此时，还没有拿到数据的索引值，因此需要使用不带KEY的SQL去查询现值
     tablePresentValue.setTableMeta(tableMeta);
@@ -81,8 +68,6 @@ public class TxcInsertVisitor extends TxcBaseVisitor {
     tablePresentValue.setAlias(tableMeta.getAlias());
     tablePresentValue.setSchemaName(tableMeta.getSchemaName());
     tablePresentValue.setLines(addLines(sql));
-
-    logger.info("tablePresentValue:" + tablePresentValue.getLinesNum());
     return tablePresentValue;
   }
 
@@ -110,15 +95,12 @@ public class TxcInsertVisitor extends TxcBaseVisitor {
       }
     })) {
       // 指定了主键
-      logger.info("has pk value");
       selectByPK(whereSqlAppender, sqlExprs, columns);
     } else {
       // 没有指定主键
-      logger.info("no has pk value");
       selectByAutoIncreaseKey(whereSqlAppender, sqlExprs, columns, st);
     }
 
-    logger.info("whereSqlAppender:" + whereSqlAppender.toString());
     return whereSqlAppender.toString();
   }
 
@@ -298,6 +280,7 @@ public class TxcInsertVisitor extends TxcBaseVisitor {
       return value;
     }
 
+    @SuppressWarnings("unused")
     public Integer getParamIndex() {
       return paramIndex;
     }
