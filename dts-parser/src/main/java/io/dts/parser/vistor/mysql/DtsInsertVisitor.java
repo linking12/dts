@@ -19,19 +19,18 @@ import com.alibaba.druid.util.JdbcUtils;
 
 import io.dts.common.common.exception.DtsException;
 import io.dts.parser.DtsSQLStatement;
+import io.dts.parser.TxcObjectWapper;
 import io.dts.parser.constant.DatabaseType;
 import io.dts.parser.model.TxcColumnMeta;
 import io.dts.parser.model.TxcTable;
 import io.dts.parser.model.TxcTableMeta;
 import io.dts.parser.util.SQLUtil;
-import io.dts.parser.vistor.MySQLEvalVisitor;
-import io.dts.parser.vistor.TxcBaseVisitor;
 
 
-public class TxcInsertVisitor extends TxcBaseVisitor {
+public class DtsInsertVisitor extends AbstractDtsVisitor {
 
 
-  public TxcInsertVisitor(DtsSQLStatement node, List<Object> parameterSet) {
+  public DtsInsertVisitor(DtsSQLStatement node, List<Object> parameterSet) {
     super(node, parameterSet);
   }
 

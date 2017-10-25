@@ -1,4 +1,4 @@
-package io.dts.parser.vistor.mysql;
+package io.dts.parser.vistor;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;

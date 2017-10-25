@@ -13,12 +13,11 @@ import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlUpdateStatement;
 import io.dts.parser.DtsSQLStatement;
 import io.dts.parser.model.TxcTable;
 import io.dts.parser.model.TxcTableMeta;
-import io.dts.parser.vistor.TxcBaseVisitor;
 
 /**
  * @author xiaoyan
  */
-public class TxcUpdateVisitor extends TxcBaseVisitor {
+public class TxcUpdateVisitor extends AbstractDtsVisitor {
 
 
   private static final Logger logger = LoggerFactory.getLogger(TxcUpdateVisitor.class);

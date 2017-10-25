@@ -12,11 +12,10 @@ import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlSelectQueryBlock;
 
 import io.dts.parser.DtsSQLStatement;
 import io.dts.parser.model.TxcTable;
-import io.dts.parser.vistor.TxcBaseVisitor;
 
-public class TxcSelectVisitor extends TxcBaseVisitor {
+public class DtsSelectVisitor extends AbstractDtsVisitor {
 
-  public TxcSelectVisitor(DtsSQLStatement node, List<Object> parameterSet) {
+  public DtsSelectVisitor(DtsSQLStatement node, List<Object> parameterSet) {
     super(node, parameterSet);
   }
 

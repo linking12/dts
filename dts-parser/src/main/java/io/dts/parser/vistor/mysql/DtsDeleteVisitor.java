@@ -10,14 +10,11 @@ import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlDeleteStatement;
 import io.dts.parser.DtsSQLStatement;
 import io.dts.parser.model.TxcTable;
 import io.dts.parser.model.TxcTableMeta;
-import io.dts.parser.vistor.TxcBaseVisitor;
 
-/**
- * @author xiaoyan
- */
-public class TxcDeleteVisitor extends TxcBaseVisitor {
 
-  public TxcDeleteVisitor(DtsSQLStatement node, List<Object> parameterSet) {
+public class DtsDeleteVisitor extends AbstractDtsVisitor {
+
+  public DtsDeleteVisitor(DtsSQLStatement node, List<Object> parameterSet) {
     super(node, parameterSet);
   }
 

@@ -1,15 +1,14 @@
 
-package io.dts.parser;
+package io.dts.parser.vistor;
 
 
 import java.util.HashMap;
 import java.util.Map;
 
 import io.dts.parser.constant.DatabaseType;
-import io.dts.parser.vistor.ITxcVisitor;
-import io.dts.parser.vistor.mysql.TxcDeleteVisitor;
-import io.dts.parser.vistor.mysql.TxcInsertVisitor;
-import io.dts.parser.vistor.mysql.TxcSelectVisitor;
+import io.dts.parser.vistor.mysql.DtsDeleteVisitor;
+import io.dts.parser.vistor.mysql.DtsInsertVisitor;
+import io.dts.parser.vistor.mysql.DtsSelectVisitor;
 import io.dts.parser.vistor.mysql.TxcUpdateVisitor;
 
 
@@ -35,23 +34,23 @@ public final class SQLVisitorRegistry {
   }
 
   private static void registerSelectVistor() {
-    SELECT_REGISTRY.put(DatabaseType.H2, TxcSelectVisitor.class);
-    SELECT_REGISTRY.put(DatabaseType.MySQL, TxcSelectVisitor.class);
+    SELECT_REGISTRY.put(DatabaseType.H2, DtsSelectVisitor.class);
+    SELECT_REGISTRY.put(DatabaseType.MySQL, DtsSelectVisitor.class);
     // TODO 其他数据库先使用MySQL, 只能使用标准SQL
-    SELECT_REGISTRY.put(DatabaseType.Oracle, TxcSelectVisitor.class);
-    SELECT_REGISTRY.put(DatabaseType.SQLServer, TxcSelectVisitor.class);
-    SELECT_REGISTRY.put(DatabaseType.DB2, TxcSelectVisitor.class);
-    SELECT_REGISTRY.put(DatabaseType.PostgreSQL, TxcSelectVisitor.class);
+    SELECT_REGISTRY.put(DatabaseType.Oracle, DtsSelectVisitor.class);
+    SELECT_REGISTRY.put(DatabaseType.SQLServer, DtsSelectVisitor.class);
+    SELECT_REGISTRY.put(DatabaseType.DB2, DtsSelectVisitor.class);
+    SELECT_REGISTRY.put(DatabaseType.PostgreSQL, DtsSelectVisitor.class);
   }
 
   private static void registerInsertVistor() {
-    INSERT_REGISTRY.put(DatabaseType.H2, TxcInsertVisitor.class);
-    INSERT_REGISTRY.put(DatabaseType.MySQL, TxcInsertVisitor.class);
+    INSERT_REGISTRY.put(DatabaseType.H2, DtsInsertVisitor.class);
+    INSERT_REGISTRY.put(DatabaseType.MySQL, DtsInsertVisitor.class);
     // TODO 其他数据库先使用MySQL, 只能使用标准SQL
-    INSERT_REGISTRY.put(DatabaseType.Oracle, TxcInsertVisitor.class);
-    INSERT_REGISTRY.put(DatabaseType.SQLServer, TxcInsertVisitor.class);
-    INSERT_REGISTRY.put(DatabaseType.DB2, TxcInsertVisitor.class);
-    INSERT_REGISTRY.put(DatabaseType.PostgreSQL, TxcInsertVisitor.class);
+    INSERT_REGISTRY.put(DatabaseType.Oracle, DtsInsertVisitor.class);
+    INSERT_REGISTRY.put(DatabaseType.SQLServer, DtsInsertVisitor.class);
+    INSERT_REGISTRY.put(DatabaseType.DB2, DtsInsertVisitor.class);
+    INSERT_REGISTRY.put(DatabaseType.PostgreSQL, DtsInsertVisitor.class);
   }
 
   private static void registerUpdateVistor() {
@@ -65,13 +64,13 @@ public final class SQLVisitorRegistry {
   }
 
   private static void registerDeleteVistor() {
-    DELETE_REGISTRY.put(DatabaseType.H2, TxcDeleteVisitor.class);
-    DELETE_REGISTRY.put(DatabaseType.MySQL, TxcDeleteVisitor.class);
+    DELETE_REGISTRY.put(DatabaseType.H2, DtsDeleteVisitor.class);
+    DELETE_REGISTRY.put(DatabaseType.MySQL, DtsDeleteVisitor.class);
     // TODO 其他数据库先使用MySQL, 只能使用标准SQL
-    INSERT_REGISTRY.put(DatabaseType.Oracle, TxcDeleteVisitor.class);
-    INSERT_REGISTRY.put(DatabaseType.SQLServer, TxcDeleteVisitor.class);
-    INSERT_REGISTRY.put(DatabaseType.DB2, TxcDeleteVisitor.class);
-    INSERT_REGISTRY.put(DatabaseType.PostgreSQL, TxcDeleteVisitor.class);
+    INSERT_REGISTRY.put(DatabaseType.Oracle, DtsDeleteVisitor.class);
+    INSERT_REGISTRY.put(DatabaseType.SQLServer, DtsDeleteVisitor.class);
+    INSERT_REGISTRY.put(DatabaseType.DB2, DtsDeleteVisitor.class);
+    INSERT_REGISTRY.put(DatabaseType.PostgreSQL, DtsDeleteVisitor.class);
   }
 
   /**

@@ -1,4 +1,4 @@
-package io.dts.parser.vistor;
+package io.dts.parser.vistor.mysql;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -17,20 +17,21 @@ import com.alibaba.druid.sql.visitor.SQLASTOutputVisitor;
 
 import io.dts.common.common.exception.DtsException;
 import io.dts.parser.DtsSQLStatement;
+import io.dts.parser.TxcObjectWapper;
 import io.dts.parser.constant.SqlType;
 import io.dts.parser.model.TxcColumnMeta;
 import io.dts.parser.model.TxcField;
 import io.dts.parser.model.TxcLine;
 import io.dts.parser.model.TxcTable;
 import io.dts.parser.model.TxcTableMeta;
-import io.dts.parser.vistor.mysql.TxcObjectWapper;
-import io.dts.parser.vistor.mysql.TxcTableMetaTools;
+import io.dts.parser.vistor.ITxcVisitor;
+import io.dts.parser.vistor.TxcTableMetaTools;
 
 /**
  * 
  * @author xiaoyan
  */
-public abstract class TxcBaseVisitor extends MySqlOutputVisitor implements ITxcVisitor {
+public abstract class AbstractDtsVisitor extends MySqlOutputVisitor implements ITxcVisitor {
 
   private String selectSql = null;
 
@@ -49,7 +50,7 @@ public abstract class TxcBaseVisitor extends MySqlOutputVisitor implements ITxcV
 
   protected String tableNameAlias;
 
-  public TxcBaseVisitor(DtsSQLStatement node, List<Object> parameterSet) {
+  public AbstractDtsVisitor(DtsSQLStatement node, List<Object> parameterSet) {
     super(new StringBuilder());
     this.node = node;
     super.setParameters(parameterSet);

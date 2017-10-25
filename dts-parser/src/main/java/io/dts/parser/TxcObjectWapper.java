@@ -1,4 +1,4 @@
-package io.dts.parser.vistor.mysql;
+package io.dts.parser;
 
 
 import com.alibaba.fastjson.JSON;
