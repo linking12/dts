@@ -8,9 +8,7 @@
 		<artifactId>dts</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
-	<groupId>io.dts</groupId>
 	<artifactId>dts-parser</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
 	<name>dts-parser</name>
 	<url>http://maven.apache.org</url>
 	<properties>
