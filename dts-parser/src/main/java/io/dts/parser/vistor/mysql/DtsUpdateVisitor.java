@@ -14,16 +14,14 @@ import io.dts.parser.DtsSQLStatement;
 import io.dts.parser.model.TxcTable;
 import io.dts.parser.model.TxcTableMeta;
 
-/**
- * @author xiaoyan
- */
-public class TxcUpdateVisitor extends AbstractDtsVisitor {
+
+public class DtsUpdateVisitor extends AbstractDtsVisitor {
 
 
-  private static final Logger logger = LoggerFactory.getLogger(TxcUpdateVisitor.class);
+  private static final Logger logger = LoggerFactory.getLogger(DtsUpdateVisitor.class);
 
 
-  public TxcUpdateVisitor(DtsSQLStatement node, List<Object> parameterSet) {
+  public DtsUpdateVisitor(DtsSQLStatement node, List<Object> parameterSet) {
     super(node, parameterSet);
   }
 

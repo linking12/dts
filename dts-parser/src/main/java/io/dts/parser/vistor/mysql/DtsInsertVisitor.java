@@ -11,8 +11,10 @@ import com.alibaba.druid.sql.ast.SQLExpr;
 import com.alibaba.druid.sql.ast.SQLObject;
 import com.alibaba.druid.sql.ast.expr.SQLIdentifierExpr;
 import com.alibaba.druid.sql.ast.expr.SQLMethodInvokeExpr;
+import com.alibaba.druid.sql.ast.expr.SQLVariantRefExpr;
 import com.alibaba.druid.sql.ast.statement.SQLInsertStatement;
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlInsertStatement;
+import com.alibaba.druid.sql.dialect.mysql.visitor.MySqlEvalVisitorImpl;
 import com.alibaba.druid.sql.visitor.SQLEvalVisitor;
 import com.alibaba.druid.sql.visitor.SQLEvalVisitorUtils;
 import com.alibaba.druid.util.JdbcUtils;
@@ -284,6 +286,35 @@ public class DtsInsertVisitor extends AbstractDtsVisitor {
       return paramIndex;
     }
 
+  }
+
+  private static class MySQLEvalVisitor extends MySqlEvalVisitorImpl {
+    private static final String EVAL_VAR_INDEX = "EVAL_VAR_INDEX";
+
+    @Override
+    public boolean visit(final SQLVariantRefExpr x) {
+      if (!"?".equals(x.getName())) {
+        return false;
+      }
+
+      Map<String, Object> attributes = x.getAttributes();
+
+      int varIndex = x.getIndex();
+
+      if (varIndex == -1 || getParameters().size() <= varIndex) {
+        return false;
+      }
+      if (attributes.containsKey(EVAL_VALUE)) {
+        return false;
+      }
+      Object value = getParameters().get(varIndex);
+      if (value == null) {
+        value = EVAL_VALUE_NULL;
+      }
+      attributes.put(EVAL_VALUE, value);
+      attributes.put(EVAL_VAR_INDEX, varIndex);
+      return false;
+    }
   }
 
 

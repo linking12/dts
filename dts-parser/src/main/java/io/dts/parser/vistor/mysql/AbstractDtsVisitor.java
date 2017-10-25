@@ -27,10 +27,7 @@ import io.dts.parser.model.TxcTableMeta;
 import io.dts.parser.vistor.ITxcVisitor;
 import io.dts.parser.vistor.TxcTableMetaTools;
 
-/**
- * 
- * @author xiaoyan
- */
+
 public abstract class AbstractDtsVisitor extends MySqlOutputVisitor implements ITxcVisitor {
 
   private String selectSql = null;

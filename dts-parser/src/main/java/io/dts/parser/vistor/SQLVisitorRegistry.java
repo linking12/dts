@@ -9,7 +9,7 @@ import io.dts.parser.constant.DatabaseType;
 import io.dts.parser.vistor.mysql.DtsDeleteVisitor;
 import io.dts.parser.vistor.mysql.DtsInsertVisitor;
 import io.dts.parser.vistor.mysql.DtsSelectVisitor;
-import io.dts.parser.vistor.mysql.TxcUpdateVisitor;
+import io.dts.parser.vistor.mysql.DtsUpdateVisitor;
 
 
 public final class SQLVisitorRegistry {
@@ -54,13 +54,13 @@ public final class SQLVisitorRegistry {
   }
 
   private static void registerUpdateVistor() {
-    UPDATE_REGISTRY.put(DatabaseType.H2, TxcUpdateVisitor.class);
-    UPDATE_REGISTRY.put(DatabaseType.MySQL, TxcUpdateVisitor.class);
+    UPDATE_REGISTRY.put(DatabaseType.H2, DtsUpdateVisitor.class);
+    UPDATE_REGISTRY.put(DatabaseType.MySQL, DtsUpdateVisitor.class);
     // TODO 其他数据库先使用MySQL, 只能使用标准SQL
-    INSERT_REGISTRY.put(DatabaseType.Oracle, TxcUpdateVisitor.class);
-    INSERT_REGISTRY.put(DatabaseType.SQLServer, TxcUpdateVisitor.class);
-    INSERT_REGISTRY.put(DatabaseType.DB2, TxcUpdateVisitor.class);
-    INSERT_REGISTRY.put(DatabaseType.PostgreSQL, TxcUpdateVisitor.class);
+    INSERT_REGISTRY.put(DatabaseType.Oracle, DtsUpdateVisitor.class);
+    INSERT_REGISTRY.put(DatabaseType.SQLServer, DtsUpdateVisitor.class);
+    INSERT_REGISTRY.put(DatabaseType.DB2, DtsUpdateVisitor.class);
+    INSERT_REGISTRY.put(DatabaseType.PostgreSQL, DtsUpdateVisitor.class);
   }
 
   private static void registerDeleteVistor() {
