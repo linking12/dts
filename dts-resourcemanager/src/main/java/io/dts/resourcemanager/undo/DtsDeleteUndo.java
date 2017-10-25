@@ -1,4 +1,4 @@
-package io.dts.parser.undo.impl;
+package io.dts.resourcemanager.undo;
 
 import com.google.common.collect.Lists;
 
@@ -11,9 +11,9 @@ import io.dts.parser.model.TxcField;
  * 
  * @author xiaoyan
  */
-public class TxcDeleteUndoSqlBuilder extends AbstractUndoSqlBuilder {
+public class DtsDeleteUndo extends AbstractDtsUndo {
 
-	public TxcDeleteUndoSqlBuilder(RollbackInfor txcUndoLogRollbackInfor) {
+	public DtsDeleteUndo(RollbackInfor txcUndoLogRollbackInfor) {
 		super(txcUndoLogRollbackInfor);
 	}
 
