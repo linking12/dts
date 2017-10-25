@@ -17,7 +17,7 @@ import com.alibaba.druid.sql.visitor.SQLASTOutputVisitor;
 
 import io.dts.common.common.exception.DtsException;
 import io.dts.parser.DtsSQLStatement;
-import io.dts.parser.TxcObjectWapper;
+import io.dts.parser.DtsObjectWapper;
 import io.dts.parser.constant.SqlType;
 import io.dts.parser.model.TxcColumnMeta;
 import io.dts.parser.model.TxcField;
@@ -25,7 +25,7 @@ import io.dts.parser.model.TxcLine;
 import io.dts.parser.model.TxcTable;
 import io.dts.parser.model.TxcTableMeta;
 import io.dts.parser.vistor.ITxcVisitor;
-import io.dts.parser.vistor.TxcTableMetaTools;
+import io.dts.parser.vistor.DtsTableMetaTools;
 
 
 public abstract class AbstractDtsVisitor extends MySqlOutputVisitor implements ITxcVisitor {
@@ -66,7 +66,7 @@ public abstract class AbstractDtsVisitor extends MySqlOutputVisitor implements I
     }
     try {
       String tablename = getTableName();
-      tableMeta = TxcTableMetaTools.getTableMeta(connection, tablename);
+      tableMeta = DtsTableMetaTools.getTableMeta(connection, tablename);
       tableMeta.setAlias(tableNameAlias);
     } catch (Exception e) {
       throw new DtsException(e, "getTableMeta error");
@@ -196,7 +196,7 @@ public abstract class AbstractDtsVisitor extends MySqlOutputVisitor implements I
         }
         appender.append(field.getFieldName());
         appender.append("=");
-        TxcObjectWapper.appendParamMarkerObject(field.getFieldValue(), appender);
+        DtsObjectWapper.appendParamMarkerObject(field.getFieldValue(), appender);
       }
     }
   }

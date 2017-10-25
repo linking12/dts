@@ -8,7 +8,7 @@ import io.dts.common.common.exception.DtsException;
 
 import java.util.Date;
 
-public class TxcObjectWapper {
+public class DtsObjectWapper {
   public static String jsonObjectDeserialize(int type, Object value) {
     if (value == null) {
       return "null";

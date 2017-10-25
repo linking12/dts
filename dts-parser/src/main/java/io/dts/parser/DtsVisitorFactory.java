@@ -21,7 +21,7 @@ import io.dts.parser.constant.SqlType;
 import io.dts.parser.vistor.ITxcVisitor;
 import io.dts.parser.vistor.SQLVisitorRegistry;
 
-public class TxcVisitorFactory {
+public class DtsVisitorFactory {
 
   /**
    * 获取SQL解析器<br>

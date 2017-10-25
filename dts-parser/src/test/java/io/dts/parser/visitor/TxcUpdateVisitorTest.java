@@ -14,7 +14,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import io.dts.parser.TxcVisitorFactory;
+import io.dts.parser.DtsVisitorFactory;
 import io.dts.parser.constant.DatabaseType;
 import io.dts.parser.vistor.ITxcVisitor;
 
@@ -45,7 +45,7 @@ public class TxcUpdateVisitorTest {
   public void parse() throws SQLException {
     Statement statement = connection.createStatement();
     String sql = "update txc_global_log l set l.state = 5 where l.tx_id=2";
-    ITxcVisitor visitor = TxcVisitorFactory.createSqlVisitor(DatabaseType.MySQL, connection, sql,
+    ITxcVisitor visitor = DtsVisitorFactory.createSqlVisitor(DatabaseType.MySQL, connection, sql,
         Lists.newArrayList());
     visitor.buildTableMeta();
     visitor.executeAndGetFrontImage(statement);

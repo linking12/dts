@@ -23,7 +23,7 @@ import io.dts.parser.model.TxcTableMeta;
 /**
  * Created by guoyubo on 2017/9/25.
  */
-public class TxcTableMetaTools {
+public class DtsTableMetaTools {
 
   private static long cacheSize = 1000;
   private static long expireTime = 300 * 1000;
@@ -32,7 +32,7 @@ public class TxcTableMetaTools {
           .expireAfterWrite(expireTime, TimeUnit.MILLISECONDS).softValues().build();
 
 
-  private static Logger logger = LoggerFactory.getLogger(TxcTableMetaTools.class);
+  private static Logger logger = LoggerFactory.getLogger(DtsTableMetaTools.class);
 
   public static TxcTableMeta getTableMeta(final String schemaName, final String tableName) {
     if (tableName == null || tableName.isEmpty()) {

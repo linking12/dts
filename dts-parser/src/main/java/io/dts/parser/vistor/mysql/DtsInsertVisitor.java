@@ -21,7 +21,7 @@ import com.alibaba.druid.util.JdbcUtils;
 
 import io.dts.common.common.exception.DtsException;
 import io.dts.parser.DtsSQLStatement;
-import io.dts.parser.TxcObjectWapper;
+import io.dts.parser.DtsObjectWapper;
 import io.dts.parser.constant.DatabaseType;
 import io.dts.parser.model.TxcColumnMeta;
 import io.dts.parser.model.TxcTable;
@@ -168,7 +168,7 @@ public class DtsInsertVisitor extends AbstractDtsVisitor {
           evalExpression(getSQLStatement().getDatabaseType(), itemsList.get(i), getParameters());
 
       attrName = String.format("%s.%s", tableName, attrName);
-      TxcObjectWapper.appendParamMarkerObject(attrName, valuePair.value, appender);
+      DtsObjectWapper.appendParamMarkerObject(attrName, valuePair.value, appender);
       return;
     }
   }
@@ -259,7 +259,7 @@ public class DtsInsertVisitor extends AbstractDtsVisitor {
       ValuePair valuePair =
           evalExpression(getSQLStatement().getDatabaseType(), itemsList.get(i), getParameters());
       attrName = String.format("%s.%s", tableName, attrName);
-      TxcObjectWapper.appendParamMarkerObject(attrName, valuePair.getValue(), appender);
+      DtsObjectWapper.appendParamMarkerObject(attrName, valuePair.getValue(), appender);
       return;
     }
   }

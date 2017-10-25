@@ -14,7 +14,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 
-import io.dts.parser.TxcVisitorFactory;
+import io.dts.parser.DtsVisitorFactory;
 import io.dts.parser.constant.DatabaseType;
 import io.dts.parser.vistor.ITxcVisitor;
 
@@ -47,7 +47,7 @@ public class TxcDelectVisitorTest {
     String sql = "DELETE FROM txc_global_log WHERE `state`=? ";
     PreparedStatement statement = connection.prepareStatement(sql);
 
-    ITxcVisitor visitor = TxcVisitorFactory.createSqlVisitor(
+    ITxcVisitor visitor = DtsVisitorFactory.createSqlVisitor(
         DatabaseType.MySQL,
         connection,
         sql,

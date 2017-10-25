@@ -44,7 +44,7 @@ import io.dts.parser.model.TxcLine;
 import io.dts.parser.model.TxcRuntimeContext;
 import io.dts.parser.model.TxcTable;
 import io.dts.parser.model.TxcTableMeta;
-import io.dts.parser.vistor.TxcTableMetaTools;
+import io.dts.parser.vistor.DtsTableMetaTools;
 import io.dts.resourcemanager.helper.DataSourceHolder;
 import io.dts.resourcemanager.undo.DtsUndo;
 
@@ -82,7 +82,7 @@ public class BranchRollbackLogManager extends DtsLogManagerImpl {
             String tablename = o.getTableName() == null ? p.getTableName() : o.getTableName();
             TxcTableMeta tablemeta = null;
             try {
-              tablemeta = TxcTableMetaTools.getTableMeta("", tablename);
+              tablemeta = DtsTableMetaTools.getTableMeta("", tablename);
             } catch (Exception e) {
               ; // 吞掉
             }
@@ -92,7 +92,7 @@ public class BranchRollbackLogManager extends DtsLogManagerImpl {
               try {
                 datasource = template.getDataSource();
                 conn = DataSourceUtils.getConnection(datasource);
-                tablemeta = TxcTableMetaTools.getTableMeta(conn, tablename);
+                tablemeta = DtsTableMetaTools.getTableMeta(conn, tablename);
               } finally {
                 if (conn != null) {
                   DataSourceUtils.releaseConnection(conn, datasource);

@@ -15,7 +15,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
-import io.dts.parser.TxcVisitorFactory;
+import io.dts.parser.DtsVisitorFactory;
 import io.dts.parser.constant.DatabaseType;
 import io.dts.parser.vistor.ITxcVisitor;
 import sun.swing.BakedArrayList;
@@ -51,7 +51,7 @@ public class TxcInsertVisitorTest {
     PreparedStatement statement = connection.prepareStatement(sql);
 
     ITxcVisitor visitor =
-        TxcVisitorFactory.createSqlVisitor(DatabaseType.MySQL, connection, sql, parameters);
+        DtsVisitorFactory.createSqlVisitor(DatabaseType.MySQL, connection, sql, parameters);
     visitor.buildTableMeta();
     visitor.executeAndGetFrontImage(statement);
     System.out.println(visitor.getSelectSql());

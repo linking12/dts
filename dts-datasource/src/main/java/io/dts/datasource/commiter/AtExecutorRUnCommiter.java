@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import io.dts.common.common.context.DtsContext;
 import io.dts.common.common.exception.DtsException;
 import io.dts.datasource.wrapper.executor.StatementModel;
-import io.dts.parser.TxcVisitorFactory;
+import io.dts.parser.DtsVisitorFactory;
 import io.dts.parser.model.RollbackInfor;
 import io.dts.parser.model.TxcTable;
 import io.dts.parser.vistor.ITxcVisitor;
@@ -30,7 +30,7 @@ public class AtExecutorRUnCommiter {
     this.stateModel = stateModel;
     IDtsConnection txcConnection = stateModel.getStatement().getDtsConnection();
     this.txcVisitor =
-        TxcVisitorFactory.createSqlVisitor(txcConnection.getDataSource().getDatabaseType(),
+        DtsVisitorFactory.createSqlVisitor(txcConnection.getDataSource().getDatabaseType(),
             txcConnection.getRawConnection(), stateModel.getSql(), parameterSet);
 
   }
