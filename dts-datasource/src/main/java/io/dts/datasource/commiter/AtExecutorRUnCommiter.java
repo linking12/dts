@@ -78,8 +78,7 @@ public class AtExecutorRUnCommiter {
   private void insertUndoLog() throws SQLException {
     // 对于空操作，直接返回成功，不写Log
     if (txcVisitor.getTableOriginalValue().getLinesNum() == 0
-        && txcVisitor.getTablePresentValue().getLinesNum() == 0
-        && txcVisitor.getRollbackRule() == null) {
+        && txcVisitor.getTablePresentValue().getLinesNum() == 0) {
       String errorInfo = "null result error:" + txcVisitor.getInputSql();
       logger.error("insertUndoLog", errorInfo);
       throw new DtsException(3333, errorInfo);
@@ -91,7 +90,6 @@ public class AtExecutorRUnCommiter {
     txcLog.setSelectSql(txcVisitor.getSelectSql());
     txcLog.setOriginalValue(txcVisitor.getTableOriginalValue());
     txcLog.setPresentValue(txcVisitor.getTablePresentValue());
-    txcLog.setRollbackRule(txcVisitor.getRollbackRule());
     switch (txcVisitor.getSqlType()) {
       case DELETE:
         txcLog.setWhereCondition(txcVisitor.getWhereCondition(txcVisitor.getTableOriginalValue()));

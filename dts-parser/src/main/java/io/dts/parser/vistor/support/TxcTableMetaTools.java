@@ -27,8 +27,9 @@ public class TxcTableMetaTools {
 
   private static long cacheSize = 1000;
   private static long expireTime = 300 * 1000;
-  private final static Cache<String, TxcTableMeta>
-      tableMetaCache = CacheBuilder.newBuilder().maximumSize(cacheSize).expireAfterWrite(expireTime, TimeUnit.MILLISECONDS).softValues().build();
+  private final static Cache<String, TxcTableMeta> tableMetaCache =
+      CacheBuilder.newBuilder().maximumSize(cacheSize)
+          .expireAfterWrite(expireTime, TimeUnit.MILLISECONDS).softValues().build();
 
 
   private static Logger logger = LoggerFactory.getLogger(TxcTableMetaTools.class);
@@ -90,7 +91,7 @@ public class TxcTableMetaTools {
   }
 
   private static TxcTableMeta fetchSchema(Connection conn, String tableName) throws SQLException {
-      return fetchSchema0(conn, tableName);
+    return fetchSchema0(conn, tableName);
   }
 
   private static TxcTableMeta fetchSchema0(Connection conn, String tableName) throws SQLException {
@@ -144,7 +145,8 @@ public class TxcTableMetaTools {
   // false--PRIMARY-3-1-id-A-0
   // true--aaa-3-1-roll_number-A-0
   // true--aaa-3-2-name-A-0
-  private static TxcTableMeta resultSetMetaToSchema(ResultSetMetaData rsmd, DatabaseMetaData dbmd) throws SQLException {
+  private static TxcTableMeta resultSetMetaToSchema(ResultSetMetaData rsmd, DatabaseMetaData dbmd)
+      throws SQLException {
     String tableName = rsmd.getTableName(1);
     String schemaName = rsmd.getSchemaName(1);
     String catalogName = rsmd.getCatalogName(1);

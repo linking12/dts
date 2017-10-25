@@ -83,7 +83,7 @@ public interface ITxcVisitor {
 
   SqlType getSqlType();
 
-  String getRollbackRule();
+
 
   TxcTableMeta getTableMeta();
 
