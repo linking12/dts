@@ -1,6 +1,4 @@
-package io.dts.parser.model;
-
-import io.dts.parser.dialect.MySQLKeyword;
+package io.dts.parser.struct;
 
 public class TxcColumnMeta {
 	private String tableCat;// 表目录（可能为空）

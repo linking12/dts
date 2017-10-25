@@ -11,8 +11,8 @@ import com.alibaba.druid.sql.ast.statement.SQLUpdateStatement;
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlUpdateStatement;
 
 import io.dts.parser.DtsSQLStatement;
-import io.dts.parser.model.TxcTable;
-import io.dts.parser.model.TxcTableMeta;
+import io.dts.parser.struct.TxcTable;
+import io.dts.parser.struct.TxcTableMeta;
 
 
 public class DtsUpdateVisitor extends AbstractDtsVisitor {

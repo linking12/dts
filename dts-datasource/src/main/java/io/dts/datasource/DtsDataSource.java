@@ -5,7 +5,7 @@ import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
-import io.dts.parser.constant.DatabaseType;
+import io.dts.parser.struct.DatabaseType;
 import io.dts.resourcemanager.ResourceManager;
 import io.dts.resourcemanager.helper.DataSourceHolder;
 

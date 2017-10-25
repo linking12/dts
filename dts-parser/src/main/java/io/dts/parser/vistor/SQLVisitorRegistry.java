@@ -5,7 +5,7 @@ package io.dts.parser.vistor;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.dts.parser.constant.DatabaseType;
+import io.dts.parser.struct.DatabaseType;
 import io.dts.parser.vistor.mysql.DtsDeleteVisitor;
 import io.dts.parser.vistor.mysql.DtsInsertVisitor;
 import io.dts.parser.vistor.mysql.DtsSelectVisitor;

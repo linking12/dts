@@ -11,7 +11,7 @@ import com.alibaba.druid.sql.ast.statement.SQLSelectStatement;
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlSelectQueryBlock;
 
 import io.dts.parser.DtsSQLStatement;
-import io.dts.parser.model.TxcTable;
+import io.dts.parser.struct.TxcTable;
 
 public class DtsSelectVisitor extends AbstractDtsVisitor {
 

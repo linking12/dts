@@ -11,8 +11,8 @@ import io.dts.common.common.context.DtsContext;
 import io.dts.common.common.exception.DtsException;
 import io.dts.datasource.wrapper.executor.StatementModel;
 import io.dts.parser.DtsVisitorFactory;
-import io.dts.parser.model.RollbackInfor;
-import io.dts.parser.model.TxcTable;
+import io.dts.parser.struct.RollbackInfor;
+import io.dts.parser.struct.TxcTable;
 import io.dts.parser.vistor.ITxcVisitor;
 import io.dts.resourcemanager.api.IDtsConnection;
 

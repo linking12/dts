@@ -4,7 +4,7 @@ import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
-import io.dts.parser.constant.DatabaseType;
+import io.dts.parser.struct.DatabaseType;
 
 public interface IDtsDataSource extends DataSource {
   /**

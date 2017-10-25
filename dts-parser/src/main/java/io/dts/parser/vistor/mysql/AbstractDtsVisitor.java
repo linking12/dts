@@ -18,12 +18,12 @@ import com.alibaba.druid.sql.visitor.SQLASTOutputVisitor;
 import io.dts.common.common.exception.DtsException;
 import io.dts.parser.DtsSQLStatement;
 import io.dts.parser.DtsObjectWapper;
-import io.dts.parser.constant.SqlType;
-import io.dts.parser.model.TxcColumnMeta;
-import io.dts.parser.model.TxcField;
-import io.dts.parser.model.TxcLine;
-import io.dts.parser.model.TxcTable;
-import io.dts.parser.model.TxcTableMeta;
+import io.dts.parser.struct.SqlType;
+import io.dts.parser.struct.TxcColumnMeta;
+import io.dts.parser.struct.TxcField;
+import io.dts.parser.struct.TxcLine;
+import io.dts.parser.struct.TxcTable;
+import io.dts.parser.struct.TxcTableMeta;
 import io.dts.parser.vistor.ITxcVisitor;
 import io.dts.parser.vistor.DtsTableMetaTools;
 

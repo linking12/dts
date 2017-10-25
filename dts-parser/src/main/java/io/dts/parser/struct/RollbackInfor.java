@@ -1,8 +1,6 @@
-package io.dts.parser.model;
+package io.dts.parser.struct;
 
 import java.io.Serializable;
-
-import io.dts.parser.constant.SqlType;
 
 public class RollbackInfor implements Serializable, Cloneable {
 

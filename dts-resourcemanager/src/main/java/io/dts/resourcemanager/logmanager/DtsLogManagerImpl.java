@@ -33,7 +33,7 @@ import io.dts.common.common.TxcXID;
 import io.dts.common.common.context.ContextStep2;
 import io.dts.common.common.exception.DtsException;
 import io.dts.common.util.blob.BlobUtil;
-import io.dts.parser.model.TxcRuntimeContext;
+import io.dts.parser.struct.TxcRuntimeContext;
 import io.dts.resourcemanager.helper.DataSourceHolder;
 
 /**

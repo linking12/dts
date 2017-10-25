@@ -1,4 +1,4 @@
-package io.dts.parser.model;
+package io.dts.parser.struct;
 
 
 import java.util.ArrayList;

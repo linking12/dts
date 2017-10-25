@@ -1,4 +1,4 @@
-package io.dts.parser.constant;
+package io.dts.datasource;
 
 /**
  * Created by guoyubo on 2017/9/20.

@@ -1,4 +1,4 @@
-package io.dts.parser.constant;
+package io.dts.parser.struct;
 
 import com.alibaba.druid.util.JdbcUtils;
 import com.google.common.base.Optional;

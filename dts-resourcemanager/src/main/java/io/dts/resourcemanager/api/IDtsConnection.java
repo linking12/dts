@@ -3,7 +3,7 @@ package io.dts.resourcemanager.api;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import io.dts.parser.model.TxcRuntimeContext;
+import io.dts.parser.struct.TxcRuntimeContext;
 
 public interface IDtsConnection extends Connection {
 	/**

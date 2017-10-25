@@ -1,4 +1,4 @@
-package io.dts.parser.model;
+package io.dts.parser.struct;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

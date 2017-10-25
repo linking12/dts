@@ -18,9 +18,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import io.dts.parser.DtsSQLStatement;
-import io.dts.parser.constant.SqlType;
-import io.dts.parser.model.TxcTable;
-import io.dts.parser.model.TxcTableMeta;
+import io.dts.parser.struct.SqlType;
+import io.dts.parser.struct.TxcTable;
+import io.dts.parser.struct.TxcTableMeta;
 
 /**
  * SQL解析基础访问器接口.

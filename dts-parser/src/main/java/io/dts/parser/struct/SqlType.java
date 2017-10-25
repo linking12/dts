@@ -15,7 +15,7 @@
  * </p>
  */
 
-package io.dts.parser.constant;
+package io.dts.parser.struct;
 
 /**
  * SQL Type.

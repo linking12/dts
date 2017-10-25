@@ -11,8 +11,7 @@ import io.dts.common.common.TxcXID;
 import io.dts.common.common.context.DtsContext;
 import io.dts.datasource.wrapper.DtsPrepareStatementWrapper;
 import io.dts.datasource.wrapper.DtsStatementWrapper;
-import io.dts.parser.constant.UndoLogMode;
-import io.dts.parser.model.TxcRuntimeContext;
+import io.dts.parser.struct.TxcRuntimeContext;
 import io.dts.resourcemanager.api.IDtsDataSource;
 import io.dts.resourcemanager.logmanager.DtsLogManagerImpl;
 

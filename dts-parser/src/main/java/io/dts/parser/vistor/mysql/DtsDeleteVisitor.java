@@ -8,8 +8,8 @@ import com.alibaba.druid.sql.ast.statement.SQLDeleteStatement;
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlDeleteStatement;
 
 import io.dts.parser.DtsSQLStatement;
-import io.dts.parser.model.TxcTable;
-import io.dts.parser.model.TxcTableMeta;
+import io.dts.parser.struct.TxcTable;
+import io.dts.parser.struct.TxcTableMeta;
 
 
 public class DtsDeleteVisitor extends AbstractDtsVisitor {

@@ -3,7 +3,7 @@ package io.dts.resourcemanager.undo;
 import java.util.List;
 
 import io.dts.common.common.exception.DtsException;
-import io.dts.parser.model.RollbackInfor;
+import io.dts.parser.struct.RollbackInfor;
 
 /**
  * Created by guoyubo on 2017/10/16.

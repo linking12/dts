@@ -15,10 +15,10 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
 import io.dts.common.common.exception.DtsException;
-import io.dts.parser.model.IndexType;
-import io.dts.parser.model.TxcColumnMeta;
-import io.dts.parser.model.TxcIndex;
-import io.dts.parser.model.TxcTableMeta;
+import io.dts.parser.struct.IndexType;
+import io.dts.parser.struct.TxcColumnMeta;
+import io.dts.parser.struct.TxcIndex;
+import io.dts.parser.struct.TxcTableMeta;
 
 /**
  * Created by guoyubo on 2017/9/25.

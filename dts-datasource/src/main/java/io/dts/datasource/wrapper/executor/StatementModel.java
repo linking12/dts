@@ -3,8 +3,7 @@ package io.dts.datasource.wrapper.executor;
 
 import java.sql.SQLException;
 
-import io.dts.parser.constant.SqlType;
-import io.dts.parser.util.SqlTypeParser;
+import io.dts.parser.struct.SqlType;
 import io.dts.resourcemanager.api.IDtsDataSource;
 import io.dts.resourcemanager.api.IDtsStatement;
 

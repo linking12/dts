@@ -15,7 +15,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import io.dts.parser.DtsVisitorFactory;
-import io.dts.parser.constant.DatabaseType;
+import io.dts.parser.struct.DatabaseType;
 import io.dts.parser.vistor.ITxcVisitor;
 
 /**

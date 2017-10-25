@@ -15,7 +15,7 @@
  * </p>
  */
 
-package io.dts.parser.dialect;
+package io.dts.parser.struct;
 
 /**
  * MySQL keyword.

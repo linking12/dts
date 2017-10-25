@@ -2,10 +2,10 @@ package io.dts.resourcemanager.undo;
 
 import com.google.common.collect.Lists;
 
-import java.util.List;
+import io.dts.parser.struct.RollbackInfor;
+import io.dts.parser.struct.TxcField;
 
-import io.dts.parser.model.RollbackInfor;
-import io.dts.parser.model.TxcField;
+import java.util.List;
 
 /**
  * 

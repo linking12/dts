@@ -16,8 +16,8 @@ import com.alibaba.druid.sql.dialect.sqlserver.parser.SQLServerStatementParser;
 import com.alibaba.druid.sql.parser.SQLStatementParser;
 
 import io.dts.common.common.exception.DtsException;
-import io.dts.parser.constant.DatabaseType;
-import io.dts.parser.constant.SqlType;
+import io.dts.parser.struct.DatabaseType;
+import io.dts.parser.struct.SqlType;
 import io.dts.parser.vistor.ITxcVisitor;
 import io.dts.parser.vistor.SQLVisitorRegistry;
 

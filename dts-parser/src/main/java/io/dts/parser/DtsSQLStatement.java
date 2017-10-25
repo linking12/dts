@@ -2,8 +2,8 @@ package io.dts.parser;
 
 import com.alibaba.druid.sql.ast.SQLStatement;
 
-import io.dts.parser.constant.DatabaseType;
-import io.dts.parser.constant.SqlType;
+import io.dts.parser.struct.DatabaseType;
+import io.dts.parser.struct.SqlType;
 
 /**
  * Created by guoyubo on 2017/9/23.

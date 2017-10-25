@@ -16,7 +16,7 @@ import java.sql.Statement;
 import java.util.List;
 
 import io.dts.parser.DtsVisitorFactory;
-import io.dts.parser.constant.DatabaseType;
+import io.dts.parser.struct.DatabaseType;
 import io.dts.parser.vistor.ITxcVisitor;
 import sun.swing.BakedArrayList;
 
