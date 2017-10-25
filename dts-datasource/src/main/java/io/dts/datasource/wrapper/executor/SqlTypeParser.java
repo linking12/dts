@@ -60,7 +60,7 @@ public class SqlTypeParser {
      *
      * @return true if the string starts with 'searchFor' ignoring whitespace
      */
-    public static boolean startsWithIgnoreCaseAndWs(String searchIn, String searchFor) {
+    private static boolean startsWithIgnoreCaseAndWs(String searchIn, String searchFor) {
       return startsWithIgnoreCaseAndWs(searchIn, searchFor, 0);
     }
 
@@ -74,7 +74,7 @@ public class SqlTypeParser {
      *
      * @return true if the string starts with 'searchFor' ignoring whitespace
      */
-    public static boolean startsWithIgnoreCaseAndWs(String searchIn, String searchFor,
+    private static boolean startsWithIgnoreCaseAndWs(String searchIn, String searchFor,
         int beginPos) {
       if (searchIn == null) {
         return searchFor == null;
@@ -101,7 +101,7 @@ public class SqlTypeParser {
      *
      * @return whether searchIn starts with searchFor, ignoring case
      */
-    public static boolean startsWithIgnoreCase(String searchIn, int startAt, String searchFor) {
+    private static boolean startsWithIgnoreCase(String searchIn, int startAt, String searchFor) {
       return searchIn.regionMatches(true, startAt, searchFor, 0, searchFor.length());
     }
 
@@ -118,7 +118,8 @@ public class SqlTypeParser {
      * @param dashDashComments strip "--" style comments to end-of-line
      * @return the input string with all comment-delimited data removed
      */
-    public static String stripComments(String src, String stringOpens, String stringCloses,
+    @SuppressWarnings("unused")
+    private static String stripComments(String src, String stringOpens, String stringCloses,
         boolean slashStarComments, boolean slashSlashComments, boolean hashComments,
         boolean dashDashComments) {
       if (src == null) {
@@ -222,41 +223,41 @@ public class SqlTypeParser {
     }
 
 
-    public static String removeBetweenWithSplitor(String sql, String start, String end) {
-      if (sql == null) {
-        return null;
-      }
-      int index0 = sql.indexOf(start);
-      if (index0 == -1) {
-        return sql;
-      }
-      int index1 = sql.indexOf(end, index0);
-      if (index1 == -1) {
-        return sql;
-      }
-      StringBuilder sb = new StringBuilder();
-      sb.append(sql.substring(0, index0));
-      sb.append(" ");
-      sb.append(sql.substring(index1 + end.length()));
-      return sb.toString();
-    }
-
-    public static String getBetween(String sql, String start, String end) {
-      if (sql == null) {
-        return null;
-      }
-
-      int index0 = sql.indexOf(start);
-      if (index0 == -1) {
-        return null;
-      }
-      int index1 = sql.indexOf(end, index0);
-      if (index1 == -1) {
-        return null;
-      }
-      return sql.substring(index0 + start.length(), index1).trim();
-    }
-
+    // private static String removeBetweenWithSplitor(String sql, String start, String end) {
+    // if (sql == null) {
+    // return null;
+    // }
+    // int index0 = sql.indexOf(start);
+    // if (index0 == -1) {
+    // return sql;
+    // }
+    // int index1 = sql.indexOf(end, index0);
+    // if (index1 == -1) {
+    // return sql;
+    // }
+    // StringBuilder sb = new StringBuilder();
+    // sb.append(sql.substring(0, index0));
+    // sb.append(" ");
+    // sb.append(sql.substring(index1 + end.length()));
+    // return sb.toString();
+    // }
+    //
+    // private static String getBetween(String sql, String start, String end) {
+    // if (sql == null) {
+    // return null;
+    // }
+    //
+    // int index0 = sql.indexOf(start);
+    // if (index0 == -1) {
+    // return null;
+    // }
+    // int index1 = sql.indexOf(end, index0);
+    // if (index1 == -1) {
+    // return null;
+    // }
+    // return sql.substring(index0 + start.length(), index1).trim();
+    // }
+    //
 
 
   }
