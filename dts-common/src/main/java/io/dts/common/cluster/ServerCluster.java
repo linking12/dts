@@ -23,7 +23,7 @@ public interface ServerCluster {
   public String select();
 
 
-  public void registry(String port);
+  public void registry(int port);
 
   public static ServerCluster getServerCluster() {
     return DefaultServerCluster.getInstance();

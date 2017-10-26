@@ -89,9 +89,9 @@ public class DefaultServerCluster implements ServerCluster {
   }
 
   @Override
-  public void registry(String rpcPort) {
+  public void registry(int rpcPort) {
     CuratorFramework curatorFramework = ZkClientFacotry.getZkClient();
-    String path = ZKPaths.makePath(SERVERADDRESS_NODEPATH, rpcPort);
+    String path = ZKPaths.makePath(SERVERADDRESS_NODEPATH, Integer.valueOf(rpcPort).toString());
     try {
       curatorFramework.create().withMode(CreateMode.EPHEMERAL).forPath(path);
     } catch (Exception e) {

@@ -28,6 +28,7 @@ import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Queues;
 
+import io.dts.common.cluster.DefaultServerCluster;
 import io.dts.common.common.TxcXID;
 import io.dts.common.component.AbstractLifecycleComponent;
 import io.dts.common.protocol.RequestCode;
@@ -121,6 +122,7 @@ public class DtsServerContainer extends AbstractLifecycleComponent {
     if (this.channelKeeping != null) {
       this.channelKeeping.start();
     }
+    DefaultServerCluster.getInstance().registry(serverProperties.getListenPort());
   }
 
   @Override
