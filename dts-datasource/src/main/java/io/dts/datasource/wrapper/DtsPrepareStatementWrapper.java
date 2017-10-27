@@ -22,12 +22,7 @@ public class DtsPrepareStatementWrapper extends AbstractDtsPrepareStatement {
 
   @Override
   public ResultSet executeQuery() throws SQLException {
-    try {
-      return new PreparedStatementExecutor(createStatementModel(getTargetSql()), getParameters())
-          .executeQuery();
-    } catch (Exception e) {
-      throw new SQLException(e);
-    }
+    return getRawStatement().executeQuery();
   }
 
 
