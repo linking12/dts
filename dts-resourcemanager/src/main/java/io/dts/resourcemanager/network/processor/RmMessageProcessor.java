@@ -8,12 +8,12 @@ import io.dts.common.protocol.header.BranchCommitMessage;
 import io.dts.common.protocol.header.BranchCommitResultMessage;
 import io.dts.common.protocol.header.BranchRollBackMessage;
 import io.dts.common.protocol.header.BranchRollbackResultMessage;
+import io.dts.common.util.NetUtil;
 import io.dts.remoting.CommandCustomHeader;
 import io.dts.remoting.netty.NettyRequestProcessor;
 import io.dts.remoting.protocol.RemotingCommand;
 import io.dts.remoting.protocol.RemotingSerializable;
 import io.dts.resourcemanager.ResourceManager;
-import io.dts.util.NetUtil;
 import io.netty.channel.ChannelHandlerContext;
 
 /**

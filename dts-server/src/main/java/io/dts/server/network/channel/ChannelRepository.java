@@ -24,9 +24,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import io.dts.common.util.NetUtil;
 import io.dts.remoting.common.RemotingHelper;
 import io.dts.remoting.common.RemotingUtil;
-import io.dts.util.NetUtil;
 import io.netty.channel.Channel;
 
 /**

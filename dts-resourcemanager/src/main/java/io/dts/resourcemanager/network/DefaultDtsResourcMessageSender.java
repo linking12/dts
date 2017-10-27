@@ -17,7 +17,7 @@ import io.dts.common.protocol.RequestCode;
 import io.dts.common.protocol.RequestMessage;
 import io.dts.common.protocol.heatbeat.HeartbeatRequestHeader;
 import io.dts.common.rpc.DtsClientMessageSender;
-import io.dts.common.util.thread.ThreadFactoryImpl;
+import io.dts.common.util.ThreadFactoryImpl;
 import io.dts.remoting.RemotingClient;
 import io.dts.remoting.exception.RemotingCommandException;
 import io.dts.remoting.exception.RemotingConnectException;

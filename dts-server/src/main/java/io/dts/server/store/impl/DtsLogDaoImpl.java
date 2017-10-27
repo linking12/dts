@@ -23,7 +23,7 @@ import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import io.dts.common.common.CommitMode;
-import io.dts.common.util.blob.BlobUtil;
+import io.dts.common.util.BlobUtil;
 import io.dts.server.config.AppConfig;
 import io.dts.server.model.BranchLog;
 import io.dts.server.model.GlobalLog;

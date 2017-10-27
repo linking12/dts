@@ -1,4 +1,4 @@
-package io.dts.common.util.thread;
+package io.dts.common.util;
 
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicLong;

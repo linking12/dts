@@ -40,11 +40,11 @@ import io.dts.common.protocol.header.ReportStatusResultMessage;
 import io.dts.common.protocol.header.ReportUdataMessage;
 import io.dts.common.protocol.header.ReportUdataResultMessage;
 import io.dts.common.rpc.DtsServerMessageHandler;
+import io.dts.common.util.NetUtil;
 import io.dts.remoting.CommandCustomHeader;
 import io.dts.remoting.netty.NettyRequestProcessor;
 import io.dts.remoting.protocol.RemotingCommand;
 import io.dts.remoting.protocol.RemotingSerializable;
-import io.dts.util.NetUtil;
 import io.netty.channel.ChannelHandlerContext;
 
 /**

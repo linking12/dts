@@ -32,7 +32,8 @@ import io.dts.common.cluster.DefaultServerCluster;
 import io.dts.common.common.TxcXID;
 import io.dts.common.component.AbstractLifecycleComponent;
 import io.dts.common.protocol.RequestCode;
-import io.dts.common.util.thread.ThreadFactoryImpl;
+import io.dts.common.util.NetUtil;
+import io.dts.common.util.ThreadFactoryImpl;
 import io.dts.remoting.RemotingServer;
 import io.dts.remoting.netty.NettyRemotingServer;
 import io.dts.remoting.netty.NettyServerConfig;
@@ -40,7 +41,6 @@ import io.dts.server.DtsServerProperties;
 import io.dts.server.network.channel.ChannelkeepingComponent;
 import io.dts.server.network.processor.DtsMessageProcessor;
 import io.dts.server.network.processor.HeatBeatProcessor;
-import io.dts.util.NetUtil;
 
 /**
  * @author liushiming

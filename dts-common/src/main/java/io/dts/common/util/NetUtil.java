@@ -1,4 +1,4 @@
-package io.dts.util;
+package io.dts.common.util;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;

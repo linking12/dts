@@ -34,6 +34,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import io.dts.common.common.exception.DtsException;
+import io.dts.common.util.NetUtil;
 
 /**
  * @author liushiming
@@ -91,7 +92,8 @@ public class DefaultServerCluster implements ServerCluster {
   @Override
   public void registry(int rpcPort) {
     CuratorFramework curatorFramework = ZkClientFacotry.getZkClient();
-    String path = ZKPaths.makePath(SERVERADDRESS_NODEPATH, Integer.valueOf(rpcPort).toString());
+    String path = ZKPaths.makePath(SERVERADDRESS_NODEPATH,
+        NetUtil.getLocalIp() + ":" + Integer.valueOf(rpcPort).toString());
     try {
       curatorFramework.create().withMode(CreateMode.EPHEMERAL).forPath(path);
     } catch (Exception e) {

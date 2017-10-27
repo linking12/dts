@@ -1,4 +1,4 @@
-package io.dts.common.util.blob;
+package io.dts.common.util;
 
 
 import javax.sql.rowset.serial.SerialBlob;
