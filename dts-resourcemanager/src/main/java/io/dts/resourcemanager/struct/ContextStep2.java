@@ -1,6 +1,7 @@
 package io.dts.resourcemanager.struct;
 
 import io.dts.common.common.CommitMode;
+import io.dts.common.struct.TrxLockMode;
 
 public class ContextStep2 {
   private long globalXid;

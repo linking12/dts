@@ -29,10 +29,10 @@ import com.google.common.collect.Maps;
 import io.dts.common.common.CommitMode;
 import io.dts.common.common.DtsXID;
 import io.dts.common.exception.DtsException;
+import io.dts.common.struct.TrxLockMode;
 import io.dts.resourcemanager.helper.TxcTrxConfig;
 import io.dts.resourcemanager.logmanager.DtsLogManager;
 import io.dts.resourcemanager.struct.ContextStep2;
-import io.dts.resourcemanager.struct.TrxLockMode;
 import io.dts.resourcemanager.struct.TxcBranchStatus;
 import io.dts.resourcemanager.struct.TxcIsolation;
 

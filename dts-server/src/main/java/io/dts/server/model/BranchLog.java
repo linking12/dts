@@ -5,7 +5,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
-import io.dts.common.common.TrxLockMode;
+import io.dts.common.struct.TrxLockMode;
 
 /**
  * @author jiangyu.jy
