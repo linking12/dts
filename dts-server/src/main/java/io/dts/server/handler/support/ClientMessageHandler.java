@@ -20,6 +20,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.dts.common.api.DtsServerMessageSender;
 import io.dts.common.common.DtsXID;
 import io.dts.common.exception.DtsException;
 import io.dts.common.protocol.header.BeginMessage;
@@ -29,7 +30,6 @@ import io.dts.common.protocol.header.BranchRollBackMessage;
 import io.dts.common.protocol.header.BranchRollbackResultMessage;
 import io.dts.common.protocol.header.GlobalCommitMessage;
 import io.dts.common.protocol.header.GlobalRollbackMessage;
-import io.dts.common.rpc.DtsServerMessageSender;
 import io.dts.server.handler.CommitingResultCode;
 import io.dts.server.handler.RollbackingResultCode;
 import io.dts.server.model.BranchLog;

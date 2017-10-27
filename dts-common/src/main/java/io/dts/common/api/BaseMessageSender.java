@@ -11,7 +11,7 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-package io.dts.common.rpc;
+package io.dts.common.api;
 
 import io.dts.common.exception.DtsException;
 import io.dts.common.protocol.RequestCode;

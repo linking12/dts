@@ -18,6 +18,7 @@ import java.util.HashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.dts.common.api.DtsClientMessageSender;
 import io.dts.common.common.CommitMode;
 import io.dts.common.common.DtsContext;
 import io.dts.common.common.Constants;
@@ -27,7 +28,6 @@ import io.dts.common.protocol.RequestMessage;
 import io.dts.common.protocol.header.RegisterMessage;
 import io.dts.common.protocol.header.RegisterResultMessage;
 import io.dts.common.protocol.header.ReportStatusMessage;
-import io.dts.common.rpc.DtsClientMessageSender;
 import io.dts.resourcemanager.network.DefaultDtsResourcMessageSender;
 
 /**

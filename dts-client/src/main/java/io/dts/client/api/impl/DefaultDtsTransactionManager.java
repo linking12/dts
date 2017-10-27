@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import io.dts.client.aop.TransactionDtsInterceptor;
 import io.dts.client.api.DtsTransactionManager;
 import io.dts.common.common.DtsContext;
+import io.dts.common.api.DtsClientMessageSender;
 import io.dts.common.common.Constants;
 import io.dts.common.common.DtsXID;
 import io.dts.common.exception.DtsException;
@@ -15,7 +16,6 @@ import io.dts.common.protocol.header.GlobalCommitMessage;
 import io.dts.common.protocol.header.GlobalCommitResultMessage;
 import io.dts.common.protocol.header.GlobalRollbackMessage;
 import io.dts.common.protocol.header.GlobalRollbackResultMessage;
-import io.dts.common.rpc.DtsClientMessageSender;
 
 /**
  * Created by guoyubo on 2017/8/24.

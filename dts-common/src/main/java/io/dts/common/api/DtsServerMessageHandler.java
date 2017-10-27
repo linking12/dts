@@ -1,4 +1,4 @@
-package io.dts.common.rpc;
+package io.dts.common.api;
 
 import io.dts.common.protocol.body.DtsMultipleRequestMessage;
 import io.dts.common.protocol.body.DtsMultipleResonseMessage;

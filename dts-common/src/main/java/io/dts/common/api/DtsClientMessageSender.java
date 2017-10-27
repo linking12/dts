@@ -1,4 +1,4 @@
-package io.dts.common.rpc;
+package io.dts.common.api;
 
 import io.dts.common.cluster.ServerCluster;
 import io.dts.common.exception.DtsException;
