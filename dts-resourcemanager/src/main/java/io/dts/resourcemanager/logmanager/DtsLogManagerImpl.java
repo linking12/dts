@@ -29,12 +29,12 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCallback;
 import org.springframework.jdbc.core.RowMapper;
 
-import io.dts.common.common.TxcXID;
-import io.dts.common.common.context.ContextStep2;
-import io.dts.common.common.exception.DtsException;
+import io.dts.common.common.DtsXID;
+import io.dts.common.exception.DtsException;
 import io.dts.common.util.BlobUtil;
 import io.dts.parser.struct.TxcRuntimeContext;
 import io.dts.resourcemanager.helper.DataSourceHolder;
+import io.dts.resourcemanager.struct.ContextStep2;
 
 /**
  * @author liushiming
@@ -106,7 +106,7 @@ public class DtsLogManagerImpl implements DtsLogManager {
       final TxcRuntimeContext txcContext) throws SQLException {
     String xid = txcContext.getXid();
     long branchID = txcContext.getBranchId();
-    long globalXid = TxcXID.getGlobalXID(xid, branchID);
+    long globalXid = DtsXID.getGlobalXID(xid, branchID);
     String serverAddr = txcContext.getServer();
     StringBuilder insertSql = new StringBuilder("INSERT INTO ");
     insertSql.append(txcLogTableName);

@@ -3,7 +3,7 @@ package io.dts.common.util;
 
 import javax.sql.rowset.serial.SerialBlob;
 
-import io.dts.common.common.exception.DtsException;
+import io.dts.common.exception.DtsException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

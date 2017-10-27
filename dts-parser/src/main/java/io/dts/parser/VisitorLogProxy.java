@@ -20,7 +20,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.dts.common.common.exception.DtsException;
+import io.dts.common.exception.DtsException;
 import io.dts.parser.vistor.ITxcVisitor;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;

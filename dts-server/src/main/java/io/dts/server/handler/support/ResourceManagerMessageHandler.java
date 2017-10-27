@@ -19,8 +19,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.dts.common.common.CommitMode;
-import io.dts.common.common.TxcXID;
-import io.dts.common.common.exception.DtsException;
+import io.dts.common.common.DtsXID;
+import io.dts.common.exception.DtsException;
 import io.dts.common.protocol.header.BeginRetryBranchMessage;
 import io.dts.common.protocol.header.BeginRetryBranchResultMessage;
 import io.dts.common.protocol.header.QueryLockMessage;
@@ -167,7 +167,7 @@ public interface ResourceManagerMessageHandler {
           dtsTransStatusDao.setRetryGlobalLog(retryGlobalLog);
         }
         long tranId = retryGlobalLog.getTransId();
-        String xid = TxcXID.generateXID(tranId);
+        String xid = DtsXID.generateXID(tranId);
         resultMessage.setXid(xid);
         BranchLog branchLog = new BranchLog();
         branchLog.setTransId(tranId);

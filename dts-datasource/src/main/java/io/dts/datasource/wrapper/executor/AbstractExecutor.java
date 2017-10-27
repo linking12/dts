@@ -4,7 +4,7 @@ import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
 
-import io.dts.common.common.exception.DtsException;
+import io.dts.common.exception.DtsException;
 import io.dts.datasource.commiter.AtExecutorRUnCommiter;
 
 /**

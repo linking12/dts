@@ -27,12 +27,12 @@ import java.util.concurrent.TimeUnit;
 import com.google.common.collect.Maps;
 
 import io.dts.common.common.CommitMode;
-import io.dts.common.common.TrxLockMode;
-import io.dts.common.common.TxcXID;
-import io.dts.common.common.context.ContextStep2;
-import io.dts.common.common.exception.DtsException;
+import io.dts.common.common.DtsXID;
+import io.dts.common.exception.DtsException;
 import io.dts.resourcemanager.helper.TxcTrxConfig;
 import io.dts.resourcemanager.logmanager.DtsLogManager;
+import io.dts.resourcemanager.struct.ContextStep2;
+import io.dts.resourcemanager.struct.TrxLockMode;
 import io.dts.resourcemanager.struct.TxcBranchStatus;
 import io.dts.resourcemanager.struct.TxcIsolation;
 
@@ -113,7 +113,7 @@ public class AtResourceManager extends BaseResourceManager {
   @Override
   public void branchCommit(String xid, long branchId, String key, String udata, int commitMode,
       String retrySql) throws DtsException {
-    String branchName = TxcXID.getBranchName(xid, branchId);
+    String branchName = DtsXID.getBranchName(xid, branchId);
     if (currentTaskMap.containsKey(branchName)) {
       throw new DtsException("Branch is working:" + currentTaskMap.get(branchName));
     }
@@ -134,7 +134,7 @@ public class AtResourceManager extends BaseResourceManager {
         context.setCommitMode(CommitMode.COMMIT_RETRY_MODE);
       }
       context.setRetrySql(retrySql);
-      context.setGlobalXid(TxcXID.getGlobalXID(xid, branchId));
+      context.setGlobalXid(DtsXID.getGlobalXID(xid, branchId));
       switch (context.getCommitMode()) {
         case COMMIT_IN_PHASE1:
         case COMMIT_IN_PHASE2:
@@ -158,7 +158,7 @@ public class AtResourceManager extends BaseResourceManager {
   @Override
   public void branchRollback(String xid, long branchId, String key, String udata, int commitMode,
       int isDelKey) throws DtsException {
-    String branchName = TxcXID.getBranchName(xid, branchId);
+    String branchName = DtsXID.getBranchName(xid, branchId);
     if (currentTaskMap.containsKey(branchName)) {
       throw new DtsException("Branch is working:" + currentTaskMap.get(branchName));
     }
@@ -184,7 +184,7 @@ public class AtResourceManager extends BaseResourceManager {
     } else if (isDelKey == TrxLockMode.NOT_DELETE_TRX_LOCK.getValue()) {
       context.setLockMode(TrxLockMode.NOT_DELETE_TRX_LOCK);
     }
-    context.setGlobalXid(TxcXID.getGlobalXID(xid, branchId));
+    context.setGlobalXid(DtsXID.getGlobalXID(xid, branchId));
     try {
       DtsLogManager.getInstance().branchRollback(context);
     } catch (DtsException e) {

@@ -20,8 +20,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.dts.common.common.TxcXID;
-import io.dts.common.common.exception.DtsException;
+import io.dts.common.common.DtsXID;
+import io.dts.common.exception.DtsException;
 import io.dts.common.protocol.header.BeginMessage;
 import io.dts.common.protocol.header.BranchCommitMessage;
 import io.dts.common.protocol.header.BranchCommitResultMessage;
@@ -73,7 +73,7 @@ public interface ClientMessageHandler {
         dtsLogDao.insertGlobalLog(globalLog, 1);;
         long tranId = globalLog.getTransId();
         dtsTransStatusDao.insertGlobalLog(tranId, globalLog);
-        String xid = TxcXID.generateXID(tranId);
+        String xid = DtsXID.generateXID(tranId);
         return xid;
       }
 
@@ -209,7 +209,7 @@ public interface ClientMessageHandler {
           String clientAddress = branchLog.getClientIp();
           Long branchId = branchLog.getBranchId();
           BranchCommitMessage branchCommitMessage = new BranchCommitMessage();
-          branchCommitMessage.setServerAddr(TxcXID.getSvrAddr());
+          branchCommitMessage.setServerAddr(DtsXID.getSvrAddr());
           branchCommitMessage.setTranId(globalLog.getTransId());
           branchCommitMessage.setBranchId(branchId);
           branchCommitMessage.setUdata(branchLog.getUdata());
@@ -239,7 +239,7 @@ public interface ClientMessageHandler {
           String clientAddress = branchLog.getClientIp();
           Long branchId = branchLog.getBranchId();
           BranchRollBackMessage branchRollbackMessage = new BranchRollBackMessage();
-          branchRollbackMessage.setServerAddr(TxcXID.getSvrAddr());
+          branchRollbackMessage.setServerAddr(DtsXID.getSvrAddr());
           branchRollbackMessage.setTranId(globalLog.getTransId());
           branchRollbackMessage.setBranchId(branchId);
           branchRollbackMessage.setUdata(branchLog.getUdata());

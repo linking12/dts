@@ -2,7 +2,7 @@ package io.dts.parser.struct;
 
 import com.alibaba.fastjson.annotation.JSONField;
 
-import io.dts.common.common.exception.DtsException;
+import io.dts.common.exception.DtsException;
 
 import java.util.ArrayList;
 import java.util.List;

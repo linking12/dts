@@ -7,8 +7,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import io.dts.common.common.CommitMode;
-import io.dts.common.common.TxcXID;
-import io.dts.common.common.context.DtsContext;
+import io.dts.common.common.DtsContext;
+import io.dts.common.common.DtsXID;
 import io.dts.datasource.wrapper.DtsPrepareStatementWrapper;
 import io.dts.datasource.wrapper.DtsStatementWrapper;
 import io.dts.parser.struct.TxcRuntimeContext;
@@ -82,7 +82,7 @@ public class DtsConnection extends AbstractDtsConnection {
     try {
       if (DtsContext.inTxcTransaction()) {
         // 日志写库
-        txcContext.setServer(TxcXID.getServerAddress(txcContext.getXid()));
+        txcContext.setServer(DtsXID.getServerAddress(txcContext.getXid()));
         txcContext.setStatus(UndoLogMode.COMMON_LOG.getValue());
         DtsLogManagerImpl.insertUndoLog(this.getRawConnection(), txcContext);
         getRawConnection().commit();

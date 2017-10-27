@@ -33,9 +33,8 @@ import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.CollectionUtils;
 
-import io.dts.common.common.TxcXID;
-import io.dts.common.common.context.ContextStep2;
-import io.dts.common.common.exception.DtsException;
+import io.dts.common.common.DtsXID;
+import io.dts.common.exception.DtsException;
 import io.dts.common.protocol.ResultCode;
 import io.dts.parser.struct.RollbackInfor;
 import io.dts.parser.struct.TxcField;
@@ -45,6 +44,7 @@ import io.dts.parser.struct.TxcTable;
 import io.dts.parser.struct.TxcTableMeta;
 import io.dts.parser.vistor.DtsTableMetaTools;
 import io.dts.resourcemanager.helper.DataSourceHolder;
+import io.dts.resourcemanager.struct.ContextStep2;
 import io.dts.resourcemanager.struct.UndoLogMode;
 import io.dts.resourcemanager.undo.DtsUndo;
 
@@ -68,7 +68,7 @@ public class BranchRollbackLogManager extends DtsLogManagerImpl {
       protected void doInTransactionWithoutResult(TransactionStatus status) {
         try {
           // 查询事务日志
-          long gid = TxcXID.getGlobalXID(context.getXid(), context.getBranchId());
+          long gid = DtsXID.getGlobalXID(context.getXid(), context.getBranchId());
           TxcRuntimeContext undolog = getTxcRuntimeContexts(gid, template);
           if (undolog == null) {
             return;

@@ -16,7 +16,7 @@ package io.dts.resourcemanager.logmanager;
 import java.sql.SQLException;
 import java.util.List;
 
-import io.dts.common.common.context.ContextStep2;
+import io.dts.resourcemanager.struct.ContextStep2;
 
 /**
  * @author liushiming

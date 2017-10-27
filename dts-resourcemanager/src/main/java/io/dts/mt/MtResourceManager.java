@@ -13,7 +13,7 @@
  */
 package io.dts.mt;
 
-import io.dts.common.common.exception.DtsException;
+import io.dts.common.exception.DtsException;
 import io.dts.resourcemanager.BaseResourceManager;
 
 /**

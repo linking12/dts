@@ -4,8 +4,8 @@ package io.dts.client.template;
 
 import io.dts.client.api.DtsTransactionManager;
 import io.dts.client.api.impl.DefaultDtsTransactionManager;
-import io.dts.common.common.context.DtsContext;
-import io.dts.common.common.exception.DtsException;
+import io.dts.common.common.DtsContext;
+import io.dts.common.exception.DtsException;
 
 
 public class TxcTransactionTemplate {

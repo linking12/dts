@@ -10,9 +10,9 @@ import java.util.concurrent.TimeUnit;
 
 import com.google.common.collect.Queues;
 
-import io.dts.common.common.TxcConstants;
-import io.dts.common.common.exception.DtsException;
+import io.dts.common.common.Constants;
 import io.dts.common.component.AbstractLifecycleComponent;
+import io.dts.common.exception.DtsException;
 import io.dts.common.protocol.RequestCode;
 import io.dts.common.protocol.RequestMessage;
 import io.dts.common.protocol.heatbeat.HeartbeatRequestHeader;
@@ -121,7 +121,7 @@ public class DefaultDtsResourcMessageSender extends AbstractLifecycleComponent
 
   @Override
   public <T> T invoke(RequestMessage msg) throws DtsException {
-    return this.invoke(msg, TxcConstants.RPC_INVOKE_TIMEOUT);
+    return this.invoke(msg, Constants.RPC_INVOKE_TIMEOUT);
   }
 
   @Override

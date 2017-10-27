@@ -31,15 +31,15 @@ import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import io.dts.common.common.CommitMode;
-import io.dts.common.common.TxcXID;
-import io.dts.common.common.context.ContextStep2;
-import io.dts.common.common.exception.DtsException;
+import io.dts.common.common.DtsXID;
+import io.dts.common.exception.DtsException;
 import io.dts.parser.struct.RollbackInfor;
 import io.dts.parser.struct.SqlType;
 import io.dts.parser.struct.TxcField;
 import io.dts.parser.struct.TxcRuntimeContext;
 import io.dts.parser.struct.TxcTable;
 import io.dts.resourcemanager.helper.DataSourceHolder;
+import io.dts.resourcemanager.struct.ContextStep2;
 import io.dts.resourcemanager.struct.UndoLogMode;
 
 /**
@@ -91,7 +91,7 @@ public class BranchCommitLogManager extends DtsLogManagerImpl {
       protected void doInTransactionWithoutResult(TransactionStatus status) {
         for (final ContextStep2 c : contexts) {
           try {
-            long gid = TxcXID.getGlobalXID(c.getXid(), c.getBranchId());
+            long gid = DtsXID.getGlobalXID(c.getXid(), c.getBranchId());
 
             // 针对delete操作延迟删除数据
             TxcRuntimeContext undos = getTxcRuntimeContexts(gid, template);

@@ -7,7 +7,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import io.dts.common.common.exception.DtsException;
+import io.dts.common.exception.DtsException;
 import io.dts.common.protocol.RequestCode;
 import io.dts.common.protocol.RequestMessage;
 import io.dts.common.protocol.ResponseMessage;

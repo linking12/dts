@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
-import io.dts.common.common.exception.DtsException;
+import io.dts.common.exception.DtsException;
 import io.dts.parser.struct.IndexType;
 import io.dts.parser.struct.TxcColumnMeta;
 import io.dts.parser.struct.TxcIndex;

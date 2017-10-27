@@ -20,7 +20,7 @@ import com.alibaba.druid.sql.visitor.SQLEvalVisitorUtils;
 import com.alibaba.druid.util.JdbcUtils;
 import com.google.common.base.CharMatcher;
 
-import io.dts.common.common.exception.DtsException;
+import io.dts.common.exception.DtsException;
 import io.dts.parser.DtsObjectWapper;
 import io.dts.parser.DtsSQLStatement;
 import io.dts.parser.struct.DatabaseType;

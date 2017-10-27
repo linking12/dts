@@ -15,8 +15,8 @@ import com.alibaba.druid.sql.ast.SQLExpr;
 import com.alibaba.druid.sql.dialect.mysql.visitor.MySqlOutputVisitor;
 import com.alibaba.druid.sql.visitor.SQLASTOutputVisitor;
 
-import io.dts.common.common.exception.DtsException;
 import io.dts.parser.DtsSQLStatement;
+import io.dts.common.exception.DtsException;
 import io.dts.parser.DtsObjectWapper;
 import io.dts.parser.struct.SqlType;
 import io.dts.parser.struct.TxcColumnMeta;

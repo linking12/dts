@@ -4,7 +4,7 @@ import com.google.common.collect.Lists;
 
 import java.util.List;
 
-import io.dts.common.common.exception.DtsException;
+import io.dts.common.exception.DtsException;
 import io.dts.common.protocol.ResultCode;
 import io.dts.parser.struct.RollbackInfor;
 import io.dts.parser.struct.TxcField;

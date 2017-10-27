@@ -5,10 +5,10 @@ import org.slf4j.LoggerFactory;
 
 import io.dts.client.aop.TransactionDtsInterceptor;
 import io.dts.client.api.DtsTransactionManager;
-import io.dts.common.common.TxcConstants;
-import io.dts.common.common.TxcXID;
-import io.dts.common.common.context.DtsContext;
-import io.dts.common.common.exception.DtsException;
+import io.dts.common.common.DtsContext;
+import io.dts.common.common.Constants;
+import io.dts.common.common.DtsXID;
+import io.dts.common.exception.DtsException;
 import io.dts.common.protocol.header.BeginMessage;
 import io.dts.common.protocol.header.BeginResultMessage;
 import io.dts.common.protocol.header.GlobalCommitMessage;
@@ -55,7 +55,7 @@ public class DefaultDtsTransactionManager implements DtsTransactionManager {
       BeginResultMessage resultMessage = null;
       try {
         BeginResultMessage beginResultMessage =
-            dtsClient.invoke(beginMessage, TxcConstants.RPC_INVOKE_TIMEOUT);
+            dtsClient.invoke(beginMessage, Constants.RPC_INVOKE_TIMEOUT);
         DtsContext.bind(beginResultMessage.getXid(), beginResultMessage.getNextSvrAddr());
       } catch (Throwable th) {
         throw new DtsException(th);
@@ -82,7 +82,7 @@ public class DefaultDtsTransactionManager implements DtsTransactionManager {
     if (DtsContext.getCurrentXid() == null) {
       throw new DtsException("the thread is not in transaction when invoke commit.");
     }
-    commitMessage.setTranId(TxcXID.getTransactionId(DtsContext.getCurrentXid()));
+    commitMessage.setTranId(DtsXID.getTransactionId(DtsContext.getCurrentXid()));
     long start = 0;
     if (logger.isDebugEnabled())
       start = System.currentTimeMillis();
@@ -92,7 +92,7 @@ public class DefaultDtsTransactionManager implements DtsTransactionManager {
       do {
         try {
           resultMessage = (GlobalCommitResultMessage) dtsClient.invoke(commitMessage,
-              TxcConstants.RPC_INVOKE_TIMEOUT);
+              Constants.RPC_INVOKE_TIMEOUT);
           Thread.sleep(3000);
         } catch (Exception e) {
           ex = e;
@@ -129,7 +129,7 @@ public class DefaultDtsTransactionManager implements DtsTransactionManager {
   @Override
   public void rollback(int retryTimes) throws DtsException {
     GlobalRollbackMessage rollbackMessage = new GlobalRollbackMessage();
-    rollbackMessage.setTranId(TxcXID.getTransactionId(DtsContext.getCurrentXid()));
+    rollbackMessage.setTranId(DtsXID.getTransactionId(DtsContext.getCurrentXid()));
     long start = 0;
     if (logger.isDebugEnabled())
       start = System.currentTimeMillis();
@@ -139,7 +139,7 @@ public class DefaultDtsTransactionManager implements DtsTransactionManager {
       do {
         try {
           resultMessage = (GlobalRollbackResultMessage) dtsClient.invoke(rollbackMessage,
-              TxcConstants.RPC_INVOKE_TIMEOUT);
+              Constants.RPC_INVOKE_TIMEOUT);
           Thread.sleep(3000);
         } catch (Exception e) {
           ex = e;

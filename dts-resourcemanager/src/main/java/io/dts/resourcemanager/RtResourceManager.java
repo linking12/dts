@@ -17,7 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.dts.common.common.CommitMode;
-import io.dts.common.common.context.DtsContext;
+import io.dts.common.common.DtsContext;
 import io.dts.common.protocol.header.BeginRetryBranchMessage;
 import io.dts.common.protocol.header.BeginRetryBranchResultMessage;
 import io.dts.resourcemanager.api.IDtsDataSource;

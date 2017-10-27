@@ -1,6 +1,6 @@
 package io.dts.client.api;
 
-import io.dts.common.common.exception.DtsException;
+import io.dts.common.exception.DtsException;
 
 /**
  * Created by guoyubo on 2017/8/24.

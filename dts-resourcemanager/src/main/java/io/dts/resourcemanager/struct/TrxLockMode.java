@@ -1,4 +1,4 @@
-package io.dts.common.common;
+package io.dts.resourcemanager.struct;
 
 public enum TrxLockMode {
 	DELETE_TRX_LOCK(1), NOT_DELETE_TRX_LOCK(0);

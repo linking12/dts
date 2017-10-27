@@ -4,7 +4,7 @@ package io.dts.parser;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 
-import io.dts.common.common.exception.DtsException;
+import io.dts.common.exception.DtsException;
 
 import java.util.Date;
 

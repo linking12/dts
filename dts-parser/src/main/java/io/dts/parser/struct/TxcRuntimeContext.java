@@ -11,8 +11,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.dts.common.common.TxcXID;
-import io.dts.common.common.context.DtsContext;
+import io.dts.common.common.DtsContext;
+import io.dts.common.common.DtsXID;
 
 public class TxcRuntimeContext {
 
@@ -154,7 +154,7 @@ public class TxcRuntimeContext {
 
 	public String txcStr() throws SQLException {
 		if (DtsContext.inTxcTransaction()) {
-			return TxcXID.formatXid(getXid(), getBranchId());
+			return DtsXID.formatXid(getXid(), getBranchId());
 		}
 
 		return " [NULL TXC] ";

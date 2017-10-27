@@ -19,10 +19,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.dts.common.common.CommitMode;
-import io.dts.common.common.TxcConstants;
-import io.dts.common.common.TxcXID;
-import io.dts.common.common.context.DtsContext;
-import io.dts.common.common.exception.DtsException;
+import io.dts.common.common.DtsContext;
+import io.dts.common.common.Constants;
+import io.dts.common.common.DtsXID;
+import io.dts.common.exception.DtsException;
 import io.dts.common.protocol.RequestMessage;
 import io.dts.common.protocol.header.RegisterMessage;
 import io.dts.common.protocol.header.RegisterResultMessage;
@@ -81,10 +81,10 @@ public abstract class BaseResourceManager implements ResourceManager {
       RegisterMessage registerMessage = new RegisterMessage();
       registerMessage.setKey(key);
       registerMessage.setCommitMode(commitMode.getValue());
-      registerMessage.setTranId(TxcXID.getTransactionId(DtsContext.getCurrentXid()));
+      registerMessage.setTranId(DtsXID.getTransactionId(DtsContext.getCurrentXid()));
       try {
         RegisterResultMessage resultMessage = (RegisterResultMessage) resourceMessageSender
-            .invoke(registerMessage, TxcConstants.RPC_INVOKE_TIMEOUT);
+            .invoke(registerMessage, Constants.RPC_INVOKE_TIMEOUT);
         if (logger.isDebugEnabled())
           logger.debug(registerMessage.toString());
         if (resultMessage == null) {
@@ -128,7 +128,7 @@ public abstract class BaseResourceManager implements ResourceManager {
       reportStatusMessage.setBranchId(branchId);
       reportStatusMessage.setSuccess(success);
       reportStatusMessage.setKey(key);
-      reportStatusMessage.setTranId(TxcXID.getTransactionId(DtsContext.getCurrentXid()));
+      reportStatusMessage.setTranId(DtsXID.getTransactionId(DtsContext.getCurrentXid()));
       reportStatusMessage.setUdata(udata);
 
       try {
@@ -145,6 +145,6 @@ public abstract class BaseResourceManager implements ResourceManager {
   }
 
   protected <T> T invoke(RequestMessage msg) throws DtsException {
-    return resourceMessageSender.invoke(msg, TxcConstants.RPC_INVOKE_TIMEOUT);
+    return resourceMessageSender.invoke(msg, Constants.RPC_INVOKE_TIMEOUT);
   }
 }

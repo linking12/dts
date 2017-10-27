@@ -14,7 +14,7 @@
 package io.dts.resourcemanager;
 
 import io.dts.common.common.CommitMode;
-import io.dts.common.common.exception.DtsException;
+import io.dts.common.exception.DtsException;
 
 /**
  * @author liushiming

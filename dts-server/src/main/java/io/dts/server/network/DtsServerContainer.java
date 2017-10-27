@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
 import com.google.common.collect.Queues;
 
 import io.dts.common.cluster.DefaultServerCluster;
-import io.dts.common.common.TxcXID;
+import io.dts.common.common.DtsXID;
 import io.dts.common.component.AbstractLifecycleComponent;
 import io.dts.common.protocol.RequestCode;
 import io.dts.common.util.NetUtil;
@@ -67,8 +67,8 @@ public class DtsServerContainer extends AbstractLifecycleComponent {
     nettyServerConfig.setListenPort(serverProperties.getListenPort());
     this.remotingServer = new NettyRemotingServer(nettyServerConfig, channelKeeping);
     this.registerProcessor();
-    TxcXID.setIpAddress(NetUtil.getLocalIp());
-    TxcXID.setPort(serverProperties.getListenPort());
+    DtsXID.setIpAddress(NetUtil.getLocalIp());
+    DtsXID.setPort(serverProperties.getListenPort());
   }
 
   private void registerHeaderRequest() {
