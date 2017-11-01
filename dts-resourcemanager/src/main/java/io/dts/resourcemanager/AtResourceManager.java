@@ -29,11 +29,9 @@ import com.google.common.collect.Maps;
 import io.dts.common.common.CommitMode;
 import io.dts.common.common.DtsXID;
 import io.dts.common.exception.DtsException;
-import io.dts.resourcemanager.helper.TxcTrxConfig;
 import io.dts.resourcemanager.logmanager.DtsLogManager;
 import io.dts.resourcemanager.struct.ContextStep2;
 import io.dts.resourcemanager.struct.TxcBranchStatus;
-import io.dts.resourcemanager.struct.TxcIsolation;
 
 /**
  * @author liushiming
@@ -46,43 +44,43 @@ public class AtResourceManager extends BaseResourceManager {
   private static Map<Long, ContextStep2> currentTaskCommitedAt = Maps.newConcurrentMap();
 
   private static Map<String, TxcBranchStatus> currentTaskMap = Maps.newConcurrentMap();
-  /**
-   * 隔离级别
-   */
-  private TxcIsolation trxLevel = TxcIsolation.READ_UNCOMMITED;
-  /**
-   * 事务配置
-   */
-  private TxcTrxConfig trxConfig = new TxcTrxConfig();
-
-  public TxcTrxConfig getTrxConfig() {
-    return trxConfig;
-  }
-
-  public void setTrxConfig(TxcTrxConfig trxConfig) {
-    this.trxConfig = trxConfig;
-  }
-
-  public TxcIsolation getIsolationLevel() {
-    switch (trxLevel) {
-      case READ_COMMITED:
-      case READ_UNCOMMITED:
-        break;
-      case READ_COMMITED_REDO:
-        break;
-      case repeatable:
-        throw new DtsException("unsupported repeatable isolation.");
-      case serializable:
-        throw new DtsException("unsupported serializable isolation.");
-      default:
-        throw new DtsException("undefined TxcIsolation:" + trxLevel.value());
-    }
-    return trxLevel;
-  }
-
-  public void setTrxLevel(TxcIsolation trxLevel) {
-    this.trxLevel = trxLevel;
-  }
+  // /**
+  // * 隔离级别
+  // */
+  // private TxcIsolation trxLevel = TxcIsolation.READ_UNCOMMITED;
+  // /**
+  // * 事务配置
+  // */
+  // private TxcTrxConfig trxConfig = new TxcTrxConfig();
+  //
+  // public TxcTrxConfig getTrxConfig() {
+  // return trxConfig;
+  // }
+  //
+  // public void setTrxConfig(TxcTrxConfig trxConfig) {
+  // this.trxConfig = trxConfig;
+  // }
+  //
+  // public TxcIsolation getIsolationLevel() {
+  // switch (trxLevel) {
+  // case READ_COMMITED:
+  // case READ_UNCOMMITED:
+  // break;
+  // case READ_COMMITED_REDO:
+  // break;
+  // case repeatable:
+  // throw new DtsException("unsupported repeatable isolation.");
+  // case serializable:
+  // throw new DtsException("unsupported serializable isolation.");
+  // default:
+  // throw new DtsException("undefined TxcIsolation:" + trxLevel.value());
+  // }
+  // return trxLevel;
+  // }
+  //
+  // public void setTrxLevel(TxcIsolation trxLevel) {
+  // this.trxLevel = trxLevel;
+  // }
 
   public void init() {
     try {
