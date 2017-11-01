@@ -1,11 +1,6 @@
 package io.dts.server.model;
 
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-
-import io.dts.common.struct.TrxLockMode;
 
 /**
  * @author jiangyu.jy
@@ -308,18 +303,18 @@ public class BranchLog {
         + ",isDelLock:" + this.isDelLock;
   }
 
-  static public void setLastBranchDelTrxKey(List<BranchLog> branchLogs) {
-    HashSet<String> tempLogs = new HashSet<String>();
-    Collections.reverse(branchLogs);
-    for (int i = 0; i < branchLogs.size(); i++) {
-      BranchLog branch = branchLogs.get(i);
-      // 对于倒序情况下，第一个分支删锁。
-      if (tempLogs.add(branch.getClientInfo())) {
-        branch.setIsDelLock(TrxLockMode.DELETE_TRX_LOCK.getValue());
-      } else {
-        branch.setIsDelLock(TrxLockMode.NOT_DELETE_TRX_LOCK.getValue());
-      }
-    }
-    Collections.reverse(branchLogs);
-  }
+  // static public void setLastBranchDelTrxKey(List<BranchLog> branchLogs) {
+  // HashSet<String> tempLogs = new HashSet<String>();
+  // Collections.reverse(branchLogs);
+  // for (int i = 0; i < branchLogs.size(); i++) {
+  // BranchLog branch = branchLogs.get(i);
+  // // 对于倒序情况下，第一个分支删锁。
+  // if (tempLogs.add(branch.getClientInfo())) {
+  // branch.setIsDelLock(TrxLockMode.DELETE_TRX_LOCK.getValue());
+  // } else {
+  // branch.setIsDelLock(TrxLockMode.NOT_DELETE_TRX_LOCK.getValue());
+  // }
+  // }
+  // Collections.reverse(branchLogs);
+  // }
 }

@@ -1,7 +1,6 @@
 package io.dts.resourcemanager.struct;
 
 import io.dts.common.common.CommitMode;
-import io.dts.common.struct.TrxLockMode;
 
 public class ContextStep2 {
   private long globalXid;
@@ -11,15 +10,6 @@ public class ContextStep2 {
   private String udata;
   private CommitMode commitMode;
   private String retrySql;
-  private TrxLockMode lockMode;
-
-  public TrxLockMode getLockMode() {
-    return lockMode;
-  }
-
-  public void setLockMode(TrxLockMode lockMode) {
-    this.lockMode = lockMode;
-  }
 
   public long getGlobalXid() {
     return globalXid;

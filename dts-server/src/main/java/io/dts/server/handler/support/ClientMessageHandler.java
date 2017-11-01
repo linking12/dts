@@ -111,7 +111,7 @@ public interface ClientMessageHandler {
             case CommitHeuristic:
               List<BranchLog> branchLogs = dtsTransStatusDao
                   .queryBranchLogByTransId(globalLog.getTransId(), false, false, false);
-              BranchLog.setLastBranchDelTrxKey(branchLogs);
+              // BranchLog.setLastBranchDelTrxKey(branchLogs);
               if (branchLogs.size() == 0) {
                 dtsLogDao.deleteGlobalLog(globalLog.getTransId(), 1);
                 dtsTransStatusDao.clearGlobalLog(tranId);
@@ -180,7 +180,7 @@ public interface ClientMessageHandler {
         } else if (globalLog.getState() == GlobalTransactionState.Begin.getValue()) {
           List<BranchLog> branchLogs =
               dtsTransStatusDao.queryBranchLogByTransId(globalLog.getTransId(), true, true, false);
-          BranchLog.setLastBranchDelTrxKey(branchLogs);
+          // BranchLog.setLastBranchDelTrxKey(branchLogs);
           globalLog.setState(GlobalTransactionState.Rollbacking.getValue());
           try {
             if (globalRollbackMessage.getRealSvrAddr() == null)

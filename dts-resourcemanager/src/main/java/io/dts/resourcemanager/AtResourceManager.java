@@ -29,7 +29,6 @@ import com.google.common.collect.Maps;
 import io.dts.common.common.CommitMode;
 import io.dts.common.common.DtsXID;
 import io.dts.common.exception.DtsException;
-import io.dts.common.struct.TrxLockMode;
 import io.dts.resourcemanager.helper.TxcTrxConfig;
 import io.dts.resourcemanager.logmanager.DtsLogManager;
 import io.dts.resourcemanager.struct.ContextStep2;
@@ -179,11 +178,11 @@ public class AtResourceManager extends BaseResourceManager {
     } else if (commitMode == CommitMode.COMMIT_RETRY_MODE.getValue()) {
       context.setCommitMode(CommitMode.COMMIT_RETRY_MODE);
     }
-    if (isDelKey == TrxLockMode.DELETE_TRX_LOCK.getValue()) {
-      context.setLockMode(TrxLockMode.DELETE_TRX_LOCK);
-    } else if (isDelKey == TrxLockMode.NOT_DELETE_TRX_LOCK.getValue()) {
-      context.setLockMode(TrxLockMode.NOT_DELETE_TRX_LOCK);
-    }
+    // if (isDelKey == TrxLockMode.DELETE_TRX_LOCK.getValue()) {
+    // context.setLockMode(TrxLockMode.DELETE_TRX_LOCK);
+    // } else if (isDelKey == TrxLockMode.NOT_DELETE_TRX_LOCK.getValue()) {
+    // context.setLockMode(TrxLockMode.NOT_DELETE_TRX_LOCK);
+    // }
     context.setGlobalXid(DtsXID.getGlobalXID(xid, branchId));
     try {
       DtsLogManager.getInstance().branchRollback(context);
