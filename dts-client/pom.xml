@@ -20,6 +20,12 @@
 			<artifactId>dts-common</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>com.quancheng.saluki</groupId>
+			<artifactId>saluki-core</artifactId>
+			<version>1.5.7.RELEASE</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-core</artifactId>
 			<version>${spring.version}</version>
