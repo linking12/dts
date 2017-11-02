@@ -25,6 +25,8 @@ import org.springframework.context.annotation.Primary;
 
 import com.alibaba.druid.pool.DruidDataSource;
 
+import io.dts.datasource.DtsDataSource;
+
 /**
  * @author liushiming
  * @version DruidDBConfig.java, v 0.0.1 2017年11月2日 上午11:21:13 liushiming
@@ -86,8 +88,8 @@ public class DruidDBConfig {
   @Value("{spring.datasource.connectionProperties}")
   private String connectionProperties;
 
-  @Bean // 声明其为Bean实例
-  @Primary // 在同样的DataSource中，首先使用被标注的DataSource
+  @Bean
+  @Primary
   public DataSource dataSource() {
     DruidDataSource datasource = new DruidDataSource();
 
@@ -116,8 +118,6 @@ public class DruidDBConfig {
       logger.error("druid configuration initialization filter", e);
     }
     datasource.setConnectionProperties(connectionProperties);
-
-    
-    return datasource;
+    return new DtsDataSource(datasource);
   }
 }
