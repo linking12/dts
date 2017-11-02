@@ -176,11 +176,6 @@ public class AtResourceManager extends BaseResourceManager {
     } else if (commitMode == CommitMode.COMMIT_RETRY_MODE.getValue()) {
       context.setCommitMode(CommitMode.COMMIT_RETRY_MODE);
     }
-    // if (isDelKey == TrxLockMode.DELETE_TRX_LOCK.getValue()) {
-    // context.setLockMode(TrxLockMode.DELETE_TRX_LOCK);
-    // } else if (isDelKey == TrxLockMode.NOT_DELETE_TRX_LOCK.getValue()) {
-    // context.setLockMode(TrxLockMode.NOT_DELETE_TRX_LOCK);
-    // }
     context.setGlobalXid(DtsXID.getGlobalXID(xid, branchId));
     try {
       DtsLogManager.getInstance().branchRollback(context);

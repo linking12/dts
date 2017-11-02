@@ -302,19 +302,4 @@ public class BranchLog {
         + ",commit mode:" + this.commitMode + ",udata:" + this.udata + ",retrySql:" + this.retrySql
         + ",isDelLock:" + this.isDelLock;
   }
-
-  // static public void setLastBranchDelTrxKey(List<BranchLog> branchLogs) {
-  // HashSet<String> tempLogs = new HashSet<String>();
-  // Collections.reverse(branchLogs);
-  // for (int i = 0; i < branchLogs.size(); i++) {
-  // BranchLog branch = branchLogs.get(i);
-  // // 对于倒序情况下，第一个分支删锁。
-  // if (tempLogs.add(branch.getClientInfo())) {
-  // branch.setIsDelLock(TrxLockMode.DELETE_TRX_LOCK.getValue());
-  // } else {
-  // branch.setIsDelLock(TrxLockMode.NOT_DELETE_TRX_LOCK.getValue());
-  // }
-  // }
-  // Collections.reverse(branchLogs);
-  // }
 }

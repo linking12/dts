@@ -114,29 +114,7 @@ public class BranchRollbackLogManager extends DtsLogManagerImpl {
             if (!CollectionUtils.isEmpty(rollbackSqls)) {
               template.batchUpdate(rollbackSqls.toArray(new String[rollbackSqls.size()]));
             }
-
-            // 针对不同隔离级别的特殊处理
-            // if (TxcResourceManagerImpl.getTxcResourceManager().getIsolationLevel() ==
-            // TxcIsolation.READ_COMMITED) {
-            // // 回滚
-            // switch (info.getSqlType()) {
-            // case DELETE:
-            // break;
-            // default:
-            // AbstractUndoSqlBuilder.createTxcUndoExcutor(info).rollback(template);
-            // break;
-            // }
-            //
-            // // 刪除事务锁
-            //// if (context.getLockMode().getValue() == TrxLockMode.DELETE_TRX_LOCK.getValue()) {
-            //// TxcActivityInfo.deleteXLock(undolog.getXid(), template);
-            //// }
-            // } else {
-            // // 回滚
-            // AbstractUndoSqlBuilder.createTxcUndoExcutor(info).rollback(template);
-            // }
           }
-
           // 删除undolog
           String deleteSql = getDeleteUndoLogSql(Arrays.asList(context));
           logger.info("delete undo log sql" + deleteSql);
