@@ -106,7 +106,10 @@ public class DefaultServerCluster implements ServerCluster {
     private static Map<String, CuratorFramework> cacheConnection = Maps.newConcurrentMap();
 
     public static CuratorFramework getZkClient() {
-      String zkConnection = System.getProperty("ZK_CONNECTION");
+      String zkConnection = System.getenv("ZK_CONNECTION");
+      if (zkConnection == null) {
+        zkConnection = System.getProperty("ZK_CONNECTION");
+      }
       if (cacheConnection.get(zkConnection) != null) {
         return cacheConnection.get(zkConnection);
       } else {
