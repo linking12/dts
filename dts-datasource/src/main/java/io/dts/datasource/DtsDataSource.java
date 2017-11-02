@@ -23,7 +23,6 @@ public class DtsDataSource extends AbstractDtsDataSource {
 
   public DtsDataSource(final DataSource dataSource, final String dbName) {
     this.dataSource = dataSource;
-    this.dbName = dbName;
     DataSourceHolder.registerDataSource(dbName, dataSource);
   }
 
