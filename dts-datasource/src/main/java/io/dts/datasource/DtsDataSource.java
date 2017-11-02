@@ -21,9 +21,13 @@ public class DtsDataSource extends AbstractDtsDataSource {
   private ResourceManager resourceManager;
 
 
-  public DtsDataSource(final DataSource dataSource, final String dbName) {
+  public DtsDataSource(final DataSource dataSource) {
     this.dataSource = dataSource;
-    DataSourceHolder.registerDataSource(dbName, dataSource);
+    try {
+      this.dbName = dataSource.getConnection().getSchema();
+      DataSourceHolder.registerDataSource(dbName, dataSource);
+    } catch (SQLException e) {
+    }
   }
 
   public void setResourceManager(final ResourceManager resourceManager) {
