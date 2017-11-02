@@ -24,7 +24,7 @@ import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.List;
 
-import org.apache.curator.shaded.com.google.common.collect.Lists;
+import com.google.common.collect.Lists;
 
 import io.dts.datasource.DtsConnection;
 import io.dts.resourcemanager.api.IDtsPrepareStatement;
