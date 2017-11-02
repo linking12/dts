@@ -1,9 +1,9 @@
 spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
-    url: jdbc:mysql://localhost:3306/dts?useUnicode=true&characterEncoding=UTF-8
-    username: qc_test
-    password: Qcwl123456
+    url: jdbc:mysql://127.0.0.1:3306/dts
+    username: root
+    password: 123456
     driverClassName: com.mysql.jdbc.Driver
     initialSize: 5
     minIdle: 5
