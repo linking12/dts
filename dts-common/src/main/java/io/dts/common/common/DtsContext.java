@@ -13,6 +13,8 @@
  */
 package io.dts.common.common;
 
+import com.quancheng.saluki.core.common.RpcContext;
+
 import io.dts.common.exception.DtsException;
 
 /**
@@ -27,7 +29,7 @@ public class DtsContext {
   private static final String BEGIN_COUNT = "BEGIN_COUNT";
   private static final String TXC_NEXT_SVR_ADDR = "NEXT_SVR_ADDR";
 
-  private static ContextInternal context = ContextInternal.getContext();
+  private static RpcContext context = RpcContext.getContext();
 
 
   public static final int getBeginCount() {
