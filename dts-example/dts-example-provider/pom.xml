@@ -8,13 +8,27 @@
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 
-	<artifactId>dts-client-example</artifactId>
-
+	<artifactId>dts-example-provider</artifactId>
 	<dependencies>
 		<dependency>
 			<groupId>io.dts</groupId>
-			<artifactId>dts-client</artifactId>
+			<artifactId>dts-datasource</artifactId>
 			<version>${dts.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>druid</artifactId>
+			<version>1.0.15</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jdbc</artifactId>
+			<version>4.3.9.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.1.40</version>
 		</dependency>
 	</dependencies>
 
