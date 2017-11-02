@@ -8,7 +8,7 @@
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 
-	<artifactId>dts-client-api</artifactId>
+	<artifactId>dts-example-api</artifactId>
 
 	<dependencies>
 		<dependency>
