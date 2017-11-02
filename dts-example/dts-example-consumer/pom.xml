@@ -42,7 +42,7 @@
 		</dependency>
 		<dependency>
 			<groupId>io.dts</groupId>
-			<artifactId>dts-client-api</artifactId>
+			<artifactId>dts-example-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
