@@ -108,11 +108,11 @@ public class ZookeeperServerCluster implements ServerCluster, PathChildrenCacheL
 
   @Override
   public void childEvent(CuratorFramework client, PathChildrenCacheEvent event) throws Exception {
-    if (event.getData().getData() == null) {
+    if (event.getData() == null) {
       return;
     }
     String path = event.getData().getPath();
-    String clusterNode = StringUtils.replace(path, dtsServerParentNode, "");
+    String clusterNode = StringUtils.replace(path, dtsServerParentNode + "/", "");
     switch (event.getType()) {
       case CHILD_UPDATED:
       case CHILD_ADDED:
