@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
 import com.alibaba.druid.pool.DruidDataSource;
@@ -31,6 +32,7 @@ import io.dts.datasource.DtsDataSource;
  * @author liushiming
  * @version DruidDBConfig.java, v 0.0.1 2017年11月2日 上午11:21:13 liushiming
  */
+@Configuration
 public class DruidDBConfig {
   private static final Logger logger = LoggerFactory.getLogger(DruidDBConfig.class);
 
