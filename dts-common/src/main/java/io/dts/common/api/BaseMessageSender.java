@@ -17,6 +17,7 @@ import io.dts.common.exception.DtsException;
 import io.dts.common.protocol.RequestCode;
 import io.dts.common.protocol.RequestMessage;
 import io.dts.common.protocol.ResponseMessage;
+import io.dts.common.protocol.heatbeat.HeartbeatRequestHeader;
 import io.dts.remoting.CommandCustomHeader;
 import io.dts.remoting.exception.RemotingCommandException;
 import io.dts.remoting.protocol.RemotingCommand;
@@ -31,8 +32,13 @@ public interface BaseMessageSender {
   default RemotingCommand buildRequest(RequestMessage dtsMessage) throws DtsException {
     RemotingCommand request = null;
     if (dtsMessage instanceof CommandCustomHeader) {
-      request = RemotingCommand.createRequestCommand(RequestCode.HEADER_REQUEST,
-          (CommandCustomHeader) dtsMessage);
+      if (dtsMessage instanceof HeartbeatRequestHeader) {
+        request = RemotingCommand.createRequestCommand(RequestCode.HEART_BEAT,
+            (CommandCustomHeader) dtsMessage);
+      } else {
+        request = RemotingCommand.createRequestCommand(RequestCode.HEADER_REQUEST,
+            (CommandCustomHeader) dtsMessage);
+      }
     } else if (dtsMessage instanceof RemotingSerializable) {
       request = RemotingCommand.createRequestCommand(RequestCode.BODY_REQUEST, null);
       request.setBody(RemotingSerializable.encode1(dtsMessage));

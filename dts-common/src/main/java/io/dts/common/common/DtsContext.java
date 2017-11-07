@@ -29,44 +29,42 @@ public class DtsContext {
   private static final String BEGIN_COUNT = "BEGIN_COUNT";
   private static final String TXC_NEXT_SVR_ADDR = "NEXT_SVR_ADDR";
 
-  private static RpcContext context = RpcContext.getContext();
-
 
   public static final int getBeginCount() {
-    String num = context.getAttachment(BEGIN_COUNT);
+    String num = RpcContext.getContext().getAttachment(BEGIN_COUNT);
     return num == null ? 0 : Integer.parseInt(num);
   }
 
   public static final void setBegin(int beginCount) {
-    context.setAttachment(BEGIN_COUNT, String.valueOf(beginCount));
+    RpcContext.getContext().setAttachment(BEGIN_COUNT, String.valueOf(beginCount));
   }
 
   public static final int getCommitCount() {
-    String num = context.getAttachment(COMMIT_COUNT);
+    String num = RpcContext.getContext().getAttachment(COMMIT_COUNT);
     return num == null ? 0 : Integer.parseInt(num);
   }
 
   public static final void setCommitCount(int commitCount) {
-    context.setAttachment(COMMIT_COUNT, String.valueOf(commitCount));
+    RpcContext.getContext().setAttachment(COMMIT_COUNT, String.valueOf(commitCount));
   }
 
   public static String getTxcNextSvrAddr() {
-    return context.getAttachment(TXC_NEXT_SVR_ADDR);
+    return RpcContext.getContext().getAttachment(TXC_NEXT_SVR_ADDR);
   }
 
   public static String getCurrentXid() {
-    return context.getAttachment(TXC_XID_KEY);
+    return RpcContext.getContext().getAttachment(TXC_XID_KEY);
   }
 
   public static void bind(String xid, String nextSvrAddr) throws DtsException {
-    context.setAttachment(TXC_XID_KEY, xid);
+    RpcContext.getContext().setAttachment(TXC_XID_KEY, xid);
     if (nextSvrAddr != null)
-      context.setAttachment(TXC_NEXT_SVR_ADDR, nextSvrAddr);
+      RpcContext.getContext().setAttachment(TXC_NEXT_SVR_ADDR, nextSvrAddr);
   }
 
   public static void unbind() {
-    context.removeAttachment(TXC_XID_KEY);
-    context.removeAttachment(TXC_NEXT_SVR_ADDR);
+    RpcContext.getContext().removeAttachment(TXC_XID_KEY);
+    RpcContext.getContext().removeAttachment(TXC_NEXT_SVR_ADDR);
   }
 
   public static boolean inTxcTransaction() {
@@ -74,19 +72,19 @@ public class DtsContext {
   }
 
   public static void startRetryBranch(long effectiveTime) {
-    context.setAttachment(TXC_RETRY_BRANCH_KEY, Long.toString(effectiveTime));
+    RpcContext.getContext().setAttachment(TXC_RETRY_BRANCH_KEY, Long.toString(effectiveTime));
   }
 
   public static void endRetryBranch() {
-    context.removeAttachment(TXC_RETRY_BRANCH_KEY);
+    RpcContext.getContext().removeAttachment(TXC_RETRY_BRANCH_KEY);
   }
 
   public static boolean inRetryContext() {
-    return context.getAttachment(TXC_RETRY_BRANCH_KEY) != null;
+    return RpcContext.getContext().getAttachment(TXC_RETRY_BRANCH_KEY) != null;
   }
 
   public static long getEffectiveTime() {
-    String s = context.getAttachment(TXC_RETRY_BRANCH_KEY);
+    String s = RpcContext.getContext().getAttachment(TXC_RETRY_BRANCH_KEY);
     if (s != null) {
       return Long.parseLong(s);
     } else

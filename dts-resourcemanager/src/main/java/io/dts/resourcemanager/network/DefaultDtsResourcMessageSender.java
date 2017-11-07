@@ -89,7 +89,7 @@ public class DefaultDtsResourcMessageSender extends AbstractLifecycleComponent
           HeartbeatRequestHeader hearbeat = new HeartbeatRequestHeader();
           DefaultDtsResourcMessageSender.this.invoke(hearbeat);
         } catch (Throwable e) {
-          // ignore
+          e.printStackTrace();
         }
       }
     }, 5, 5, TimeUnit.SECONDS);
