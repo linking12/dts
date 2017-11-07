@@ -26,7 +26,7 @@ public interface ServerCluster {
   public void registry(int port);
 
   public static ServerCluster getServerCluster() {
-    return DefaultServerCluster.getInstance();
+    return ZookeeperServerCluster.getInstance();
   }
 
 }

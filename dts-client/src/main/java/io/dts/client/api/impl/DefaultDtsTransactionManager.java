@@ -44,30 +44,24 @@ public class DefaultDtsTransactionManager implements DtsTransactionManager {
     if (DtsContext.inRetryContext()) {
       throw new DtsException("This transaction has been RT model!");
     }
-    int beginCount = DtsContext.getBeginCount();
-    DtsContext.setBegin(++beginCount);
-    if (beginCount == 1) {
-      BeginMessage beginMessage = new BeginMessage();
-      beginMessage.setTimeout(timeout);
-      long start = 0;
-      if (logger.isDebugEnabled())
-        start = System.currentTimeMillis();
-      BeginResultMessage resultMessage = null;
-      try {
-        BeginResultMessage beginResultMessage =
-            dtsClient.invoke(beginMessage, Constants.RPC_INVOKE_TIMEOUT);
-        DtsContext.bind(beginResultMessage.getXid(), beginResultMessage.getNextSvrAddr());
-      } catch (Throwable th) {
-        throw new DtsException(th);
-      } finally {
-        if (logger.isDebugEnabled()) {
-          long end = System.currentTimeMillis();
-          logger.debug(resultMessage + " cost " + (end - start) + " ms.");
-        } else
-          logger.info("begin transaction. " + resultMessage);
-      }
-    } else {
-      logger.info(String.format("merge transaction , level %s", beginCount));
+    BeginMessage beginMessage = new BeginMessage();
+    beginMessage.setTimeout(timeout);
+    long start = 0;
+    if (logger.isDebugEnabled())
+      start = System.currentTimeMillis();
+    BeginResultMessage resultMessage = null;
+    try {
+      BeginResultMessage beginResultMessage =
+          dtsClient.invoke(beginMessage, Constants.RPC_INVOKE_TIMEOUT);
+      DtsContext.bind(beginResultMessage.getXid(), beginResultMessage.getNextSvrAddr());
+    } catch (Throwable th) {
+      throw new DtsException(th);
+    } finally {
+      if (logger.isDebugEnabled()) {
+        long end = System.currentTimeMillis();
+        logger.debug(resultMessage + " cost " + (end - start) + " ms.");
+      } else
+        logger.info("begin transaction. " + resultMessage);
     }
   }
 
