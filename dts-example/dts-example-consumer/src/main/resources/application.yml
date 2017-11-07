@@ -2,7 +2,7 @@ spring:
   application:
     name: dts-consumer
 server:
-  port: 8081
+  port: 8080
 saluki:
   grpc:
     registryAddress: localhost:8500

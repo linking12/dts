@@ -53,7 +53,7 @@ public class DefaultServerCluster implements ServerCluster {
   private static ServerCluster serverCluster = new DefaultServerCluster();
 
 
-  public DefaultServerCluster() {
+  private DefaultServerCluster() {
     CuratorFramework curatorFramework = ZkClientFacotry.getZkClient();
     try {
       @SuppressWarnings("resource")
