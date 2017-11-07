@@ -5,6 +5,7 @@ import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
+import io.dts.common.cluster.ServerCluster;
 import io.dts.parser.struct.DatabaseType;
 import io.dts.resourcemanager.BaseResourceManager;
 import io.dts.resourcemanager.ResourceManager;
@@ -22,13 +23,11 @@ public class DtsDataSource extends AbstractDtsDataSource {
   private ResourceManager resourceManager;
 
 
-  public DtsDataSource(final DataSource dataSource) {
+  public DtsDataSource(final DataSource dataSource, String dbName) {
     this.dataSource = dataSource;
-    try {
-      this.dbName = dataSource.getConnection().getSchema();
-      DataSourceHolder.registerDataSource(dbName, dataSource);
-    } catch (SQLException e) {
-    }
+    this.dbName = dbName;
+    DataSourceHolder.registerDataSource(dbName, dataSource);
+    ServerCluster.getServerCluster();
   }
 
   public void setResourceManager(final ResourceManager resourceManager) {

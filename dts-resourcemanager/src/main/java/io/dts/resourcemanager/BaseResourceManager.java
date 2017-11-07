@@ -93,7 +93,7 @@ public abstract class BaseResourceManager implements ResourceManager {
           return resultMessage.getBranchId();
         }
       } catch (Throwable th) {
-        logger.error("", "invoke msg failed. " + registerMessage);
+        logger.error("invoke msg failed. " + registerMessage, th);
         throw new DtsException(th);
       } finally {
       }

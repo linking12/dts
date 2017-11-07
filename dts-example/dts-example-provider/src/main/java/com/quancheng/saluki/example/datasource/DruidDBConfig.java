@@ -119,7 +119,9 @@ public class DruidDBConfig {
     } catch (SQLException e) {
       logger.error("druid configuration initialization filter", e);
     }
+    int startIndex = dbUrl.lastIndexOf("/");
+    String databaseName = dbUrl.substring(startIndex + 1, dbUrl.length());
     datasource.setConnectionProperties(connectionProperties);
-    return new DtsDataSource(datasource);
+    return new DtsDataSource(datasource, databaseName);
   }
 }

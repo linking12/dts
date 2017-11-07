@@ -28,6 +28,7 @@ import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.curator.utils.ZKPaths;
 import org.apache.zookeeper.CreateMode;
+import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -100,6 +101,10 @@ public class ZookeeperServerCluster implements ServerCluster, PathChildrenCacheL
     String path = ZKPaths.makePath(dtsServerParentNode,
         NetUtil.getLocalIp() + ":" + Integer.valueOf(rpcPort).toString());
     try {
+      Stat stat = client.checkExists().forPath(path);
+      if (stat != null) {
+        client.delete().forPath(path);
+      }
       client.create().withMode(CreateMode.EPHEMERAL).forPath(path);
     } catch (Exception e) {
       throw new DtsException(e);
