@@ -42,9 +42,6 @@ import io.dts.resourcemanager.struct.ContextStep2;
  */
 public class DtsLogManagerImpl implements DtsLogManager {
 
-
-  protected static final String txcLogTableName = "txc_undo_log";
-
   protected static DtsLogManager logManager = new DtsLogManagerImpl();
 
   private volatile BranchRollbackLogManager rollbackLogManager;
@@ -102,98 +99,5 @@ public class DtsLogManagerImpl implements DtsLogManager {
     return undos.get(0);
   }
 
-  public static Integer insertUndoLog(final Connection connection,
-      final TxcRuntimeContext txcContext) throws SQLException {
-    String xid = txcContext.getXid();
-    long branchID = txcContext.getBranchId();
-    long globalXid = DtsXID.getGlobalXID(xid, branchID);
-    String serverAddr = txcContext.getServer();
-    StringBuilder insertSql = new StringBuilder("INSERT INTO ");
-    insertSql.append(txcLogTableName);
-    insertSql.append("(id, xid, branch_id, rollback_info, ");
-    insertSql.append("gmt_create, gmt_modified, status, server)");
-    insertSql.append(" VALUES(");
-    insertSql.append("?,"); // id
-    insertSql.append("?,"); // xid
-    insertSql.append("?,"); // branch_id
-    insertSql.append("?,"); // rollback_info
-    insertSql.append("?,"); // gmt_create
-    insertSql.append("?,"); // gmt_modified
-    insertSql.append(txcContext.getStatus()); // status
-    insertSql.append(",?)"); // server
-    return SqlExecuteHelper.executeSql(connection, insertSql.toString(),
-        new PreparedStatementCallback<Integer>() {
-          @Override
-          public Integer doInPreparedStatement(final PreparedStatement pst) throws SQLException {
-            pst.setLong(1, globalXid);
-            pst.setString(2, xid);
-            pst.setLong(3, branchID);
-            pst.setBlob(4, BlobUtil.string2blob(txcContext.encode()));
-            java.sql.Timestamp currentTime = new java.sql.Timestamp(System.currentTimeMillis());
-            pst.setTimestamp(5, currentTime);
-            pst.setTimestamp(6, currentTime);
-            pst.setString(7, serverAddr);
-            return pst.executeUpdate();
-          }
-        });
 
-  }
-
-
-
-  static class SqlExecuteHelper {
-
-    private static final Logger logger = LoggerFactory.getLogger(SqlExecuteHelper.class);
-
-    public static void executeSql(String dbName, String sql) throws SQLException {
-      if (sql == null) {
-        return;
-      }
-      try {
-        DataSource db = DataSourceHolder.getDataSource(dbName);
-        JdbcTemplate jdbcTemplate = new JdbcTemplate(db);
-        jdbcTemplate.execute(sql);
-      } catch (DataAccessException e) {
-        SQLException sqle = (SQLException) e.getCause();
-        if (sqle.getErrorCode() == 1062) {
-          logger.info("RtExecutor retry sql:" + e.getMessage() + ":" + sql);
-        } else {
-          throw sqle;
-        }
-      }
-    }
-
-    public static <T> List<T> querySql(final JdbcTemplate template, final RowMapper rowMapper,
-        final String sql) {
-      List<T> contents;
-      long start = 0;
-      if (logger.isDebugEnabled())
-        start = System.currentTimeMillis();
-      try {
-        contents = template.query(sql, rowMapper);
-      } finally {
-        if (logger.isDebugEnabled()) {
-          long end = System.currentTimeMillis();
-          logger.info(String.format("query:[%s] cost %d ms.", sql, (end - start)));
-        }
-      }
-
-      return contents;
-    }
-
-
-    public static <T> T executeSql(final Connection connection, String sql,
-        PreparedStatementCallback<T> callback) throws SQLException {
-      PreparedStatement pst = null;
-      try {
-        pst = connection.prepareStatement(sql);
-        return callback.doInPreparedStatement(pst);
-      } finally {
-        if (pst != null) {
-          pst.close();
-        }
-      }
-    }
-
-  }
 }

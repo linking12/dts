@@ -116,48 +116,6 @@ public class AtResourceManager extends BaseResourceManager {
   }
 
   @Override
-  public void branchRollback(String xid, long branchId, String key, String udata, int commitMode,
-      int isDelKey) throws DtsException {
-    String branchName = DtsXID.getBranchName(xid, branchId);
-    if (currentTaskMap.containsKey(branchName)) {
-      throw new DtsException("Branch is working:" + currentTaskMap.get(branchName));
-    }
-
-    if (currentTaskMap.put(branchName, TxcBranchStatus.ROLLBACKING) != null) {
-      throw new DtsException("Branch is working:" + currentTaskMap.get(branchName));
-    }
-
-    ContextStep2 context = new ContextStep2();
-    context.setXid(xid);
-    context.setBranchId(branchId);
-    context.setDbname(key);
-    context.setUdata(udata);
-    if (commitMode == CommitMode.COMMIT_IN_PHASE1.getValue()) {
-      context.setCommitMode(CommitMode.COMMIT_IN_PHASE1);
-    } else if (commitMode == CommitMode.COMMIT_IN_PHASE2.getValue()) {
-      context.setCommitMode(CommitMode.COMMIT_IN_PHASE2);
-    } else if (commitMode == CommitMode.COMMIT_RETRY_MODE.getValue()) {
-      context.setCommitMode(CommitMode.COMMIT_RETRY_MODE);
-    }
-    context.setGlobalXid(DtsXID.getGlobalXID(xid, branchId));
-    try {
-      DtsLogManager.getInstance().branchRollback(context);
-    } catch (DtsException e) {
-      throw e;
-    } catch (SQLException e) {
-      throw new DtsException(e);
-    } finally {
-      currentTaskMap.remove(branchName);
-    }
-  }
-
-  @Override
-  public void reportUdata(String xid, long branchId, String key, String udata, boolean delay)
-      throws DtsException {
-    throw new UnsupportedOperationException("method not support");
-  }
-
-  @Override
   public void branchRollback(String xid, long branchId, String key, String udata, int commitMode)
       throws DtsException {
     String branchName = DtsXID.getBranchName(xid, branchId);
@@ -192,4 +150,18 @@ public class AtResourceManager extends BaseResourceManager {
       currentTaskMap.remove(branchName);
     }
   }
+
+  @Override
+  public void branchRollback(String xid, long branchId, String key, String udata, int commitMode,
+      int isDelKey) throws DtsException {
+    throw new UnsupportedOperationException("method not support");
+  }
+
+  @Override
+  public void reportUdata(String xid, long branchId, String key, String udata, boolean delay)
+      throws DtsException {
+    throw new UnsupportedOperationException("method not support");
+  }
+
+
 }

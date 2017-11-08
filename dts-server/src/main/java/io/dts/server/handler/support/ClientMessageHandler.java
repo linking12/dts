@@ -242,6 +242,7 @@ public interface ClientMessageHandler {
           branchRollbackMessage.setServerAddr(DtsXID.getSvrAddr());
           branchRollbackMessage.setTranId(globalLog.getTransId());
           branchRollbackMessage.setBranchId(branchId);
+          branchRollbackMessage.setDbName(branchLog.getClientInfo());
           branchRollbackMessage.setUdata(branchLog.getUdata());
           branchRollbackMessage.setCommitMode((byte) branchLog.getCommitMode());
           branchRollbackMessage.setIsDelLock((byte) branchLog.getIsDelLock());
