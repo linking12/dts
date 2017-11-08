@@ -25,7 +25,6 @@ import io.dts.parser.struct.TxcTableMeta;
 /**
  * SQL解析基础访问器接口.
  * 
- * @author zhangliang
  */
 public interface ITxcVisitor {
 

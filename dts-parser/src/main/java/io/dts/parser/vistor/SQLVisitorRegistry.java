@@ -36,7 +36,6 @@ public final class SQLVisitorRegistry {
   private static void registerSelectVistor() {
     SELECT_REGISTRY.put(DatabaseType.H2, DtsSelectVisitor.class);
     SELECT_REGISTRY.put(DatabaseType.MySQL, DtsSelectVisitor.class);
-    // TODO 其他数据库先使用MySQL, 只能使用标准SQL
     SELECT_REGISTRY.put(DatabaseType.Oracle, DtsSelectVisitor.class);
     SELECT_REGISTRY.put(DatabaseType.SQLServer, DtsSelectVisitor.class);
     SELECT_REGISTRY.put(DatabaseType.DB2, DtsSelectVisitor.class);
@@ -46,7 +45,6 @@ public final class SQLVisitorRegistry {
   private static void registerInsertVistor() {
     INSERT_REGISTRY.put(DatabaseType.H2, DtsInsertVisitor.class);
     INSERT_REGISTRY.put(DatabaseType.MySQL, DtsInsertVisitor.class);
-    // TODO 其他数据库先使用MySQL, 只能使用标准SQL
     INSERT_REGISTRY.put(DatabaseType.Oracle, DtsInsertVisitor.class);
     INSERT_REGISTRY.put(DatabaseType.SQLServer, DtsInsertVisitor.class);
     INSERT_REGISTRY.put(DatabaseType.DB2, DtsInsertVisitor.class);
@@ -56,7 +54,6 @@ public final class SQLVisitorRegistry {
   private static void registerUpdateVistor() {
     UPDATE_REGISTRY.put(DatabaseType.H2, DtsUpdateVisitor.class);
     UPDATE_REGISTRY.put(DatabaseType.MySQL, DtsUpdateVisitor.class);
-    // TODO 其他数据库先使用MySQL, 只能使用标准SQL
     INSERT_REGISTRY.put(DatabaseType.Oracle, DtsUpdateVisitor.class);
     INSERT_REGISTRY.put(DatabaseType.SQLServer, DtsUpdateVisitor.class);
     INSERT_REGISTRY.put(DatabaseType.DB2, DtsUpdateVisitor.class);
@@ -66,7 +63,6 @@ public final class SQLVisitorRegistry {
   private static void registerDeleteVistor() {
     DELETE_REGISTRY.put(DatabaseType.H2, DtsDeleteVisitor.class);
     DELETE_REGISTRY.put(DatabaseType.MySQL, DtsDeleteVisitor.class);
-    // TODO 其他数据库先使用MySQL, 只能使用标准SQL
     INSERT_REGISTRY.put(DatabaseType.Oracle, DtsDeleteVisitor.class);
     INSERT_REGISTRY.put(DatabaseType.SQLServer, DtsDeleteVisitor.class);
     INSERT_REGISTRY.put(DatabaseType.DB2, DtsDeleteVisitor.class);
