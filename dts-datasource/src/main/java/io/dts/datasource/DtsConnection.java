@@ -24,7 +24,7 @@ public class DtsConnection extends AbstractDtsConnection {
 
   private Connection connection;
 
-  private TxcRuntimeContext txcContext; // 事务SQL上下文
+  private TxcRuntimeContext txcContext;
 
 
   public DtsConnection(final DtsDataSource dtsDataSource, final Connection connection)
