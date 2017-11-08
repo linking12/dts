@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.dts.common.api.DtsServerMessageSender;
+import io.dts.common.common.Constants;
 import io.dts.common.common.DtsXID;
 import io.dts.common.exception.DtsException;
 import io.dts.common.protocol.header.BeginMessage;
@@ -247,8 +248,8 @@ public interface ClientMessageHandler {
           branchRollbackMessage.setCommitMode((byte) branchLog.getCommitMode());
           branchRollbackMessage.setIsDelLock((byte) branchLog.getIsDelLock());
           try {
-            BranchRollbackResultMessage branchRollbackResult =
-                serverMessageServer.invokeSync(clientAddress, branchRollbackMessage, 3000);
+            BranchRollbackResultMessage branchRollbackResult = serverMessageServer
+                .invokeSync(clientAddress, branchRollbackMessage, Constants.RPC_INVOKE_TIMEOUT);
             if (branchRollbackResult == null) {
               dtsTransStatusDao.insertRollbackResult(branchId,
                   RollbackingResultCode.TIMEOUT.getValue());

@@ -134,7 +134,7 @@ public abstract class BaseResourceManager implements ResourceManager {
       try {
         if (logger.isDebugEnabled())
           logger.debug(reportStatusMessage.toString());
-        resourceMessageSender.invoke(reportStatusMessage, -1);
+        resourceMessageSender.invoke(reportStatusMessage, Constants.RPC_INVOKE_TIMEOUT);
       } catch (Throwable th) {
         throw new DtsException(th);
       } finally {
