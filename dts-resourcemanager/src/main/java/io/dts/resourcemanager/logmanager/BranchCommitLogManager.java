@@ -38,7 +38,7 @@ import io.dts.parser.struct.SqlType;
 import io.dts.parser.struct.TxcField;
 import io.dts.parser.struct.TxcRuntimeContext;
 import io.dts.parser.struct.TxcTable;
-import io.dts.resourcemanager.helper.DataSourceHolder;
+import io.dts.resourcemanager.DataSourceHolder;
 import io.dts.resourcemanager.struct.ContextStep2;
 import io.dts.resourcemanager.struct.UndoLogMode;
 

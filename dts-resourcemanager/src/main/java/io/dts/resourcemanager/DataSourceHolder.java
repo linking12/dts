@@ -1,4 +1,4 @@
-package io.dts.resourcemanager.helper;
+package io.dts.resourcemanager;
 
 import javax.sql.DataSource;
 

@@ -43,7 +43,7 @@ import io.dts.parser.struct.TxcRuntimeContext;
 import io.dts.parser.struct.TxcTable;
 import io.dts.parser.struct.TxcTableMeta;
 import io.dts.parser.vistor.DtsTableMetaTools;
-import io.dts.resourcemanager.helper.DataSourceHolder;
+import io.dts.resourcemanager.DataSourceHolder;
 import io.dts.resourcemanager.struct.ContextStep2;
 import io.dts.resourcemanager.struct.UndoLogMode;
 import io.dts.resourcemanager.undo.DtsUndo;

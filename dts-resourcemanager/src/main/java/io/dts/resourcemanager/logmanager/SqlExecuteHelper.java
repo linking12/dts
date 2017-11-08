@@ -27,7 +27,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCallback;
 import org.springframework.jdbc.core.RowMapper;
 
-import io.dts.resourcemanager.helper.DataSourceHolder;
+import io.dts.resourcemanager.DataSourceHolder;
 
 /**
  * @author liushiming

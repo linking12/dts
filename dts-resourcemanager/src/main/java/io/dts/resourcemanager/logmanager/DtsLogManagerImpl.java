@@ -14,26 +14,16 @@
 package io.dts.resourcemanager.logmanager;
 
 import java.sql.Blob;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-import javax.sql.DataSource;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementCallback;
 import org.springframework.jdbc.core.RowMapper;
 
-import io.dts.common.common.DtsXID;
 import io.dts.common.exception.DtsException;
 import io.dts.common.util.BlobUtil;
 import io.dts.parser.struct.TxcRuntimeContext;
-import io.dts.resourcemanager.helper.DataSourceHolder;
 import io.dts.resourcemanager.struct.ContextStep2;
 
 /**
@@ -75,24 +65,22 @@ public class DtsLogManagerImpl implements DtsLogManager {
   protected TxcRuntimeContext getTxcRuntimeContexts(final long gid, final JdbcTemplate template) {
     String sql = String.format("select * from %s where status = 0 && " + "id = %d order by id desc",
         txcLogTableName, gid);
-    List<TxcRuntimeContext> undos = SqlExecuteHelper.querySql(template, new RowMapper() {
-      @Override
-      public TxcRuntimeContext mapRow(ResultSet rs, int rowNum) throws SQLException {
-        Blob blob = rs.getBlob("rollback_info");
-        String str = BlobUtil.blob2string(blob);
-        TxcRuntimeContext undoLogInfor = TxcRuntimeContext.decode(str);
-        return undoLogInfor;
-      }
-    }, sql);
-
+    List<TxcRuntimeContext> undos =
+        SqlExecuteHelper.querySql(template, new RowMapper<TxcRuntimeContext>() {
+          @Override
+          public TxcRuntimeContext mapRow(ResultSet rs, int rowNum) throws SQLException {
+            Blob blob = rs.getBlob("rollback_info");
+            String str = BlobUtil.blob2string(blob);
+            TxcRuntimeContext undoLogInfor = TxcRuntimeContext.decode(str);
+            return undoLogInfor;
+          }
+        }, sql);
     if (undos == null) {
       return null;
     }
-
     if (undos.size() == 0) {
       return null;
     }
-
     if (undos.size() > 1) {
       throw new DtsException("check txc_undo_log, trx info duplicate");
     }
