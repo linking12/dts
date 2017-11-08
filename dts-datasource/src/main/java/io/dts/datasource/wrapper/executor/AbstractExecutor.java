@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import io.dts.common.exception.DtsException;
-import io.dts.datasource.commiter.AtExecutorRUnCommiter;
+import io.dts.datasource.commiter.AtExecutorRunCommiter;
 
 /**
  * Created by guoyubo on 2017/9/21.
@@ -33,7 +33,7 @@ public abstract class AbstractExecutor {
   private <T> T executeInternal(final StatementModel baseStatementUnit,
       final List<Object> parameterSet, final ExecuteCallback<T> executeCallback) throws Exception {
     try {
-      AtExecutorRUnCommiter commiter = new AtExecutorRUnCommiter(baseStatementUnit, parameterSet);
+      AtExecutorRunCommiter commiter = new AtExecutorRunCommiter(baseStatementUnit, parameterSet);
       commiter.beforeExecute();
       T result = executeCallback.execute(baseStatementUnit);
       commiter.afterExecute();
