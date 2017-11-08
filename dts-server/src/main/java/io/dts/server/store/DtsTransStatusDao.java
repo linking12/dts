@@ -16,8 +16,8 @@ package io.dts.server.store;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
-import io.dts.server.model.BranchLog;
-import io.dts.server.model.GlobalLog;
+import io.dts.server.struct.BranchLog;
+import io.dts.server.struct.GlobalLog;
 
 /**
  * @author liushiming

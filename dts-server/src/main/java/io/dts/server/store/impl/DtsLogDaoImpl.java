@@ -25,9 +25,9 @@ import org.springframework.transaction.support.TransactionTemplate;
 import io.dts.common.common.CommitMode;
 import io.dts.common.util.BlobUtil;
 import io.dts.server.config.AppConfig;
-import io.dts.server.model.BranchLog;
-import io.dts.server.model.GlobalLog;
 import io.dts.server.store.DtsLogDao;
+import io.dts.server.struct.BranchLog;
+import io.dts.server.struct.GlobalLog;
 
 @Repository
 public class DtsLogDaoImpl implements DtsLogDao {

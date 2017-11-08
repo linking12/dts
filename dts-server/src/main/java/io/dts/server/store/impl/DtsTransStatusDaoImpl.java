@@ -24,9 +24,9 @@ import org.springframework.stereotype.Repository;
 
 import com.google.common.collect.Lists;
 
-import io.dts.server.model.BranchLog;
-import io.dts.server.model.GlobalLog;
 import io.dts.server.store.DtsTransStatusDao;
+import io.dts.server.struct.BranchLog;
+import io.dts.server.struct.GlobalLog;
 
 /**
  * @author liushiming

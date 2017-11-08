@@ -21,10 +21,10 @@ import io.dts.common.protocol.header.BranchCommitResultMessage;
 import io.dts.common.protocol.header.BranchRollbackResultMessage;
 import io.dts.server.handler.CommitingResultCode;
 import io.dts.server.handler.RollbackingResultCode;
-import io.dts.server.model.BranchLog;
-import io.dts.server.model.GlobalLog;
 import io.dts.server.store.DtsLogDao;
 import io.dts.server.store.DtsTransStatusDao;
+import io.dts.server.struct.BranchLog;
+import io.dts.server.struct.GlobalLog;
 
 /**
  * @author liushiming

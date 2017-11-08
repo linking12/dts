@@ -1,4 +1,4 @@
-package io.dts.server.model;
+package io.dts.server.struct;
 
 import java.util.ArrayList;
 import java.util.Collections;
