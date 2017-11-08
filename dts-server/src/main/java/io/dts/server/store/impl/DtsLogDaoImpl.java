@@ -83,11 +83,10 @@ public class DtsLogDaoImpl implements DtsLogDao {
 
   @Override
   public GlobalLog getGlobalLog(long tx_id, int mid) {
-    return (GlobalLog) jdbcTemplate.queryForObject(
-        "select * from txc_global_log where tx_id = ? and mid = ?", new Object[] {tx_id, mid},
-        new RowMapper() {
+    return jdbcTemplate.queryForObject("select * from txc_global_log where tx_id = ? and mid = ?",
+        new Object[] {tx_id, mid}, new RowMapper<GlobalLog>() {
           @Override
-          public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
+          public GlobalLog mapRow(ResultSet rs, int rowNum) throws SQLException {
             GlobalLog log = new GlobalLog();
 
             log.setTransId(rs.getLong("tx_id"));
@@ -130,11 +129,8 @@ public class DtsLogDaoImpl implements DtsLogDao {
     };
 
     KeyHolder keyHolder = new GeneratedKeyHolder();
-
     jdbcTemplate.update(psc, keyHolder);
-
     long branchId = keyHolder.getKey().longValue();
-
     branchLog.setBranchId(branchId);
     if (branchLog.getCommitMode() == CommitMode.COMMIT_RETRY_MODE.getValue()) {
       branchLog.setGmtCreated(Calendar.getInstance().getTime());
@@ -186,25 +182,23 @@ public class DtsLogDaoImpl implements DtsLogDao {
         new Object[] {branchLog.getState(), branchLog.getBranchId(), mid});
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public List<BranchLog> getBranchLogs(long txId, int mid) {
     return jdbcTemplate.query("select * from txc_branch_log where tx_id = ? and mid = ?",
-        new Object[] {txId, mid}, new RowMapper() {
+        new Object[] {txId, mid}, new RowMapper<BranchLog>() {
           @Override
-          public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
+          public BranchLog mapRow(ResultSet rs, int rowNum) throws SQLException {
             return rowToObject(rs);
           }
         });
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public List<BranchLog> getBranchLogs(int mid) {
     return jdbcTemplate.query("select * from txc_branch_log where mid = ?", new Object[] {mid},
-        new RowMapper() {
+        new RowMapper<BranchLog>() {
           @Override
-          public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
+          public BranchLog mapRow(ResultSet rs, int rowNum) throws SQLException {
             return rowToObject(rs);
           }
         });
@@ -224,14 +218,14 @@ public class DtsLogDaoImpl implements DtsLogDao {
     log.setGmtModified(rs.getTimestamp("gmt_modified"));
 
     if (log.getCommitMode() == CommitMode.COMMIT_RETRY_MODE.getValue()) {
-      @SuppressWarnings("rawtypes")
-      List rtSqls = jdbcTemplate.query(
-          "select rt_sql from txc_rt_sql where branch_id = " + log.getBranchId(), new RowMapper() {
-            @Override
-            public String mapRow(ResultSet rs, int rowNum) throws SQLException {
-              return BlobUtil.blob2string(rs.getBlob("rt_sql"));
-            }
-          });
+      List<String> rtSqls =
+          jdbcTemplate.query("select rt_sql from txc_rt_sql where branch_id = " + log.getBranchId(),
+              new RowMapper<String>() {
+                @Override
+                public String mapRow(ResultSet rs, int rowNum) throws SQLException {
+                  return BlobUtil.blob2string(rs.getBlob("rt_sql"));
+                }
+              });
       log.setRetrySql(rtSqls.size() > 0 ? (String) rtSqls.get(0) : null);
     }
 
@@ -240,25 +234,23 @@ public class DtsLogDaoImpl implements DtsLogDao {
 
   @Override
   public BranchLog getBranchLog(long branchId, int mid) {
-    return (BranchLog) jdbcTemplate.queryForObject(
+    return jdbcTemplate.queryForObject(
         "select * from txc_branch_log where branch_id = ? and mid = ?",
-        new Object[] {branchId, mid}, new RowMapper() {
+        new Object[] {branchId, mid}, new RowMapper<BranchLog>() {
           @Override
-          public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
+          public BranchLog mapRow(ResultSet rs, int rowNum) throws SQLException {
             return rowToObject(rs);
           }
         });
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public List<GlobalLog> getGlobalLogs(int mid) {
     return jdbcTemplate.query("select * from txc_global_log where mid=?", new Object[] {mid},
-        new RowMapper() {
+        new RowMapper<GlobalLog>() {
           @Override
-          public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
+          public GlobalLog mapRow(ResultSet rs, int rowNum) throws SQLException {
             GlobalLog log = new GlobalLog();
-
             log.setTransId(rs.getLong("tx_id"));
             log.setState(rs.getInt("state"));
             log.setGmtCreated(rs.getTimestamp("gmt_created"));
@@ -294,15 +286,14 @@ public class DtsLogDaoImpl implements DtsLogDao {
             branchLog.getBranchId(), mid});
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public List<BranchLog> findWaitNotifyErrorLog(int commit_type) {
     return jdbcTemplate.query(
         "select * from txc_branch_error_log where is_notify<>1 and commit_mode=? and mid=? "
             + "order by client_app_name",
-        new Object[] {commit_type, AppConfig.mId}, new RowMapper() {
+        new Object[] {commit_type, AppConfig.mId}, new RowMapper<BranchLog>() {
           @Override
-          public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
+          public BranchLog mapRow(ResultSet rs, int rowNum) throws SQLException {
             BranchLog log = new BranchLog();
             log.setTransId(rs.getLong("tx_id"));
             log.setState(rs.getInt("state"));
