@@ -2,6 +2,8 @@ package io.dts.resourcemanager.helper;
 
 import javax.sql.DataSource;
 
+import io.dts.common.cluster.ServerCluster;
+
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -12,6 +14,7 @@ public class DataSourceHolder {
   private static ConcurrentHashMap<String, DataSource> dataSourceMap = new ConcurrentHashMap<>();
 
   public static void registerDataSource(String dbName, DataSource dataSource) {
+    ServerCluster.getServerCluster();
     dataSourceMap.put(dbName, dataSource);
   }
 

@@ -5,7 +5,6 @@ import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
-import io.dts.common.cluster.ServerCluster;
 import io.dts.parser.struct.DatabaseType;
 import io.dts.resourcemanager.BaseResourceManager;
 import io.dts.resourcemanager.ResourceManager;
@@ -27,7 +26,6 @@ public class DtsDataSource extends AbstractDtsDataSource {
     this.dataSource = dataSource;
     this.dbName = dbName;
     DataSourceHolder.registerDataSource(dbName, dataSource);
-    ServerCluster.getServerCluster();
   }
 
   public void setResourceManager(final ResourceManager resourceManager) {
