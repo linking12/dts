@@ -22,6 +22,9 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
+import org.apache.curator.framework.recipes.atomic.AtomicValue;
+import org.apache.curator.framework.recipes.atomic.CachedAtomicInteger;
+import org.apache.curator.framework.recipes.atomic.DistributedAtomicInteger;
 import org.apache.curator.framework.recipes.cache.PathChildrenCache;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
@@ -60,6 +63,8 @@ public class ZookeeperServerCluster implements ServerCluster, PathChildrenCacheL
 
   private transient PathChildrenCache pathCache;
 
+  private transient MIdGenerator midGenerator;
+
   private ZookeeperServerCluster() {
     String connectString = System.getenv(ZOOKEEPER_ENV_URL);
     if (StringUtils.isEmpty(connectString)) {
@@ -70,13 +75,25 @@ public class ZookeeperServerCluster implements ServerCluster, PathChildrenCacheL
       client = CuratorFrameworkFactory.builder().connectString(connectString)
           .retryPolicy(retryPolicy).connectionTimeoutMs(5000).build();
       client.start();
-      pathCache = new PathChildrenCache(client, dtsServerParentNode, true);
-      pathCache.start();
-      Executor executor = Executors.newFixedThreadPool(2);
-      pathCache.getListenable().addListener(this, executor);
+      initIdgenerator();
+      initPathCache();
+
     } catch (Exception e) {
       LOGGER.error("ZKCfgSource Initial Exception, exception = {}", e);
     }
+  }
+
+  private void initIdgenerator() {
+    DistributedAtomicInteger atomicInteger = new DistributedAtomicInteger(client,
+        dtsServerParentNode, new ExponentialBackoffRetry(1000, 1));
+    midGenerator = new MIdGenerator(atomicInteger, 1);
+  }
+
+  private void initPathCache() throws Exception {
+    pathCache = new PathChildrenCache(client, dtsServerParentNode, true);
+    pathCache.start();
+    Executor executor = Executors.newFixedThreadPool(2);
+    pathCache.getListenable().addListener(this, executor);
   }
 
   public static ServerCluster getInstance() {
@@ -97,7 +114,7 @@ public class ZookeeperServerCluster implements ServerCluster, PathChildrenCacheL
   }
 
   @Override
-  public void registry(int rpcPort) {
+  public Integer registry(int rpcPort) {
     String path = ZKPaths.makePath(dtsServerParentNode,
         NetUtil.getLocalIp() + ":" + Integer.valueOf(rpcPort).toString());
     try {
@@ -105,11 +122,14 @@ public class ZookeeperServerCluster implements ServerCluster, PathChildrenCacheL
       if (stat != null) {
         client.delete().forPath(path);
       }
-      client.create().withMode(CreateMode.EPHEMERAL).forPath(path);
+      Integer mid = midGenerator.next();
+      client.create().withMode(CreateMode.EPHEMERAL).forPath(path, mid.toString().getBytes());
+      return mid;
     } catch (Exception e) {
       throw new DtsException(e);
     }
   }
+
 
   @Override
   public void childEvent(CuratorFramework client, PathChildrenCacheEvent event) throws Exception {
@@ -130,6 +150,31 @@ public class ZookeeperServerCluster implements ServerCluster, PathChildrenCacheL
         break;
     }
 
+  }
+
+  private static class MIdGenerator {
+    private static final Logger log = LoggerFactory.getLogger(MIdGenerator.class);
+    private final CachedAtomicInteger atomicInteger;
+
+    public MIdGenerator(DistributedAtomicInteger atomicInteger, int cacheFactor) {
+      this.atomicInteger = new CachedAtomicInteger(atomicInteger, cacheFactor);
+    }
+
+    public Integer next() {
+      try {
+        AtomicValue<Integer> code = atomicInteger.next();
+        if (code.succeeded())
+          return code.postValue();
+
+        return -1;
+      } catch (Exception ex) {
+        if (log.isErrorEnabled()) {
+          log.error("Cannot get the increment serial number from ZooKeeper", ex);
+        }
+
+        return -1;
+      }
+    }
   }
 
 }

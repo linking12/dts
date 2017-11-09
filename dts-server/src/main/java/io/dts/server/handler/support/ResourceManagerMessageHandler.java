@@ -29,6 +29,7 @@ import io.dts.common.protocol.header.ReportStatusMessage;
 import io.dts.common.protocol.header.ReportUdataMessage;
 import io.dts.server.handler.CommitingResultCode;
 import io.dts.server.handler.RollbackingResultCode;
+import io.dts.server.network.DtsServerContainer;
 import io.dts.server.store.DtsLogDao;
 import io.dts.server.store.DtsTransStatusDao;
 import io.dts.server.struct.BranchLog;
@@ -84,7 +85,7 @@ public interface ResourceManagerMessageHandler {
         if (commitMode == CommitMode.COMMIT_IN_PHASE2.getValue())
           globalLog.setContainPhase2CommitBranch(true);
         try {
-          dtsLogDao.insertBranchLog(branchLog, 1);
+          dtsLogDao.insertBranchLog(branchLog, DtsServerContainer.mid);
         } catch (Exception e) {
           logger.error(e.getMessage(), e);
           throw new DtsException("insert branch log failed");
@@ -106,7 +107,7 @@ public interface ResourceManagerMessageHandler {
             : BranchLogState.Failed.getValue();
         branchLog.setState(state);
         branchLog.setUdata(reportStatusMessage.getUdata());
-        dtsLogDao.updateBranchLog(branchLog, 1);
+        dtsLogDao.updateBranchLog(branchLog, DtsServerContainer.mid);
         /**
          * 如果事务因为超时而回滚，事务在rollbacking状态，需要把这个分支放入rollbackingMap
          */
@@ -136,7 +137,7 @@ public interface ResourceManagerMessageHandler {
         if (reportUdataMessage.getUdata() != null) {
           branchLog.setUdata(reportUdataMessage.getUdata());
           try {
-            dtsLogDao.updateBranchLog(branchLog, 1);
+            dtsLogDao.updateBranchLog(branchLog, DtsServerContainer.mid);
           } catch (Exception e) {
             throw new DtsException("update branchlog usedata failed");
           }
@@ -157,7 +158,7 @@ public interface ResourceManagerMessageHandler {
           retryGlobalLog.setRecvTime(System.currentTimeMillis());
           // }
           try {
-            dtsLogDao.insertGlobalLog(retryGlobalLog, 1);
+            dtsLogDao.insertGlobalLog(retryGlobalLog, DtsServerContainer.mid);
           } catch (Exception e) {
             throw new DtsException("insert global retry log failed");
           }
@@ -185,7 +186,7 @@ public interface ResourceManagerMessageHandler {
         branchLog.setRecvTime(System.currentTimeMillis());
         // }
         try {
-          dtsLogDao.insertBranchLog(branchLog, 1);
+          dtsLogDao.insertBranchLog(branchLog, DtsServerContainer.mid);
         } catch (Exception e) {
           throw new DtsException("insert branch retry log failed");
         }

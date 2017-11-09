@@ -33,6 +33,7 @@ import io.dts.common.protocol.header.GlobalCommitMessage;
 import io.dts.common.protocol.header.GlobalRollbackMessage;
 import io.dts.server.handler.CommitingResultCode;
 import io.dts.server.handler.RollbackingResultCode;
+import io.dts.server.network.DtsServerContainer;
 import io.dts.server.store.DtsLogDao;
 import io.dts.server.store.DtsTransStatusDao;
 import io.dts.server.struct.BranchLog;
@@ -71,7 +72,7 @@ public interface ClientMessageHandler {
         globalLog.setTimeout(beginMessage.getTimeout());
         globalLog.setClientAppName(clientIp);
         globalLog.setContainPhase2CommitBranch(false);
-        dtsLogDao.insertGlobalLog(globalLog, 1);;
+        dtsLogDao.insertGlobalLog(globalLog, DtsServerContainer.mid);;
         long tranId = globalLog.getTransId();
         dtsTransStatusDao.insertGlobalLog(tranId, globalLog);
         String xid = DtsXID.generateXID(tranId);
@@ -114,13 +115,13 @@ public interface ClientMessageHandler {
                   .queryBranchLogByTransId(globalLog.getTransId(), false, false, false);
               // BranchLog.setLastBranchDelTrxKey(branchLogs);
               if (branchLogs.size() == 0) {
-                dtsLogDao.deleteGlobalLog(globalLog.getTransId(), 1);
+                dtsLogDao.deleteGlobalLog(globalLog.getTransId(), DtsServerContainer.mid);
                 dtsTransStatusDao.clearGlobalLog(tranId);
                 return;
               }
               globalLog.setState(GlobalTransactionState.Committing.getValue());
               try {
-                dtsLogDao.updateGlobalLog(globalLog, 1);
+                dtsLogDao.updateGlobalLog(globalLog, DtsServerContainer.mid);
               } catch (Exception e) {
                 logger.error(e.getMessage(), e);
                 // 状态设置为提交未决
@@ -181,11 +182,10 @@ public interface ClientMessageHandler {
         } else if (globalLog.getState() == GlobalTransactionState.Begin.getValue()) {
           List<BranchLog> branchLogs =
               dtsTransStatusDao.queryBranchLogByTransId(globalLog.getTransId(), true, true, false);
-          // BranchLog.setLastBranchDelTrxKey(branchLogs);
           globalLog.setState(GlobalTransactionState.Rollbacking.getValue());
           try {
             if (globalRollbackMessage.getRealSvrAddr() == null)
-              dtsLogDao.updateGlobalLog(globalLog, 1);
+              dtsLogDao.updateGlobalLog(globalLog, DtsServerContainer.mid);
           } catch (Exception e) {
             globalLog.setState(GlobalTransactionState.Begin.getValue());
             throw new DtsException("update global status fail.");

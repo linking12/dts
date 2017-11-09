@@ -21,6 +21,7 @@ import io.dts.common.protocol.header.BranchCommitResultMessage;
 import io.dts.common.protocol.header.BranchRollbackResultMessage;
 import io.dts.server.handler.CommitingResultCode;
 import io.dts.server.handler.RollbackingResultCode;
+import io.dts.server.network.DtsServerContainer;
 import io.dts.server.store.DtsLogDao;
 import io.dts.server.store.DtsTransStatusDao;
 import io.dts.server.struct.BranchLog;
@@ -55,7 +56,7 @@ public interface SyncGlobalResultMessagHandler {
           }
           BranchLog branchLog = dtsTransStatusDao.clearBranchLog(branchId);
           if (branchLog != null) {
-            dtsLogDao.deleteBranchLog(branchLog, 1);
+            dtsLogDao.deleteBranchLog(branchLog, DtsServerContainer.mid);
           }
           GlobalLog globalLog = dtsTransStatusDao.queryGlobalLog(tranId);
           synchronized (globalLog) {
@@ -63,13 +64,12 @@ public interface SyncGlobalResultMessagHandler {
             int leftBranches = globalLog.getLeftBranches();
             if (leftBranches == 0) {
               dtsTransStatusDao.clearGlobalLog(tranId);
-              dtsLogDao.deleteGlobalLog(tranId, 1);
+              dtsLogDao.deleteGlobalLog(tranId, DtsServerContainer.mid);
             }
           }
 
         } else if (message.getResult() == ResultCode.SYSTEMERROR.getValue()) {
-          dtsTransStatusDao.insertCommitedResult(branchId,
-              CommitingResultCode.FAILED.getValue());
+          dtsTransStatusDao.insertCommitedResult(branchId, CommitingResultCode.FAILED.getValue());
         } // 如果出现了逻辑错误，需要发出告警
         else if (message.getResult() == ResultCode.LOGICERROR.getValue()) {
           if (!dtsTransStatusDao.clearCommitedResult(branchId)) {
@@ -77,7 +77,7 @@ public interface SyncGlobalResultMessagHandler {
           }
           BranchLog branchLog = dtsTransStatusDao.clearBranchLog(branchId);
           if (branchLog != null) {
-            dtsLogDao.insertBranchErrorLog(branchLog, 1);
+            dtsLogDao.insertBranchErrorLog(branchLog, DtsServerContainer.mid);
             dtsLogDao.deleteBranchLog(branchLog, 1);
             logger.error("Logic error occurs while commit branch:" + branchId
                 + ". Please check server table:txc_branch_error_log.");
@@ -93,8 +93,7 @@ public interface SyncGlobalResultMessagHandler {
             }
           }
         } else {
-          dtsTransStatusDao.insertCommitedResult(branchId,
-              CommitingResultCode.FAILED.getValue());
+          dtsTransStatusDao.insertCommitedResult(branchId, CommitingResultCode.FAILED.getValue());
 
         }
       }
@@ -109,7 +108,7 @@ public interface SyncGlobalResultMessagHandler {
           }
           BranchLog branchLog = dtsTransStatusDao.clearBranchLog(branchId);
           if (branchLog != null) {
-            dtsLogDao.deleteBranchLog(branchLog, 1);
+            dtsLogDao.deleteBranchLog(branchLog, DtsServerContainer.mid);
           }
           GlobalLog globalLog = dtsTransStatusDao.queryGlobalLog(tranId);
           synchronized (globalLog) {
@@ -117,20 +116,19 @@ public interface SyncGlobalResultMessagHandler {
             int leftBranches = globalLog.getLeftBranches();
             if (leftBranches == 0) {
               dtsTransStatusDao.clearGlobalLog(tranId);
-              dtsLogDao.deleteGlobalLog(tranId, 1);
+              dtsLogDao.deleteGlobalLog(tranId, DtsServerContainer.mid);
             }
           }
         } else if (message.getResult() == ResultCode.SYSTEMERROR.getValue()) {
-          dtsTransStatusDao.insertRollbackResult(branchId,
-              RollbackingResultCode.FAILED.getValue());
+          dtsTransStatusDao.insertRollbackResult(branchId, RollbackingResultCode.FAILED.getValue());
         } else if (message.getResult() == ResultCode.LOGICERROR.getValue()) {
           if (!dtsTransStatusDao.clearRollbackResult(branchId)) {
             return;
           }
           BranchLog branchLog = dtsTransStatusDao.clearBranchLog(branchId);
           if (branchLog != null) {
-            dtsLogDao.insertBranchErrorLog(branchLog, 1);
-            dtsLogDao.deleteBranchLog(branchLog, 1);
+            dtsLogDao.insertBranchErrorLog(branchLog, DtsServerContainer.mid);
+            dtsLogDao.deleteBranchLog(branchLog, DtsServerContainer.mid);
             logger.error("Logic error occurs while rollback branch:" + message.getBranchId()
                 + ". Please check server table:txc_branch_error_log.");
           }
@@ -145,8 +143,7 @@ public interface SyncGlobalResultMessagHandler {
             }
           }
         } else {
-          dtsTransStatusDao.insertRollbackResult(branchId,
-              RollbackingResultCode.FAILED.getValue());
+          dtsTransStatusDao.insertRollbackResult(branchId, RollbackingResultCode.FAILED.getValue());
         }
       }
 

@@ -61,6 +61,8 @@ public class DtsServerContainer extends AbstractLifecycleComponent {
 
   private RemotingServer remotingServer;
 
+  public static Integer mid;
+
   @PostConstruct
   public void init() {
     NettyServerConfig nettyServerConfig = new NettyServerConfig();
@@ -122,7 +124,7 @@ public class DtsServerContainer extends AbstractLifecycleComponent {
     if (this.channelKeeping != null) {
       this.channelKeeping.start();
     }
-    ServerCluster.getServerCluster().registry(serverProperties.getListenPort());
+    mid = ServerCluster.getServerCluster().registry(serverProperties.getListenPort());
   }
 
   @Override
