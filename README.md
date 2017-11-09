@@ -13,5 +13,5 @@
 # 系统架构
 ![flow](architecture.png)
 
-# 事务流程图
+# 事务流程
 ![flow](flow.png)
