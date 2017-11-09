@@ -31,7 +31,7 @@ import io.dts.resourcemanager.struct.ContextStep2;
  */
 public interface DtsLogManager {
 
-  public static final String txcLogTableName = "txc_undo_log";
+  public static final String txcLogTableName = "dts_undo_log";
 
   /**
    * 分支事务提交，仅删除UndoLog

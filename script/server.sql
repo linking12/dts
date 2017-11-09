@@ -1,4 +1,4 @@
-CREATE TABLE `txc_branch_error_log` (
+CREATE TABLE `dts_branch_error_log` (
   `branch_id` bigint(20) NOT NULL,
   `tx_id` bigint(20) NOT NULL,
   `client_app_name` varchar(50) COLLATE utf8_bin NOT NULL,
@@ -18,7 +18,7 @@ CREATE TABLE `txc_branch_error_log` (
   KEY `commit_mode` (`commit_mode`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
-CREATE TABLE `txc_branch_log` (
+CREATE TABLE `dts_branch_log` (
   `branch_id` bigint(20) NOT NULL AUTO_INCREMENT,
   `tx_id` bigint(20) NOT NULL,
   `client_app_name` varchar(200) COLLATE utf8_bin NOT NULL,
@@ -34,7 +34,7 @@ CREATE TABLE `txc_branch_log` (
   KEY `tx_id` (`tx_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
-CREATE TABLE `txc_global_log` (
+CREATE TABLE `dts_global_log` (
   `tx_id` bigint(20) NOT NULL AUTO_INCREMENT,
   `state` tinyint(1) NOT NULL,
   `gmt_created` datetime NOT NULL,

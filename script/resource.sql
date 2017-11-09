@@ -1,4 +1,4 @@
-CREATE TABLE `txc_undo_log` (
+CREATE TABLE `dts_undo_log` (
   `id` bigint(11) NOT NULL AUTO_INCREMENT,
   `xid` char(64) NOT NULL,
   `branch_id` bigint(20) NOT NULL,
