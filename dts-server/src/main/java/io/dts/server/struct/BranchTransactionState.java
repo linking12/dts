@@ -1,9 +1,7 @@
 package io.dts.server.struct;
 
 /**
- * @author jiangyu.jy
- * 
- *         事务分支的提交状态
+ * 事务分支的提交状态
  */
 public enum BranchTransactionState {
 

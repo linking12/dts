@@ -1,9 +1,7 @@
 package io.dts.server.struct;
 
 /**
- * @author jiangyu.jy
- * 
- *         分支状态
+ * 分支状态
  */
 public enum BranchLogState {
 

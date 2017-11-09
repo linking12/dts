@@ -3,9 +3,8 @@ package io.dts.server.struct;
 import java.util.Date;
 
 /**
- * @author jiangyu.jy
  * 
- *         事务分支日志
+ * 事务分支日志
  */
 public class BranchLog {
 
