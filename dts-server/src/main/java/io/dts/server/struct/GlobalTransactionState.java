@@ -1,9 +1,8 @@
 package io.dts.server.struct;
 
 /**
- * @author jiangyu.jy
  * 
- *         全局事务状态
+ * 全局事务状态
  */
 public enum GlobalTransactionState {
 

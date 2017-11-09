@@ -6,9 +6,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * @author jiangyu.jy
- * 
- *         全局事务日志
+ * 全局事务日志
  */
 public class GlobalLog {
 
