@@ -92,7 +92,7 @@ public class DefaultDtsResourcMessageSender extends AbstractLifecycleComponent
           e.printStackTrace();
         }
       }
-    }, 5, 5, TimeUnit.SECONDS);
+    }, 0, 5, TimeUnit.SECONDS);
   }
 
   @Override
