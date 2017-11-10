@@ -87,12 +87,7 @@ public class DtsXID {
     return infoAppender.toString();
   }
 
-  /**
-   * 判断XID是否合法
-   * 
-   * @param xid
-   * @return
-   */
+
   public static boolean isValidXid(String xid) {
     boolean f = true;
     try {
@@ -104,10 +99,4 @@ public class DtsXID {
     return f;
   }
 
-  /**
-   * @param args
-   */
-  public static void main(String[] args) {
-    System.out.println(DtsXID.getServerAddress("localhost:8080:21123132"));
-  }
 }
