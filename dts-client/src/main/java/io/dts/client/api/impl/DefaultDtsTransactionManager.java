@@ -116,7 +116,6 @@ public class DefaultDtsTransactionManager implements DtsTransactionManager {
   public void rollback(int retryTimes) throws DtsException {
     GlobalRollbackMessage rollbackMessage = new GlobalRollbackMessage();
     int transId = DtsXID.getTransactionId(DtsContext.getCurrentXid());
-    System.out.println("Rollback transId is :" + transId);
     rollbackMessage.setTranId(transId);
     long start = 0;
     if (logger.isDebugEnabled())
