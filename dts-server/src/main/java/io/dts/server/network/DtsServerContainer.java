@@ -80,7 +80,7 @@ public class DtsServerContainer extends AbstractLifecycleComponent {
     ExecutorService clientMessageExecutor =
         new ServerFixedThreadPoolExecutor(serverProperties.getClientThreadPoolSize(),
             serverProperties.getClientThreadPoolSize(), 1000 * 60, TimeUnit.MILLISECONDS,
-            clientThreadPoolQueue, new ThreadFactoryImpl("ClientMessageThread_"));
+            clientThreadPoolQueue, new ThreadFactoryImpl("ServerHeaderThread_"));
     this.remotingServer.registerProcessor(RequestCode.HEADER_REQUEST, messageProcessor,
         clientMessageExecutor);
   }
@@ -92,7 +92,7 @@ public class DtsServerContainer extends AbstractLifecycleComponent {
     ExecutorService resourceMessageExecutor =
         new ServerFixedThreadPoolExecutor(serverProperties.getResourceThreadPoolSize(),
             serverProperties.getResourceThreadPoolSize(), 1000 * 60, TimeUnit.MILLISECONDS,
-            resourceThreadPoolQueue, new ThreadFactoryImpl("ResourceMessageThread_"));
+            resourceThreadPoolQueue, new ThreadFactoryImpl("ServerBodyThread_"));
     this.remotingServer.registerProcessor(RequestCode.BODY_REQUEST, messageProcessor,
         resourceMessageExecutor);
   }
@@ -100,7 +100,7 @@ public class DtsServerContainer extends AbstractLifecycleComponent {
   private void registerHeatBeatRequest() {
     ExecutorService heatBeatProcessorExecutor =
         Executors.newFixedThreadPool(serverProperties.getChannelHeatThreadPoolSize(),
-            new ThreadFactoryImpl("ClientManageThread_"));
+            new ThreadFactoryImpl("ServerHeadBeatThread_"));
     this.remotingServer.registerProcessor(RequestCode.HEART_BEAT, heatBeatProccessor,
         heatBeatProcessorExecutor);
   }

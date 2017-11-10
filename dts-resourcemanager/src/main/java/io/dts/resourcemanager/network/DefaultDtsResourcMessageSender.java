@@ -63,7 +63,7 @@ public class DefaultDtsResourcMessageSender extends AbstractLifecycleComponent
     ExecutorService clientMessageExecutor =
         new ThreadPoolExecutor(nettyClientConfig.getClientCallbackExecutorThreads(),
             nettyClientConfig.getClientCallbackExecutorThreads(), 1000 * 60, TimeUnit.MILLISECONDS,
-            clientThreadPoolQueue, new ThreadFactoryImpl("ResourceMessageThread_"));
+            clientThreadPoolQueue, new ThreadFactoryImpl("RMThread_"));
     this.remotingClient.registerProcessor(RequestCode.HEADER_REQUEST, messageProcessor,
         clientMessageExecutor);
   }
@@ -74,7 +74,7 @@ public class DefaultDtsResourcMessageSender extends AbstractLifecycleComponent
     ExecutorService clientMessageExecutor =
         new ThreadPoolExecutor(nettyClientConfig.getClientCallbackExecutorThreads(),
             nettyClientConfig.getClientCallbackExecutorThreads(), 1000 * 60, TimeUnit.MILLISECONDS,
-            clientThreadPoolQueue, new ThreadFactoryImpl("ResourceMessageThread_"));
+            clientThreadPoolQueue, new ThreadFactoryImpl("RMThread_"));
     this.remotingClient.registerProcessor(RequestCode.BODY_REQUEST, messageProcessor,
         clientMessageExecutor);
   }
