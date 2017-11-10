@@ -29,21 +29,21 @@ import io.dts.server.struct.GlobalLog;
 
 /**
  * @author liushiming
- * @version SyncGlobalResultMessagHandler.java, v 0.0.1 2017年9月19日 下午4:36:31 liushiming
+ * @version SyncRmMessagHandler.java, v 0.0.1 2017年9月19日 下午4:36:31 liushiming
  */
-public interface SyncGlobalResultMessagHandler {
+public interface SyncRmMessagHandler {
 
   void processMessage(String clientIp, BranchCommitResultMessage message);
 
   void processMessage(String clientIp, BranchRollbackResultMessage message);
 
 
-  public static SyncGlobalResultMessagHandler createSyncGlobalResultProcess(
+  public static SyncRmMessagHandler createSyncGlobalResultProcess(
       DtsTransStatusDao dtsTransStatusDao, DtsLogDao dtsLogDao) {
 
-    return new SyncGlobalResultMessagHandler() {
+    return new SyncRmMessagHandler() {
 
-      private final Logger logger = LoggerFactory.getLogger(SyncGlobalResultMessagHandler.class);
+      private final Logger logger = LoggerFactory.getLogger(SyncRmMessagHandler.class);
 
       @Override
       public void processMessage(String clientIp, BranchCommitResultMessage message) {

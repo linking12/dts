@@ -44,7 +44,7 @@ import io.dts.common.protocol.header.ReportStatusResultMessage;
 import io.dts.common.protocol.header.ReportUdataMessage;
 import io.dts.common.protocol.header.ReportUdataResultMessage;
 import io.dts.server.handler.support.ClientMessageHandler;
-import io.dts.server.handler.support.ResourceManagerMessageHandler;
+import io.dts.server.handler.support.RmMessageHandler;
 import io.dts.server.store.DtsLogDao;
 import io.dts.server.store.DtsTransStatusDao;
 
@@ -68,13 +68,13 @@ public class DefaultDtsServerMessageHandler implements DtsServerMessageHandler {
 
   private ClientMessageHandler clientHandler;
 
-  private ResourceManagerMessageHandler resourceHandler;
+  private RmMessageHandler resourceHandler;
 
   @PostConstruct
   public void init() {
     clientHandler = ClientMessageHandler.createClientMessageProcessor(dtsTransStatusDao, dtsLogDao,
         serverMessageServer);
-    resourceHandler = ResourceManagerMessageHandler
+    resourceHandler = RmMessageHandler
         .createResourceManagerMessageProcessor(dtsTransStatusDao, dtsLogDao);
   }
 

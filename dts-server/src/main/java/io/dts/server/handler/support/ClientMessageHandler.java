@@ -59,10 +59,10 @@ public interface ClientMessageHandler {
       DtsServerMessageSender serverMessageServer) {
 
     return new ClientMessageHandler() {
-      private final Logger logger = LoggerFactory.getLogger(ResourceManagerMessageHandler.class);
+      private final Logger logger = LoggerFactory.getLogger(RmMessageHandler.class);
 
-      private final SyncGlobalResultMessagHandler globalResultMessageHandler =
-          SyncGlobalResultMessagHandler.createSyncGlobalResultProcess(dtsTransStatusDao, dtsLogDao);
+      private final SyncRmMessagHandler globalResultMessageHandler =
+          SyncRmMessagHandler.createSyncGlobalResultProcess(dtsTransStatusDao, dtsLogDao);
 
       // 开始一个事务
       @Override

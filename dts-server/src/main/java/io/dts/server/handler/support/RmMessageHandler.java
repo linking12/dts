@@ -39,9 +39,9 @@ import io.dts.server.struct.GlobalTransactionState;
 
 /**
  * @author liushiming
- * @version ResourceManagerMessageHandler.java, v 0.0.1 2017年9月19日 下午2:48:59 liushiming
+ * @version RmMessageHandler.java, v 0.0.1 2017年9月19日 下午2:48:59 liushiming
  */
-public interface ResourceManagerMessageHandler {
+public interface RmMessageHandler {
 
   Long processMessage(RegisterMessage registerMessage, String clientIp);
 
@@ -54,11 +54,11 @@ public interface ResourceManagerMessageHandler {
   void processMessage(BeginRetryBranchMessage beginRetryBranchMessage,
       BeginRetryBranchResultMessage resultMessage, String clientIp);
 
-  public static ResourceManagerMessageHandler createResourceManagerMessageProcessor(
+  public static RmMessageHandler createResourceManagerMessageProcessor(
       DtsTransStatusDao dtsTransStatusDao, DtsLogDao dtsLogDao) {
 
-    return new ResourceManagerMessageHandler() {
-      private final Logger logger = LoggerFactory.getLogger(ResourceManagerMessageHandler.class);
+    return new RmMessageHandler() {
+      private final Logger logger = LoggerFactory.getLogger(RmMessageHandler.class);
 
       @Override
       public Long processMessage(RegisterMessage registerMessage, String clientIp) {
