@@ -78,9 +78,8 @@ public class RemotingCommand {
 
   public static RemotingCommand createResponseCommand(
       Class<? extends CommandCustomHeader> classHeader) {
-    RemotingCommand cmd = createResponseCommand(RemotingSysResponseCode.SYSTEM_ERROR,
-        "not set any response code", classHeader);
-
+    RemotingCommand cmd =
+        createResponseCommand(RemotingSysResponseCode.SUCCESS, "success", classHeader);
     return cmd;
   }
 

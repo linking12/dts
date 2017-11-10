@@ -46,22 +46,13 @@ public class DefaultDtsTransactionManager implements DtsTransactionManager {
     }
     BeginMessage beginMessage = new BeginMessage();
     beginMessage.setTimeout(timeout);
-    long start = 0;
-    if (logger.isDebugEnabled())
-      start = System.currentTimeMillis();
-    BeginResultMessage resultMessage = null;
     try {
       BeginResultMessage beginResultMessage =
           dtsClient.invoke(beginMessage, Constants.RPC_INVOKE_TIMEOUT);
-      DtsContext.bind(beginResultMessage.getXid(), beginResultMessage.getNextSvrAddr());
+      String transId = beginResultMessage.getXid();
+      DtsContext.bind(transId, beginResultMessage.getNextSvrAddr());
     } catch (Throwable th) {
       throw new DtsException(th);
-    } finally {
-      if (logger.isDebugEnabled()) {
-        long end = System.currentTimeMillis();
-        logger.debug(resultMessage + " cost " + (end - start) + " ms.");
-      } else
-        logger.info("begin transaction. " + resultMessage);
     }
   }
 
@@ -76,7 +67,8 @@ public class DefaultDtsTransactionManager implements DtsTransactionManager {
     if (DtsContext.getCurrentXid() == null) {
       throw new DtsException("the thread is not in transaction when invoke commit.");
     }
-    commitMessage.setTranId(DtsXID.getTransactionId(DtsContext.getCurrentXid()));
+    int transId = DtsXID.getTransactionId(DtsContext.getCurrentXid());
+    commitMessage.setTranId(transId);
     long start = 0;
     if (logger.isDebugEnabled())
       start = System.currentTimeMillis();
@@ -123,7 +115,9 @@ public class DefaultDtsTransactionManager implements DtsTransactionManager {
   @Override
   public void rollback(int retryTimes) throws DtsException {
     GlobalRollbackMessage rollbackMessage = new GlobalRollbackMessage();
-    rollbackMessage.setTranId(DtsXID.getTransactionId(DtsContext.getCurrentXid()));
+    int transId = DtsXID.getTransactionId(DtsContext.getCurrentXid());
+    System.out.println("Rollback transId is :" + transId);
+    rollbackMessage.setTranId(transId);
     long start = 0;
     if (logger.isDebugEnabled())
       start = System.currentTimeMillis();

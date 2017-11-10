@@ -12,7 +12,7 @@ public class TxcTransactionTemplate {
   private DtsTransactionManager tm = DefaultDtsTransactionManager.getInstance();
 
 
-  public Object runATMT(TxcCallback callback, long timeout) throws DtsException {
+  public Object runATMT(TxcCallback callback, long timeout) throws Throwable {
     try {
       tm.begin(timeout);
       Object obj = callback.callback();
@@ -23,7 +23,7 @@ public class TxcTransactionTemplate {
         tm.rollback();
       } catch (Throwable ee) {
       }
-      throw new DtsException(e);
+      throw e;
     }
   }
 
