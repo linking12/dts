@@ -51,7 +51,7 @@ public interface SyncGlobalResultMessagHandler {
         Long tranId = message.getTranId();
         Long branchId = message.getBranchId();
         if (message.getResult() == ResultCode.OK.getValue()) {
-          if (!dtsTransStatusDao.clearCommitedResult(branchId)) {
+          if (dtsTransStatusDao.clearCommitedResult(branchId)) {
             return;
           }
           BranchLog branchLog = dtsTransStatusDao.clearBranchLog(branchId);
