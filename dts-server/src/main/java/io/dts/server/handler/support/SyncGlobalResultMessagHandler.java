@@ -103,7 +103,7 @@ public interface SyncGlobalResultMessagHandler {
         Long tranId = message.getTranId();
         Long branchId = message.getBranchId();
         if (message.getResult() == ResultCode.OK.getValue()) {
-          if (!dtsTransStatusDao.clearRollbackResult(branchId)) {
+          if (dtsTransStatusDao.clearRollbackResult(branchId)) {
             return;
           }
           BranchLog branchLog = dtsTransStatusDao.clearBranchLog(branchId);
