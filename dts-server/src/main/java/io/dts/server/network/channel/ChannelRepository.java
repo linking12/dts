@@ -13,7 +13,6 @@
  */
 package io.dts.server.network.channel;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -23,6 +22,8 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
+import com.google.common.collect.Maps;
 
 import io.dts.common.util.NetUtil;
 import io.dts.remoting.common.RemotingHelper;
@@ -44,33 +45,22 @@ public class ChannelRepository {
 
   private final Lock groupChannelLock = new ReentrantLock();
 
-  private final HashMap<String, HashMap<Channel, ChannelInfo>> groupChannelTable =
-      new HashMap<String, HashMap<Channel, ChannelInfo>>();
-
-  public HashMap<String, HashMap<Channel, ChannelInfo>> getGroupChannelTable() {
-    return groupChannelTable;
-  }
+  private final Map<Channel, ChannelInfo> channelTable = Maps.newConcurrentMap();
 
   public void scanNotActiveChannel() {
     try {
       if (this.groupChannelLock.tryLock(LockTimeoutMillis, TimeUnit.MILLISECONDS)) {
         try {
-          for (final Map.Entry<String, HashMap<Channel, ChannelInfo>> entry : this.groupChannelTable
-              .entrySet()) {
-            final String group = entry.getKey();
-            final HashMap<Channel, ChannelInfo> chlMap = entry.getValue();
-            Iterator<Map.Entry<Channel, ChannelInfo>> it = chlMap.entrySet().iterator();
-            while (it.hasNext()) {
-              Map.Entry<Channel, ChannelInfo> item = it.next();
-              final ChannelInfo info = item.getValue();
-              long diff = System.currentTimeMillis() - info.getLastUpdateTimestamp();
-              if (diff > ChannelExpiredTimeout) {
-                it.remove();
-                log.warn(
-                    "SCAN: remove expired channel[{}] from ClientManager groupChannelTable, producer group name: {}",
-                    RemotingHelper.parseChannelRemoteAddr(info.getChannel()), group);
-                RemotingUtil.closeChannel(info.getChannel());
-              }
+          Iterator<Map.Entry<Channel, ChannelInfo>> it = channelTable.entrySet().iterator();
+          while (it.hasNext()) {
+            Map.Entry<Channel, ChannelInfo> item = it.next();
+            final ChannelInfo info = item.getValue();
+            long diff = System.currentTimeMillis() - info.getLastUpdateTimestamp();
+            if (diff > ChannelExpiredTimeout) {
+              it.remove();
+              log.warn("SCAN: remove expired channel[{}] from ClientManager ",
+                  RemotingHelper.parseChannelRemoteAddr(info.getChannel()));
+              RemotingUtil.closeChannel(info.getChannel());
             }
           }
         } finally {
@@ -90,16 +80,10 @@ public class ChannelRepository {
       try {
         if (this.groupChannelLock.tryLock(LockTimeoutMillis, TimeUnit.MILLISECONDS)) {
           try {
-            for (final Map.Entry<String, HashMap<Channel, ChannelInfo>> entry : this.groupChannelTable
-                .entrySet()) {
-              final String group = entry.getKey();
-              final HashMap<Channel, ChannelInfo> clientChannelInfoTable = entry.getValue();
-              final ChannelInfo clientChannelInfo = clientChannelInfoTable.remove(channel);
-              if (clientChannelInfo != null) {
-                log.info(
-                    "NETTY EVENT: remove channel[{}][{}] from ClientManager groupChannelTable, producer group: {}",
-                    clientChannelInfo.toString(), remoteAddr, group);
-              }
+            final ChannelInfo clientChannelInfo = channelTable.remove(channel);
+            if (clientChannelInfo != null) {
+              log.info("NETTY EVENT: remove channel[{}][{}] from ClientManager groupChannelTable",
+                  clientChannelInfo.toString(), remoteAddr);
             }
           } finally {
             this.groupChannelLock.unlock();
@@ -114,17 +98,13 @@ public class ChannelRepository {
   }
 
   public Channel getChannelByAddress(String address) {
-    for (final Map.Entry<String, HashMap<Channel, ChannelInfo>> entry : this.groupChannelTable
-        .entrySet()) {
-      final HashMap<Channel, ChannelInfo> chlMap = entry.getValue();
-      Iterator<Map.Entry<Channel, ChannelInfo>> it = chlMap.entrySet().iterator();
-      while (it.hasNext()) {
-        Map.Entry<Channel, ChannelInfo> item = it.next();
-        final Channel channel = item.getKey();
-        final String clientIp = NetUtil.toStringAddress(channel.remoteAddress());
-        if (clientIp.equals(address)) {
-          return channel;
-        }
+    Iterator<Map.Entry<Channel, ChannelInfo>> it = channelTable.entrySet().iterator();
+    while (it.hasNext()) {
+      Map.Entry<Channel, ChannelInfo> item = it.next();
+      final Channel channel = item.getKey();
+      final String clientIp = NetUtil.toStringAddress(channel.remoteAddress());
+      if (clientIp.equals(address)) {
+        return channel;
       }
     }
     return null;
@@ -132,27 +112,19 @@ public class ChannelRepository {
   }
 
 
-  public void registerChannel(final String group, final ChannelInfo clientChannelInfo) {
+  public void registerChannel(final ChannelInfo clientChannelInfo) {
     try {
       ChannelInfo clientChannelInfoFound = null;
       if (this.groupChannelLock.tryLock(LockTimeoutMillis, TimeUnit.MILLISECONDS)) {
         try {
-          HashMap<Channel, ChannelInfo> channelTable = this.groupChannelTable.get(group);
-          if (null == channelTable) {
-            channelTable = new HashMap<Channel, ChannelInfo>();
-            this.groupChannelTable.put(group, channelTable);
-          }
-
           clientChannelInfoFound = channelTable.get(clientChannelInfo.getChannel());
           if (null == clientChannelInfoFound) {
             channelTable.put(clientChannelInfo.getChannel(), clientChannelInfo);
-            log.info("new producer connected, group: {} channel: {}", group,
-                clientChannelInfo.toString());
+            log.info("new producer connected, channel: {}", clientChannelInfo.toString());
           }
         } finally {
           this.groupChannelLock.unlock();
         }
-
         if (clientChannelInfoFound != null) {
           clientChannelInfoFound.setLastUpdateTimestamp(System.currentTimeMillis());
         }
@@ -169,17 +141,10 @@ public class ChannelRepository {
     try {
       if (this.groupChannelLock.tryLock(LockTimeoutMillis, TimeUnit.MILLISECONDS)) {
         try {
-          HashMap<Channel, ChannelInfo> channelTable = this.groupChannelTable.get(group);
-          if (null != channelTable && !channelTable.isEmpty()) {
-            ChannelInfo old = channelTable.remove(clientChannelInfo.getChannel());
-            if (old != null) {
-              log.info("unregister a producer[{}] from groupChannelTable {}", group,
-                  clientChannelInfo.toString());
-            }
-            if (channelTable.isEmpty()) {
-              this.groupChannelTable.remove(group);
-              log.info("unregister a producer group[{}] from groupChannelTable", group);
-            }
+          ChannelInfo old = channelTable.remove(clientChannelInfo.getChannel());
+          if (old != null) {
+            log.info("unregister a producer[{}] from groupChannelTable {}", group,
+                clientChannelInfo.toString());
           }
         } finally {
           this.groupChannelLock.unlock();

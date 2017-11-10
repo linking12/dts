@@ -49,7 +49,7 @@ public class HeatBeatProcessor implements NettyRequestProcessor {
         request.getLanguage(), //
         request.getVersion()//
     );
-    channelRepository.registerChannel("DEFAULT", clientChannelInfo);
+    channelRepository.registerChannel(clientChannelInfo);
     RemotingCommand response = RemotingCommand.createResponseCommand(HeartbeatResponseHeader.class);
     response.setCode(RemotingSysResponseCode.SUCCESS);
     return response;
