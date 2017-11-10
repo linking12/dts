@@ -205,8 +205,7 @@ public interface ClientMessageHandler {
       }
 
       protected void syncGlobalCommit(List<BranchLog> branchLogs, GlobalLog globalLog) {
-
-        branchLogs.forEach(branchLog -> {
+        for (BranchLog branchLog : branchLogs) {
           String clientAddress = branchLog.getClientIp();
           Long branchId = branchLog.getBranchId();
           BranchCommitMessage branchCommitMessage = new BranchCommitMessage();
@@ -231,12 +230,12 @@ public interface ClientMessageHandler {
             dtsTransStatusDao.insertCommitedResult(branchId,
                 CommitingResultCode.TIMEOUT.getValue());
           }
+        }
 
-        });
       }
 
       protected void syncGlobalRollback(List<BranchLog> branchLogs, GlobalLog globalLog) {
-        branchLogs.forEach(branchLog -> {
+        for (BranchLog branchLog : branchLogs) {
           String clientAddress = branchLog.getClientIp();
           Long branchId = branchLog.getBranchId();
           BranchRollBackMessage branchRollbackMessage = new BranchRollBackMessage();
@@ -261,8 +260,7 @@ public interface ClientMessageHandler {
             dtsTransStatusDao.insertRollbackResult(branchId,
                 RollbackingResultCode.TIMEOUT.getValue());
           }
-
-        });
+        }
       }
 
     };
