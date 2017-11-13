@@ -38,12 +38,8 @@ public class BranchCommitLogManager extends DtsLogManagerImpl {
   private static final Logger logger = LoggerFactory.getLogger(BranchCommitLogManager.class);
 
   @Override
-  public void branchCommit(ContextStep2 contexts) throws SQLException {
-    branchCommit(contexts, contexts.getDbname());
-  }
-
-  private void branchCommit(ContextStep2 context, String dbName) throws SQLException {
-    DataSource datasource = DataSourceHolder.getDataSource(dbName);
+  public void branchCommit(ContextStep2 context) throws SQLException {
+    DataSource datasource = DataSourceHolder.getDataSource(context.getDbname());
     DataSourceTransactionManager tm = new DataSourceTransactionManager(datasource);
     TransactionTemplate transactionTemplate = new TransactionTemplate(tm);
     final JdbcTemplate template = new JdbcTemplate(datasource);
@@ -51,7 +47,8 @@ public class BranchCommitLogManager extends DtsLogManagerImpl {
     transactionTemplate.execute(new TransactionCallbackWithoutResult() {
       @Override
       protected void doInTransactionWithoutResult(TransactionStatus status) {
-        String deleteSql = getDeleteUndoLogSql(context);
+        String deleteSql = String.format("delete from %s where id in (%s) and status = %d",
+            txcLogTableName, context.getGlobalXid(), UndoLogMode.COMMON_LOG.getValue());
         logger.info("delete undo log sql" + deleteSql);
         template.execute(deleteSql);
 
@@ -60,9 +57,5 @@ public class BranchCommitLogManager extends DtsLogManagerImpl {
   }
 
 
-  private String getDeleteUndoLogSql(ContextStep2 contexts) {
-    return String.format("delete from %s where id = %d and status = %d", txcLogTableName,
-        contexts.getGlobalXid(), UndoLogMode.COMMON_LOG.getValue());
-  }
 
 }
