@@ -77,7 +77,6 @@ public interface SyncRmMessagHandler {
             if (leftBranches == 0) {
               dtsTransStatusDao.removeGlobalLog(tranId);
               dtsLogDao.deleteGlobalLog(tranId, 1);
-
             }
           }
         }

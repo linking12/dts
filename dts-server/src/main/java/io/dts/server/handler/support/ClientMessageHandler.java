@@ -154,14 +154,18 @@ public interface ClientMessageHandler {
           branchCommitMessage.setCommitMode(branchLog.getCommitMode());
           branchCommitMessage.setRetrySql(branchLog.getRetrySql());
           branchCommitMessage.setDbName(branchLog.getClientInfo());
+          BranchCommitResultMessage branchCommitResult = null;
           try {
-            BranchCommitResultMessage branchCommitResult = serverMessageServer
-                .invokeSync(clientAddress, branchCommitMessage, Constants.RPC_INVOKE_TIMEOUT);
-            globalResultMessageHandler.processMessage(clientAddress, branchCommitResult);
+            branchCommitResult = serverMessageServer.invokeSync(clientAddress, branchCommitMessage,
+                Constants.RPC_INVOKE_TIMEOUT);
           } catch (DtsException e) {
-            logger.error(e.getMessage(), e);
-            throw e;
+            dtsLogDao.insertBranchErrorLog(branchLog, DtsServerContainer.mid);
+            logger.error(
+                "notify " + clientAddress + " to commit occur system error,branchId:" + branchId,
+                e);
           }
+          if (branchCommitResult != null)
+            globalResultMessageHandler.processMessage(clientAddress, branchCommitResult);
         }
 
       }
@@ -178,17 +182,19 @@ public interface ClientMessageHandler {
           branchRollbackMessage.setDbName(branchLog.getClientInfo());
           branchRollbackMessage.setUdata(branchLog.getUdata());
           branchRollbackMessage.setCommitMode(branchLog.getCommitMode());
+          BranchRollbackResultMessage branchRollbackResult = null;
           try {
-            BranchRollbackResultMessage branchRollbackResult = serverMessageServer
-                .invokeSync(clientAddress, branchRollbackMessage, Constants.RPC_INVOKE_TIMEOUT);
-            globalResultMessageHandler.processMessage(clientAddress, branchRollbackResult);
+            branchRollbackResult = serverMessageServer.invokeSync(clientAddress,
+                branchRollbackMessage, Constants.RPC_INVOKE_TIMEOUT);
           } catch (DtsException e) {
-            logger.error(e.getMessage(), e);
-            throw e;
+            dtsLogDao.insertBranchErrorLog(branchLog, DtsServerContainer.mid);
+            logger.error(
+                "notify " + clientAddress + " rollback occur system error,branchId:" + branchId, e);
           }
+          if (branchRollbackResult != null)
+            globalResultMessageHandler.processMessage(clientAddress, branchRollbackResult);
         }
       }
-
     };
   }
 
