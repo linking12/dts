@@ -15,7 +15,6 @@ package io.dts.server.store.impl;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -44,17 +43,6 @@ public class DtsTransStatusDaoImpl implements DtsTransStatusDao {
    */
   private static final ConcurrentHashMap<Long, BranchLog> activeTranBranchMap =
       new ConcurrentHashMap<Long, BranchLog>();
-  /**
-   * 保存已经发送BranchCommitMessage消息，但是还没收到响应或者失败的分支
-   */
-  private static final ConcurrentHashMap<Long, Integer> committingMap =
-      new ConcurrentHashMap<Long, Integer>();
-
-  /**
-   * 保存已经发送BranchRollbackMessage消息，但是还没收到响应或者失败的分支
-   */
-  private static final ConcurrentHashMap<Long, Integer> rollbackingMap =
-      new ConcurrentHashMap<Long, Integer>();
 
   /**
    * 超时的事务列表
@@ -88,25 +76,6 @@ public class DtsTransStatusDaoImpl implements DtsTransStatusDao {
   }
 
   @Override
-  public void insertCommitedResult(Long branchId, Integer commitResultCode) {
-    committingMap.put(branchId, commitResultCode);
-  }
-
-  @Override
-  public boolean clearCommitedResult(Long branchId) {
-    return committingMap.remove(branchId) != null;
-  }
-
-  @Override
-  public void insertRollbackResult(Long branchId, Integer rollbackingResultCode) {
-    rollbackingMap.put(branchId, rollbackingResultCode);
-  }
-
-  public boolean clearRollbackResult(Long branchId) {
-    return rollbackingMap.remove(branchId) != null;
-  }
-
-  @Override
   public GlobalLog queryGlobalLog(Long transId) {
     return activeTranMap.get(transId);
   }
@@ -117,8 +86,7 @@ public class DtsTransStatusDaoImpl implements DtsTransStatusDao {
   }
 
   @Override
-  public List<BranchLog> queryBranchLogByTransId(long tranId, boolean sort, boolean reverse,
-      boolean fromBkup) {
+  public List<BranchLog> queryBranchLogByTransId(long tranId) {
     List<BranchLog> branchLogs = new ArrayList<BranchLog>();
     Map<Long, BranchLog> branchMap = activeTranBranchMap;
     GlobalLog globalLog;
@@ -129,23 +97,6 @@ public class DtsTransStatusDaoImpl implements DtsTransStatusDao {
       BranchLog branchLog;
       if ((branchLog = branchMap.get(branchId)) != null) {
         branchLogs.add(branchLog);
-      }
-    }
-    if (sort) {
-      if (reverse) {
-        Collections.sort(branchLogs, new Comparator<BranchLog>() {
-          @Override
-          public int compare(BranchLog o1, BranchLog o2) {
-            return (int) (o2.getBranchId() - o1.getBranchId());
-          }
-        });
-      } else {
-        Collections.sort(branchLogs, new Comparator<BranchLog>() {
-          @Override
-          public int compare(BranchLog o1, BranchLog o2) {
-            return (int) (o1.getBranchId() - o2.getBranchId());
-          }
-        });
       }
     }
     return branchLogs;

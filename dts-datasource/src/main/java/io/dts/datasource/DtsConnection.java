@@ -86,7 +86,6 @@ public class DtsConnection extends AbstractDtsConnection {
         txcContext.setStatus(UndoLogMode.COMMON_LOG.getValue());
         DtsLogManager.getInstance().insertUndoLog(this.getRawConnection(), txcContext);
         getRawConnection().commit();
-        reportBranchStatus(true);
       } else {
         getRawConnection().commit();
       }
@@ -95,19 +94,12 @@ public class DtsConnection extends AbstractDtsConnection {
     }
   }
 
-  private void reportBranchStatus(final boolean success) {
-    if (DtsContext.inTxcTransaction()) {
-      dtsDataSource.getResourceManager().reportStatus(txcContext.getBranchId(), success,
-          dtsDataSource.getDbName(), null);
-    }
-  }
 
   @Override
   public void rollback() throws SQLException {
     try {
       if (DtsContext.inTxcTransaction()) {
         getRawConnection().rollback();
-        reportBranchStatus(false);
       } else {
         getRawConnection().rollback();
       }

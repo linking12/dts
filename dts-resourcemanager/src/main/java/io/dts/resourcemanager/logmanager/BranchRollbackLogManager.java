@@ -22,6 +22,7 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -104,17 +105,20 @@ public class BranchRollbackLogManager extends DtsLogManagerImpl {
           }
           logger.info(String.format("[logid:%d:xid:%s:branch:%d]", undolog.getId(),
               undolog.getXid(), undolog.getBranchId()));
+          StringBuilder rollbackSqlsSB = new StringBuilder();
           for (int i = undolog.getInfor().size(); i > 0; i--) {
             RollbackInfor info = undolog.getInfor().get(i - 1);
             // 检查脏写
             checkDirtyRead(template, info);
-
             List<String> rollbackSqls = DtsUndo.createDtsundo(info).buildRollbackSql();
             logger.info("the rollback sql is " + rollbackSqls);
             if (!CollectionUtils.isEmpty(rollbackSqls)) {
-              template.batchUpdate(rollbackSqls.toArray(new String[rollbackSqls.size()]));
+              String[] rollbackSqlArray = rollbackSqls.toArray(new String[rollbackSqls.size()]);
+              template.batchUpdate(rollbackSqlArray);
+              rollbackSqlsSB.append(StringUtils.join(rollbackSqlArray, ";"));
             }
           }
+          context.setReportSql(rollbackSqlsSB.toString());
           // 删除undolog
           String deleteSql = getDeleteUndoLogSql(Arrays.asList(context));
           logger.info("delete undo log sql" + deleteSql);
@@ -154,7 +158,7 @@ public class BranchRollbackLogManager extends DtsLogManagerImpl {
       retLog.append("]");
 
       if (valueByLog.equals(valueBySql) == false) {
-        throw new DtsException(ResultCode.LOGICERROR.getValue(), "dirty read:" + retLog.toString());
+        throw new DtsException(ResultCode.ERROR.getValue(), "dirty read:" + retLog.toString());
       }
     } catch (Exception e) {
       throw new DtsException(e, "checkDirtyRead error:" + retLog.toString());

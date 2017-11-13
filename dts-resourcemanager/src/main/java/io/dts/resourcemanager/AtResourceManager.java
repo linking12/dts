@@ -14,24 +14,11 @@
 package io.dts.resourcemanager;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
-import com.google.common.collect.Maps;
-
-import io.dts.common.common.CommitMode;
 import io.dts.common.common.DtsXID;
 import io.dts.common.exception.DtsException;
 import io.dts.resourcemanager.logmanager.DtsLogManager;
 import io.dts.resourcemanager.struct.ContextStep2;
-import io.dts.resourcemanager.struct.TxcBranchStatus;
 
 /**
  * @author liushiming
@@ -39,128 +26,43 @@ import io.dts.resourcemanager.struct.TxcBranchStatus;
  */
 public class AtResourceManager extends BaseResourceManager {
 
-  private static ScheduledExecutorService timerExecutor = Executors.newScheduledThreadPool(1);
-
-  private static Map<Long, ContextStep2> currentTaskCommitedAt = Maps.newConcurrentMap();
-
-  private static Map<String, TxcBranchStatus> currentTaskMap = Maps.newConcurrentMap();
-
-  public void init() {
-    try {
-      timerExecutor.scheduleAtFixedRate(new Runnable() {
-        @Override
-        public void run() {
-          List<ContextStep2> list = new ArrayList<ContextStep2>();
-          Iterator<Entry<Long, ContextStep2>> it = currentTaskCommitedAt.entrySet().iterator();
-          while (it.hasNext()) {
-            Entry<Long, ContextStep2> entry = it.next();
-            ContextStep2 context = entry.getValue();
-            it.remove();
-            list.add(context);
-          }
-          try {
-            DtsLogManager.getInstance().branchCommit(list);
-          } catch (SQLException e) {
-            throw new DtsException(e);
-          }
-        }
-      }, 10, 1000 * 5, TimeUnit.MILLISECONDS);
-    } catch (Exception e) {
-      throw new DtsException(e);
-    }
-  }
-
   @Override
-  public void branchCommit(String xid, long branchId, String key, String udata, int commitMode,
+  public String branchCommit(String xid, long branchId, String key, String udata, int commitMode,
       String retrySql) throws DtsException {
-    String branchName = DtsXID.getBranchName(xid, branchId);
-    if (currentTaskMap.containsKey(branchName)) {
-      throw new DtsException("Branch is working:" + currentTaskMap.get(branchName));
-    }
-    if (currentTaskMap.put(branchName, TxcBranchStatus.COMMITING) != null) {
-      throw new DtsException("Branch is working:" + currentTaskMap.get(branchName));
-    }
     try {
       ContextStep2 context = new ContextStep2();
       context.setXid(xid);
       context.setBranchId(branchId);
       context.setDbname(key);
       context.setUdata(udata);
-      if (commitMode == CommitMode.COMMIT_IN_PHASE1.getValue()) {
-        context.setCommitMode(CommitMode.COMMIT_IN_PHASE1);
-      } else if (commitMode == CommitMode.COMMIT_IN_PHASE2.getValue()) {
-        context.setCommitMode(CommitMode.COMMIT_IN_PHASE2);
-      } else if (commitMode == CommitMode.COMMIT_RETRY_MODE.getValue()) {
-        context.setCommitMode(CommitMode.COMMIT_RETRY_MODE);
-      }
       context.setRetrySql(retrySql);
       context.setGlobalXid(DtsXID.getGlobalXID(xid, branchId));
-      switch (context.getCommitMode()) {
-        case COMMIT_IN_PHASE1:
-        case COMMIT_IN_PHASE2:
-          currentTaskCommitedAt.put(context.getGlobalXid(), context);
-          break;
-        case COMMIT_RETRY_MODE:
-          DtsLogManager.getInstance().branchCommit(Arrays.asList(context));
-          break;
-        default:
-          break;
-      }
+      DtsLogManager.getInstance().branchCommit(context);
+      return context.getReportSql();
     } catch (DtsException e) {
       throw e;
     } catch (SQLException e) {
       throw new DtsException(e);
-    } finally {
-      currentTaskMap.remove(branchName);
     }
   }
 
   @Override
-  public void branchRollback(String xid, long branchId, String key, String udata, int commitMode)
+  public String branchRollback(String xid, long branchId, String key, String udata, int commitMode)
       throws DtsException {
-    String branchName = DtsXID.getBranchName(xid, branchId);
-    if (currentTaskMap.containsKey(branchName)) {
-      throw new DtsException("Branch is working:" + currentTaskMap.get(branchName));
-    }
-
-    if (currentTaskMap.put(branchName, TxcBranchStatus.ROLLBACKING) != null) {
-      throw new DtsException("Branch is working:" + currentTaskMap.get(branchName));
-    }
-
     ContextStep2 context = new ContextStep2();
     context.setXid(xid);
     context.setBranchId(branchId);
     context.setDbname(key);
     context.setUdata(udata);
-    if (commitMode == CommitMode.COMMIT_IN_PHASE1.getValue()) {
-      context.setCommitMode(CommitMode.COMMIT_IN_PHASE1);
-    } else if (commitMode == CommitMode.COMMIT_IN_PHASE2.getValue()) {
-      context.setCommitMode(CommitMode.COMMIT_IN_PHASE2);
-    } else if (commitMode == CommitMode.COMMIT_RETRY_MODE.getValue()) {
-      context.setCommitMode(CommitMode.COMMIT_RETRY_MODE);
-    }
     context.setGlobalXid(DtsXID.getGlobalXID(xid, branchId));
     try {
       DtsLogManager.getInstance().branchRollback(context);
+      return context.getReportSql();
     } catch (DtsException e) {
       throw e;
     } catch (SQLException e) {
       throw new DtsException(e);
-    } finally {
-      currentTaskMap.remove(branchName);
     }
-  }
-
-  @Override
-  public void branchRollback(String xid, long branchId, String key, String udata, int commitMode,
-      int isDelKey) throws DtsException {
-    throw new UnsupportedOperationException("method not support");
-  }
-
-  @Override
-  public void reportUdata(String xid, long branchId, String key, String udata, boolean delay)
-      throws DtsException {
-    throw new UnsupportedOperationException("method not support");
   }
 
 

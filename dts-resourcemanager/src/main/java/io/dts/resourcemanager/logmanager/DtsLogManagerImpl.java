@@ -44,11 +44,11 @@ public class DtsLogManagerImpl implements DtsLogManager {
    * 分支事务提交，仅删除UndoLog
    */
   @Override
-  public void branchCommit(List<ContextStep2> contexts) throws SQLException {
+  public void branchCommit(ContextStep2 context) throws SQLException {
     if (commitLogManager == null) {
       commitLogManager = new BranchCommitLogManager();
     }
-    commitLogManager.branchCommit(contexts);
+    commitLogManager.branchCommit(context);
   }
 
   /**

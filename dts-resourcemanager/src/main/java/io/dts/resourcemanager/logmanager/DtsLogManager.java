@@ -16,7 +16,6 @@ package io.dts.resourcemanager.logmanager;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.List;
 
 import org.springframework.jdbc.core.PreparedStatementCallback;
 
@@ -36,7 +35,7 @@ public interface DtsLogManager {
   /**
    * 分支事务提交，仅删除UndoLog
    */
-  void branchCommit(List<ContextStep2> contexts) throws SQLException;
+  void branchCommit(ContextStep2 context) throws SQLException;
 
   /**
    * 分支事务回滚，回滚阶段的数据库操作在一个本地事务中执行

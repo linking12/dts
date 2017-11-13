@@ -30,7 +30,7 @@ public class DtsUpdateUndo extends AbstractDtsUndo {
     if (rule == null) {
       // 检查数据行是否一致，update不应该影响行数目
       if (getOriginalValue().getLinesNum() != getPresentValue().getLinesNum()) {
-        throw new DtsException(ResultCode.LOGICERROR.getValue(), "line num changed.");
+        throw new DtsException(ResultCode.ERROR.getValue(), "line num changed.");
       }
     }
     List<String> sqls = Lists.newArrayList();

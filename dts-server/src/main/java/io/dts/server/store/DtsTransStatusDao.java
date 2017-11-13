@@ -27,26 +27,18 @@ public interface DtsTransStatusDao {
 
   public void insertGlobalLog(Long transId, GlobalLog globalLog);
 
+  public GlobalLog queryGlobalLog(Long transId);
+
   public void clearGlobalLog(Long transId);
 
   public void insertBranchLog(Long branchId, BranchLog branchLog);
 
-  public BranchLog clearBranchLog(Long branchId);
-
-  public void insertCommitedResult(Long branchId, Integer commitResultCode);
-
-  public boolean clearCommitedResult(Long branchId);
-
-  public void insertRollbackResult(Long branchId, Integer rollbackResultCode);
-
-  public boolean clearRollbackResult(Long branchId);
-
-  public GlobalLog queryGlobalLog(Long transId);
-
   public BranchLog queryBranchLog(Long branchId);
 
-  public List<BranchLog> queryBranchLogByTransId(long tranId, boolean sort, boolean reverse,
-      boolean fromBkup);
+
+  public BranchLog clearBranchLog(Long branchId);
+
+  public List<BranchLog> queryBranchLogByTransId(long tranId);
 
   public boolean queryTimeOut(Long transId);
 

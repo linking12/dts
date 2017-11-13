@@ -20,14 +20,13 @@ import org.slf4j.LoggerFactory;
 
 import io.dts.common.api.DtsClientMessageSender;
 import io.dts.common.common.CommitMode;
-import io.dts.common.common.DtsContext;
 import io.dts.common.common.Constants;
+import io.dts.common.common.DtsContext;
 import io.dts.common.common.DtsXID;
 import io.dts.common.exception.DtsException;
 import io.dts.common.protocol.RequestMessage;
 import io.dts.common.protocol.header.RegisterMessage;
 import io.dts.common.protocol.header.RegisterResultMessage;
-import io.dts.common.protocol.header.ReportStatusMessage;
 import io.dts.resourcemanager.network.DefaultDtsResourcMessageSender;
 
 /**
@@ -102,47 +101,48 @@ public abstract class BaseResourceManager implements ResourceManager {
     }
   }
 
-  @Override
-  public void reportStatus(long branchId, boolean success, String key, String udata)
-      throws DtsException {
-    int retry = getReportRetryTime();
-    for (int i = 1;; i++) {
-      try {
-        reportStatus(branchId, success, key, udata, i);
-        break;
-      } catch (DtsException e) {
-        if (i <= retry) {
-          logger.error("", "reportStatus branch:" + branchId + ", retry:" + i, e);
-        } else {
-          logger.error("", "reportStatus branch:" + branchId, e);
-          throw e;
-        }
-      }
-    }
-  }
+  // @Override
+  // public void reportStatus(long branchId, boolean success, String key, String udata)
+  // throws DtsException {
+  // int retry = getReportRetryTime();
+  // for (int i = 1;; i++) {
+  // try {
+  // reportStatus(branchId, success, key, udata, i);
+  // break;
+  // } catch (DtsException e) {
+  // if (i <= retry) {
+  // logger.error("", "reportStatus branch:" + branchId + ", retry:" + i, e);
+  // } else {
+  // logger.error("", "reportStatus branch:" + branchId, e);
+  // throw e;
+  // }
+  // }
+  // }
+  // }
 
-  private void reportStatus(long branchId, boolean success, String key, String udata, int tryTime)
-      throws DtsException {
-    if (DtsContext.inTxcTransaction()) {
-      ReportStatusMessage reportStatusMessage = new ReportStatusMessage();
-      reportStatusMessage.setBranchId(branchId);
-      reportStatusMessage.setSuccess(success);
-      reportStatusMessage.setKey(key);
-      reportStatusMessage.setTranId(DtsXID.getTransactionId(DtsContext.getCurrentXid()));
-      reportStatusMessage.setUdata(udata);
-
-      try {
-        if (logger.isDebugEnabled())
-          logger.debug(reportStatusMessage.toString());
-        resourceMessageSender.invoke(reportStatusMessage, Constants.RPC_INVOKE_TIMEOUT);
-      } catch (Throwable th) {
-        throw new DtsException(th);
-      } finally {
-      }
-    } else {
-      throw new IllegalStateException("current thread is not bind to txc transaction.");
-    }
-  }
+  // private void reportStatus(long branchId, boolean success, String key, String udata, int
+  // tryTime)
+  // throws DtsException {
+  // if (DtsContext.inTxcTransaction()) {
+  // ReportStatusMessage reportStatusMessage = new ReportStatusMessage();
+  // reportStatusMessage.setBranchId(branchId);
+  // reportStatusMessage.setSuccess(success);
+  // reportStatusMessage.setKey(key);
+  // reportStatusMessage.setTranId(DtsXID.getTransactionId(DtsContext.getCurrentXid()));
+  // reportStatusMessage.setUdata(udata);
+  //
+  // try {
+  // if (logger.isDebugEnabled())
+  // logger.debug(reportStatusMessage.toString());
+  // resourceMessageSender.invoke(reportStatusMessage, Constants.RPC_INVOKE_TIMEOUT);
+  // } catch (Throwable th) {
+  // throw new DtsException(th);
+  // } finally {
+  // }
+  // } else {
+  // throw new IllegalStateException("current thread is not bind to txc transaction.");
+  // }
+  // }
 
   protected <T> T invoke(RequestMessage msg) throws DtsException {
     return resourceMessageSender.invoke(msg, Constants.RPC_INVOKE_TIMEOUT);

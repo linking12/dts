@@ -267,11 +267,12 @@ public class DtsLogDaoImpl implements DtsLogDao {
     jdbcTemplate.update(
         "insert into dts_branch_error_log ("
             + "branch_id,tx_id,state,client_ip,client_app_name,client_info,"
-            + "gmt_created,gmt_modified,commit_mode,rt_sql,mid)"
-            + " values (?,?,?,?,?,?, now(),now(),?,?,?)",
+            + "gmt_created,gmt_modified,commit_mode,rt_sql,report_sql,mid)"
+            + " values (?,?,?,?,?,?, now(),now(),?,?,?,?)",
         new Object[] {branchLog.getBranchId(), branchLog.getTransId(), branchLog.getState(),
             branchLog.getClientIp(), appName, branchLog.getClientInfo(), branchLog.getCommitMode(),
-            BlobUtil.string2blob(branchLog.getRetrySql()), mid});
+            BlobUtil.string2blob(branchLog.getRetrySql()),
+            BlobUtil.string2blob(branchLog.getReportSql()), mid});
   }
 
   @Override

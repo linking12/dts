@@ -69,14 +69,11 @@ public class BranchLog {
   private int waitPeriods;
 
   /**
-   * 是否删除事务锁， 该标记适用于读已提交隔离级别的回滚逻辑，对于读未提交的情况不起作用
-   */
-  private int isDelLock;
-
-  /**
    * 重试Sql
    */
   private String retrySql;
+
+  private String reportSql;
 
   /**
    * slave节点接收时间
@@ -283,12 +280,14 @@ public class BranchLog {
     this.commitMode = commitMode;
   }
 
-  public int getIsDelLock() {
-    return isDelLock;
+
+
+  public String getReportSql() {
+    return reportSql;
   }
 
-  public void setIsDelLock(int isDelLock) {
-    this.isDelLock = isDelLock;
+  public void setReportSql(String reportSql) {
+    this.reportSql = reportSql;
   }
 
   /*
@@ -298,7 +297,6 @@ public class BranchLog {
    */
   public String toString() {
     return "tranId:" + this.transId + ",branchId:" + this.branchId + ",state:" + this.state
-        + ",commit mode:" + this.commitMode + ",udata:" + this.udata + ",retrySql:" + this.retrySql
-        + ",isDelLock:" + this.isDelLock;
+        + ",commit mode:" + this.commitMode + ",udata:" + this.udata + ",retrySql:" + this.retrySql;
   }
 }

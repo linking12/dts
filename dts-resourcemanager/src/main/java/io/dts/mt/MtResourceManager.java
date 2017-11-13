@@ -23,27 +23,19 @@ import io.dts.resourcemanager.BaseResourceManager;
 public class MtResourceManager extends BaseResourceManager {
 
   @Override
-  public void reportUdata(String xid, long branchId, String key, String udata, boolean delay)
-      throws DtsException {
-
-  }
-
-  @Override
-  public void branchCommit(String xid, long branchId, String key, String udata, int commitMode,
+  public String branchCommit(String xid, long branchId, String key, String udata, int commitMode,
       String retrySql) throws DtsException {
-
+    // TODO Auto-generated method stub
+    return null;
   }
 
   @Override
-  public void branchRollback(String xid, long branchId, String key, String udata, int commitMode)
+  public String branchRollback(String xid, long branchId, String key, String udata, int commitMode)
       throws DtsException {
-
+    // TODO Auto-generated method stub
+    return null;
   }
 
-  @Override
-  public void branchRollback(String xid, long branchId, String key, String udata, int commitMode,
-      int isDelKey) throws DtsException {
 
-  }
 
 }

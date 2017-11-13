@@ -96,7 +96,7 @@ public class RmMessageProcessor implements NettyRequestProcessor {
       rm.branchCommit(servAddr + ":" + tranId, branchId, dbName, udata, commitMode, retrySql);
       resultMessage.setResult(ResultCode.OK.getValue());
     } catch (Exception e) {
-      resultMessage.setResult(ResultCode.SYSTEMERROR.getValue());
+      resultMessage.setResult(ResultCode.ERROR.getValue());
     }
   }
 
@@ -116,7 +116,7 @@ public class RmMessageProcessor implements NettyRequestProcessor {
       rm.branchRollback(servAddr + ":" + tranId, branchId, dbName, udata, commitMode);
       resultMessage.setResult(ResultCode.OK.getValue());
     } catch (Exception e) {
-      resultMessage.setResult(ResultCode.SYSTEMERROR.getValue());
+      resultMessage.setResult(ResultCode.ERROR.getValue());
     }
   }
 

@@ -10,6 +10,7 @@ public class ContextStep2 {
   private String udata;
   private CommitMode commitMode;
   private String retrySql;
+  private String reportSql;
 
   public long getGlobalXid() {
     return globalXid;
@@ -66,5 +67,15 @@ public class ContextStep2 {
   public void setDbname(String dbname) {
     this.dbname = dbname;
   }
+
+  public String getReportSql() {
+    return reportSql;
+  }
+
+  public void setReportSql(String reportSql) {
+    this.reportSql = reportSql;
+  }
+
+
 
 }

@@ -13,8 +13,6 @@
  */
 package io.dts.server.handler.support;
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -31,8 +29,6 @@ import io.dts.common.protocol.header.BranchRollBackMessage;
 import io.dts.common.protocol.header.BranchRollbackResultMessage;
 import io.dts.common.protocol.header.GlobalCommitMessage;
 import io.dts.common.protocol.header.GlobalRollbackMessage;
-import io.dts.server.handler.CommitingResultCode;
-import io.dts.server.handler.RollbackingResultCode;
 import io.dts.server.network.DtsServerContainer;
 import io.dts.server.store.DtsLogDao;
 import io.dts.server.store.DtsTransStatusDao;
@@ -63,6 +59,7 @@ public interface ClientMessageHandler {
 
       private final SyncRmMessagHandler globalResultMessageHandler =
           SyncRmMessagHandler.createSyncGlobalResultProcess(dtsTransStatusDao, dtsLogDao);
+
 
       // 开始一个事务
       @Override
@@ -111,9 +108,8 @@ public interface ClientMessageHandler {
               }
             case Begin:
             case CommitHeuristic:
-              List<BranchLog> branchLogs = dtsTransStatusDao
-                  .queryBranchLogByTransId(globalLog.getTransId(), false, false, false);
-              // BranchLog.setLastBranchDelTrxKey(branchLogs);
+              List<BranchLog> branchLogs =
+                  dtsTransStatusDao.queryBranchLogByTransId(globalLog.getTransId());
               if (branchLogs.size() == 0) {
                 dtsLogDao.deleteGlobalLog(globalLog.getTransId(), DtsServerContainer.mid);
                 dtsTransStatusDao.clearGlobalLog(tranId);
@@ -124,30 +120,15 @@ public interface ClientMessageHandler {
                 dtsLogDao.updateGlobalLog(globalLog, DtsServerContainer.mid);
               } catch (Exception e) {
                 logger.error(e.getMessage(), e);
-                // 状态设置为提交未决
                 globalLog.setState(GlobalTransactionState.CommitHeuristic.getValue());
                 throw new DtsException("update global status fail.");
               }
-              if (!globalLog.isContainPhase2CommitBranch()) {
-                for (BranchLog branchLog : branchLogs) {
-                  dtsTransStatusDao.insertCommitedResult(branchLog.getBranchId(),
-                      CommitingResultCode.BEGIN.getValue());
-                }
+              // 通知各个分支开始提交
+              try {
                 this.syncGlobalCommit(branchLogs, globalLog);
-
-              } else {
-                try {
-                  Collections.sort(branchLogs, new Comparator<BranchLog>() {
-                    @Override
-                    public int compare(BranchLog o1, BranchLog o2) {
-                      return (int) (o1.getBranchId() - o2.getBranchId());
-                    }
-                  });
-                  this.syncGlobalCommit(branchLogs, globalLog);
-                } catch (Exception e) {
-                  logger.error(e.getMessage(), e);
-                  throw new DtsException("notify resourcemanager to commit failed");
-                }
+              } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+                throw new DtsException("notify resourcemanager to commit failed");
               }
               return;
             default:
@@ -170,37 +151,42 @@ public interface ClientMessageHandler {
           } else {
             throw new DtsException("transaction doesn't exist.");
           }
-        } else if (globalLog.getState() == GlobalTransactionState.Committing.getValue()) {
-          throw new DtsException("transaction is committing.");
-        } else if (globalLog.getState() == GlobalTransactionState.Rollbacking.getValue()) {
-          if (dtsTransStatusDao.queryTimeOut(tranId)) {
-            dtsTransStatusDao.removeTimeOut(tranId);
-            throw new DtsException("transaction has been rollbacking because of timeout.");
-          } else {
-            throw new DtsException("transaction has been rollbacking.");
-          }
-        } else if (globalLog.getState() == GlobalTransactionState.Begin.getValue()) {
-          List<BranchLog> branchLogs =
-              dtsTransStatusDao.queryBranchLogByTransId(globalLog.getTransId(), true, true, false);
-          globalLog.setState(GlobalTransactionState.Rollbacking.getValue());
-          try {
-            if (globalRollbackMessage.getRealSvrAddr() == null)
-              dtsLogDao.updateGlobalLog(globalLog, DtsServerContainer.mid);
-          } catch (Exception e) {
-            globalLog.setState(GlobalTransactionState.Begin.getValue());
-            throw new DtsException("update global status fail.");
-          }
-          try {
-            String clusterNode = globalRollbackMessage.getRealSvrAddr();
-            if (clusterNode == null)
-              this.syncGlobalRollback(branchLogs, globalLog);
-            // handler.globalRollbackForPrevNode(branchLogs, globalLog, tranId, clusterNode);
-          } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-            throw new DtsException("notify resourcemanager to rollback failed");
-          }
         } else {
-          throw new DtsException("Unknown state " + globalLog.getState());
+          switch (GlobalTransactionState.parse(globalLog.getState())) {
+            case Committing:
+              throw new DtsException("transaction is committing.");
+            case Rollbacking:
+              if (dtsTransStatusDao.queryTimeOut(tranId)) {
+                dtsTransStatusDao.removeTimeOut(tranId);
+                throw new DtsException("transaction is rollbacking because of timeout.");
+              } else {
+                throw new DtsException("transaction is rollbacking.");
+              }
+            case Begin:
+              List<BranchLog> branchLogs =
+                  dtsTransStatusDao.queryBranchLogByTransId(globalLog.getTransId());
+              globalLog.setState(GlobalTransactionState.Rollbacking.getValue());
+              try {
+                dtsLogDao.updateGlobalLog(globalLog, DtsServerContainer.mid);
+              } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+                globalLog.setState(GlobalTransactionState.Begin.getValue());
+                throw new DtsException("update global status fail.");
+              }
+              // 通知各个分支开始回滚
+              try {
+                this.syncGlobalRollback(branchLogs, globalLog);
+              } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+                throw new DtsException("notify resourcemanager to commit failed");
+              }
+              return;
+            default:
+              throw new DtsException("Unknown state " + globalLog.getState());
+          }
+
+
+
         }
       }
 
@@ -217,48 +203,36 @@ public interface ClientMessageHandler {
           branchCommitMessage.setRetrySql(branchLog.getRetrySql());
           branchCommitMessage.setDbName(branchLog.getClientInfo());
           try {
-            BranchCommitResultMessage branchCommitResult =
-                serverMessageServer.invokeSync(clientAddress, branchCommitMessage, 3000);
-            if (branchCommitResult == null) {
-              dtsTransStatusDao.insertCommitedResult(branchId,
-                  CommitingResultCode.TIMEOUT.getValue());
-            } else {
-              globalResultMessageHandler.processMessage(clientAddress, branchCommitResult);
-            }
+            BranchCommitResultMessage branchCommitResult = serverMessageServer
+                .invokeSync(clientAddress, branchCommitMessage, Constants.RPC_INVOKE_TIMEOUT);
+            globalResultMessageHandler.processMessage(clientAddress, branchCommitResult);
           } catch (DtsException e) {
             logger.error(e.getMessage(), e);
-            dtsTransStatusDao.insertCommitedResult(branchId,
-                CommitingResultCode.TIMEOUT.getValue());
+            throw e;
           }
         }
 
       }
 
       protected void syncGlobalRollback(List<BranchLog> branchLogs, GlobalLog globalLog) {
-        for (BranchLog branchLog : branchLogs) {
-          String clientAddress = branchLog.getClientIp();
+        for (int i = 0; i < branchLogs.size(); i++) {
+          BranchLog branchLog = branchLogs.get(i);
           Long branchId = branchLog.getBranchId();
+          String clientAddress = branchLog.getClientIp();
           BranchRollBackMessage branchRollbackMessage = new BranchRollBackMessage();
           branchRollbackMessage.setServerAddr(DtsXID.getSvrAddr());
           branchRollbackMessage.setTranId(globalLog.getTransId());
           branchRollbackMessage.setBranchId(branchId);
           branchRollbackMessage.setDbName(branchLog.getClientInfo());
           branchRollbackMessage.setUdata(branchLog.getUdata());
-          branchRollbackMessage.setCommitMode((byte) branchLog.getCommitMode());
-          branchRollbackMessage.setIsDelLock((byte) branchLog.getIsDelLock());
+          branchRollbackMessage.setCommitMode(branchLog.getCommitMode());
           try {
             BranchRollbackResultMessage branchRollbackResult = serverMessageServer
                 .invokeSync(clientAddress, branchRollbackMessage, Constants.RPC_INVOKE_TIMEOUT);
-            if (branchRollbackResult == null) {
-              dtsTransStatusDao.insertRollbackResult(branchId,
-                  RollbackingResultCode.TIMEOUT.getValue());
-            } else {
-              globalResultMessageHandler.processMessage(clientAddress, branchRollbackResult);
-            }
+            globalResultMessageHandler.processMessage(clientAddress, branchRollbackResult);
           } catch (DtsException e) {
             logger.error(e.getMessage(), e);
-            dtsTransStatusDao.insertRollbackResult(branchId,
-                RollbackingResultCode.TIMEOUT.getValue());
+            throw e;
           }
         }
       }

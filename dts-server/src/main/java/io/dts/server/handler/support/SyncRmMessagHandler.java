@@ -19,8 +19,6 @@ import org.slf4j.LoggerFactory;
 import io.dts.common.protocol.ResultCode;
 import io.dts.common.protocol.header.BranchCommitResultMessage;
 import io.dts.common.protocol.header.BranchRollbackResultMessage;
-import io.dts.server.handler.CommitingResultCode;
-import io.dts.server.handler.RollbackingResultCode;
 import io.dts.server.network.DtsServerContainer;
 import io.dts.server.store.DtsLogDao;
 import io.dts.server.store.DtsTransStatusDao;
@@ -47,13 +45,9 @@ public interface SyncRmMessagHandler {
 
       @Override
       public void processMessage(String clientIp, BranchCommitResultMessage message) {
-        // 如果该resourceManager下面的branch提交成功
         Long tranId = message.getTranId();
         Long branchId = message.getBranchId();
         if (message.getResult() == ResultCode.OK.getValue()) {
-          if (dtsTransStatusDao.clearCommitedResult(branchId)) {
-            return;
-          }
           BranchLog branchLog = dtsTransStatusDao.clearBranchLog(branchId);
           if (branchLog != null) {
             dtsLogDao.deleteBranchLog(branchLog, DtsServerContainer.mid);
@@ -68,13 +62,7 @@ public interface SyncRmMessagHandler {
             }
           }
 
-        } else if (message.getResult() == ResultCode.SYSTEMERROR.getValue()) {
-          dtsTransStatusDao.insertCommitedResult(branchId, CommitingResultCode.FAILED.getValue());
-        } // 如果出现了逻辑错误，需要发出告警
-        else if (message.getResult() == ResultCode.LOGICERROR.getValue()) {
-          if (!dtsTransStatusDao.clearCommitedResult(branchId)) {
-            return;
-          }
+        } else if (message.getResult() == ResultCode.ERROR.getValue()) {
           BranchLog branchLog = dtsTransStatusDao.clearBranchLog(branchId);
           if (branchLog != null) {
             dtsLogDao.insertBranchErrorLog(branchLog, DtsServerContainer.mid);
@@ -92,9 +80,6 @@ public interface SyncRmMessagHandler {
 
             }
           }
-        } else {
-          dtsTransStatusDao.insertCommitedResult(branchId, CommitingResultCode.FAILED.getValue());
-
         }
       }
 
@@ -103,9 +88,6 @@ public interface SyncRmMessagHandler {
         Long tranId = message.getTranId();
         Long branchId = message.getBranchId();
         if (message.getResult() == ResultCode.OK.getValue()) {
-          if (dtsTransStatusDao.clearRollbackResult(branchId)) {
-            return;
-          }
           BranchLog branchLog = dtsTransStatusDao.clearBranchLog(branchId);
           if (branchLog != null) {
             dtsLogDao.deleteBranchLog(branchLog, DtsServerContainer.mid);
@@ -119,14 +101,10 @@ public interface SyncRmMessagHandler {
               dtsLogDao.deleteGlobalLog(tranId, DtsServerContainer.mid);
             }
           }
-        } else if (message.getResult() == ResultCode.SYSTEMERROR.getValue()) {
-          dtsTransStatusDao.insertRollbackResult(branchId, RollbackingResultCode.FAILED.getValue());
-        } else if (message.getResult() == ResultCode.LOGICERROR.getValue()) {
-          if (!dtsTransStatusDao.clearRollbackResult(branchId)) {
-            return;
-          }
+        } else if (message.getResult() == ResultCode.ERROR.getValue()) {
           BranchLog branchLog = dtsTransStatusDao.clearBranchLog(branchId);
           if (branchLog != null) {
+            branchLog.setReportSql(message.getReportSql());
             dtsLogDao.insertBranchErrorLog(branchLog, DtsServerContainer.mid);
             dtsLogDao.deleteBranchLog(branchLog, DtsServerContainer.mid);
             logger.error("Logic error occurs while rollback branch:" + message.getBranchId()
@@ -139,14 +117,10 @@ public interface SyncRmMessagHandler {
             if (leftBranches == 0) {
               dtsTransStatusDao.clearGlobalLog(tranId);
               dtsLogDao.deleteGlobalLog(tranId, 1);
-
             }
           }
-        } else {
-          dtsTransStatusDao.insertRollbackResult(branchId, RollbackingResultCode.FAILED.getValue());
         }
       }
-
     };
   }
 }

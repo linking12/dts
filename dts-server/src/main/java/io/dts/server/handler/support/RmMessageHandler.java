@@ -23,12 +23,7 @@ import io.dts.common.common.DtsXID;
 import io.dts.common.exception.DtsException;
 import io.dts.common.protocol.header.BeginRetryBranchMessage;
 import io.dts.common.protocol.header.BeginRetryBranchResultMessage;
-import io.dts.common.protocol.header.QueryLockMessage;
 import io.dts.common.protocol.header.RegisterMessage;
-import io.dts.common.protocol.header.ReportStatusMessage;
-import io.dts.common.protocol.header.ReportUdataMessage;
-import io.dts.server.handler.CommitingResultCode;
-import io.dts.server.handler.RollbackingResultCode;
 import io.dts.server.network.DtsServerContainer;
 import io.dts.server.store.DtsLogDao;
 import io.dts.server.store.DtsTransStatusDao;
@@ -44,12 +39,6 @@ import io.dts.server.struct.GlobalTransactionState;
 public interface RmMessageHandler {
 
   Long processMessage(RegisterMessage registerMessage, String clientIp);
-
-  void processMessage(ReportStatusMessage reportStatusMessage, String clientIp);
-
-  void processMessage(QueryLockMessage queryLockMessage, String clientIp);
-
-  void processMessage(ReportUdataMessage reportUdataMessage, String clientIp);
 
   void processMessage(BeginRetryBranchMessage beginRetryBranchMessage,
       BeginRetryBranchResultMessage resultMessage, String clientIp);
@@ -98,53 +87,6 @@ public interface RmMessageHandler {
       }
 
       @Override
-      public void processMessage(ReportStatusMessage reportStatusMessage, String clientIp) {
-        BranchLog branchLog = dtsTransStatusDao.queryBranchLog(reportStatusMessage.getBranchId());
-        if (branchLog == null) {
-          throw new DtsException("branch doesn't exist.");
-        }
-        int state = (reportStatusMessage.isSuccess()) ? BranchLogState.Success.getValue()
-            : BranchLogState.Failed.getValue();
-        branchLog.setState(state);
-        branchLog.setUdata(reportStatusMessage.getUdata());
-        dtsLogDao.updateBranchLog(branchLog, DtsServerContainer.mid);
-        /**
-         * 如果事务因为超时而回滚，事务在rollbacking状态，需要把这个分支放入rollbackingMap
-         */
-        GlobalLog globalLog = dtsTransStatusDao.queryGlobalLog(branchLog.getTransId());
-        if (globalLog == null) {
-          throw new DtsException("global log doesn't exist.");
-        }
-        if (globalLog.getState() == GlobalTransactionState.Rollbacking.getValue()) {
-          dtsTransStatusDao.insertRollbackResult(branchLog.getBranchId(),
-              RollbackingResultCode.TIMEOUT.getValue());
-        }
-      }
-
-      @Override
-      public void processMessage(QueryLockMessage queryLockMessage, String clientIp) {
-
-        // TODO
-      }
-
-      @Override
-      public void processMessage(ReportUdataMessage reportUdataMessage, String clientIp) {
-        Long branchId = reportUdataMessage.getBranchId();
-        BranchLog branchLog = dtsTransStatusDao.queryBranchLog(branchId);
-        if (branchLog == null) {
-          throw new DtsException("branch doesn't exist.");
-        }
-        if (reportUdataMessage.getUdata() != null) {
-          branchLog.setUdata(reportUdataMessage.getUdata());
-          try {
-            dtsLogDao.updateBranchLog(branchLog, DtsServerContainer.mid);
-          } catch (Exception e) {
-            throw new DtsException("update branchlog usedata failed");
-          }
-        }
-      }
-
-      @Override
       public void processMessage(BeginRetryBranchMessage beginRetryBranchMessage,
           BeginRetryBranchResultMessage resultMessage, String clientIp) {
         GlobalLog retryGlobalLog = dtsTransStatusDao.getRetryGlobalLog();
@@ -179,12 +121,10 @@ public interface RmMessageHandler {
         branchLog.setCommitMode(CommitMode.COMMIT_RETRY_MODE.getValue());
         branchLog.setUdata(Long.toString(beginRetryBranchMessage.getEffectiveTime()));
         branchLog.setRetrySql(beginRetryBranchMessage.getSql());
-        // if (this.clusterWorker != null) {
         branchLog.setBranchId(dtsTransStatusDao.generateBranchId());
         branchLog.setGmtCreated(Calendar.getInstance().getTime());
         branchLog.setGmtModified(branchLog.getGmtCreated());
         branchLog.setRecvTime(System.currentTimeMillis());
-        // }
         try {
           dtsLogDao.insertBranchLog(branchLog, DtsServerContainer.mid);
         } catch (Exception e) {
@@ -193,8 +133,6 @@ public interface RmMessageHandler {
         dtsTransStatusDao.insertBranchLog(branchLog.getBranchId(), branchLog);
         retryGlobalLog.getBranchIds().add(branchLog.getBranchId());
         resultMessage.setBranchId(branchLog.getBranchId());
-        dtsTransStatusDao.insertCommitedResult(branchLog.getBranchId(),
-            CommitingResultCode.BEGIN.getValue());
       }
 
 
