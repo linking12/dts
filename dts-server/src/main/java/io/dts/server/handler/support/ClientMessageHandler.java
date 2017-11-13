@@ -151,7 +151,6 @@ public interface ClientMessageHandler {
           branchCommitMessage.setTranId(transId);
           branchCommitMessage.setBranchId(branchId);
           branchCommitMessage.setUdata(branchLog.getUdata());
-          branchCommitMessage.setCommitMode(branchLog.getCommitMode());
           branchCommitMessage.setRetrySql(branchLog.getRetrySql());
           branchCommitMessage.setDbName(branchLog.getClientInfo());
           BranchCommitResultMessage branchCommitResult = null;
@@ -181,7 +180,6 @@ public interface ClientMessageHandler {
           branchRollbackMessage.setBranchId(branchId);
           branchRollbackMessage.setDbName(branchLog.getClientInfo());
           branchRollbackMessage.setUdata(branchLog.getUdata());
-          branchRollbackMessage.setCommitMode(branchLog.getCommitMode());
           BranchRollbackResultMessage branchRollbackResult = null;
           try {
             branchRollbackResult = serverMessageServer.invokeSync(clientAddress,

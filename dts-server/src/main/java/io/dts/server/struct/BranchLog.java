@@ -24,11 +24,6 @@ public class BranchLog {
   private int state;
 
   /**
-   * 提交模式 （TXC缺省RM都是一阶段做事务分支的提交，用户自定义RM，如MT场景为第二阶段提交
-   */
-  private int commitMode;
-
-  /**
    * 客户端IP
    */
   private String clientIp;
@@ -266,20 +261,6 @@ public class BranchLog {
     this.gmtModified = gmtModified;
   }
 
-  /**
-   * @return
-   */
-  public int getCommitMode() {
-    return commitMode;
-  }
-
-  /**
-   * @param commitMode
-   */
-  public void setCommitMode(int commitMode) {
-    this.commitMode = commitMode;
-  }
-
 
 
   public String getReportSql() {
@@ -297,6 +278,6 @@ public class BranchLog {
    */
   public String toString() {
     return "tranId:" + this.transId + ",branchId:" + this.branchId + ",state:" + this.state
-        + ",commit mode:" + this.commitMode + ",udata:" + this.udata + ",retrySql:" + this.retrySql;
+        + ",udata:" + this.udata + ",retrySql:" + this.retrySql;
   }
 }

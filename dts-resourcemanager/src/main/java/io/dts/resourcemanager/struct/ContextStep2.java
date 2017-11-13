@@ -1,6 +1,5 @@
 package io.dts.resourcemanager.struct;
 
-import io.dts.common.common.CommitMode;
 
 public class ContextStep2 {
   private long globalXid;
@@ -8,7 +7,6 @@ public class ContextStep2 {
   private long branchId;
   private String dbname;
   private String udata;
-  private CommitMode commitMode;
   private String retrySql;
 
   public long getGlobalXid() {
@@ -43,13 +41,6 @@ public class ContextStep2 {
     this.udata = udata;
   }
 
-  public CommitMode getCommitMode() {
-    return commitMode;
-  }
-
-  public void setCommitMode(CommitMode commitMode) {
-    this.commitMode = commitMode;
-  }
 
   public String getRetrySql() {
     return retrySql;

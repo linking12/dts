@@ -30,7 +30,7 @@ public class RegisterMessage implements CommandCustomHeader, RequestMessage {
   private long tranId;
 
   /**
-   * 对于缺省模式（TXC Atom为数据源），这个域为dbKey；对于MT模式，这是用户自定义key
+   * 这个域为dbKey；
    */
   private String key;
 
@@ -39,11 +39,6 @@ public class RegisterMessage implements CommandCustomHeader, RequestMessage {
    */
   private String businessKey;
 
-  /**
-   * 提交模式
-   */
-  @CFNotNull
-  private int commitMode;
 
   public long getTranId() {
     return tranId;

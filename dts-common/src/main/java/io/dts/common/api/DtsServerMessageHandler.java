@@ -46,27 +46,6 @@ public interface DtsServerMessageHandler {
   public void handleMessage(String clientIp, RegisterMessage message,
       RegisterResultMessage resultMessage);
 
-  // /**
-  // * 事务分支上报状态消息处理
-  // *
-  // */
-  // public void handleMessage(String clientIp, ReportStatusMessage message,
-  // ReportStatusResultMessage resultMessage);
-
-  /**
-   * 可重试事务分支处理
-   * 
-   */
-  public void handleMessage(String clientIp, BeginRetryBranchMessage message,
-      BeginRetryBranchResultMessage resultMessage);
-
-  // /**
-  // * 事务分支上报用户数据（udata）消息处理
-  // *
-  // */
-  // public void handleMessage(String clientIp, ReportUdataMessage message,
-  // ReportUdataResultMessage resultMessage);
-
 
 
 }

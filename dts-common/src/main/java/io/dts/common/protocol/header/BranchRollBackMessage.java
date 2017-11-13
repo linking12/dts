@@ -41,11 +41,7 @@ public class BranchRollBackMessage implements CommandCustomHeader, RequestMessag
   private String appName;
 
   private String dbName;
-  /**
-   * 提交模式
-   */
-  @CFNotNull
-  private int commitMode;
+
 
   /**
    * 用户自定义信息，MT服务可以把一阶段的一些用户数据上报给Server，Server在二阶段把这个信息再传下来； 这样MT服务二阶段可以节省一次查询
@@ -91,15 +87,6 @@ public class BranchRollBackMessage implements CommandCustomHeader, RequestMessag
   public void setDbName(String dbName) {
     this.dbName = dbName;
   }
-
-  public int getCommitMode() {
-    return commitMode;
-  }
-
-  public void setCommitMode(int commitMode) {
-    this.commitMode = commitMode;
-  }
-
 
   public String getUdata() {
     return udata;

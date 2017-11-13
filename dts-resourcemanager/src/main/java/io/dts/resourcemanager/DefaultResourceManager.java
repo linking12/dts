@@ -13,13 +13,12 @@
  */
 package io.dts.resourcemanager;
 
-import java.util.HashMap;
+import java.sql.SQLException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.dts.common.api.DtsClientMessageSender;
-import io.dts.common.common.CommitMode;
 import io.dts.common.common.Constants;
 import io.dts.common.common.DtsContext;
 import io.dts.common.common.DtsXID;
@@ -27,59 +26,38 @@ import io.dts.common.exception.DtsException;
 import io.dts.common.protocol.RequestMessage;
 import io.dts.common.protocol.header.RegisterMessage;
 import io.dts.common.protocol.header.RegisterResultMessage;
+import io.dts.resourcemanager.logmanager.DtsLogManager;
 import io.dts.resourcemanager.network.DefaultDtsResourcMessageSender;
+import io.dts.resourcemanager.struct.ContextStep2;
 
 /**
  * @author liushiming
  * @version BaseResourceManager.java, v 0.0.1 2017年10月13日 下午2:28:51 liushiming
  */
-public abstract class BaseResourceManager implements ResourceManager {
-  private static final Logger logger = LoggerFactory.getLogger(BaseResourceManager.class);
+public class DefaultResourceManager implements ResourceManager {
+  private static final Logger logger = LoggerFactory.getLogger(DefaultResourceManager.class);
 
-  static private HashMap<String, ResourceManager> m_registry =
-      new HashMap<String, ResourceManager>();
+  private static ResourceManager resourceManager = new DefaultResourceManager();
 
   private final DtsClientMessageSender resourceMessageSender;
 
-  protected BaseResourceManager() {
+  private DefaultResourceManager() {
     DefaultDtsResourcMessageSender messageSender = DefaultDtsResourcMessageSender.getInstance();
     messageSender.registerResourceManager(this);
     this.resourceMessageSender = messageSender;
     messageSender.start();
   }
 
-  static public ResourceManager getInstance(String name) {
-    if (name == null) {
-      throw new DtsException("null ResourceManager class name");
-    }
-
-    if (m_registry.get(name) == null) {
-      try {
-        m_registry.put(name, (ResourceManager) Class.forName(name).newInstance());
-      } catch (Exception e) {
-        throw new DtsException("Error happened:" + name);
-      }
-    }
-    return (ResourceManager) (m_registry.get(name));
-  }
-
-  private int reportRetryTime = 5; // 分支汇报状态时，如果失败，则进行重试
-
-  public int getReportRetryTime() {
-    return reportRetryTime;
-  }
-
-  public void setReportRetryTime(int reportRetryTime) {
-    this.reportRetryTime = reportRetryTime;
+  public static ResourceManager newResourceManager() {
+    return resourceManager;
   }
 
 
   @Override
-  public long register(String key, CommitMode commitMode) throws DtsException {
+  public long register(String key) throws DtsException {
     if (DtsContext.inTxcTransaction()) {
       RegisterMessage registerMessage = new RegisterMessage();
       registerMessage.setKey(key);
-      registerMessage.setCommitMode(commitMode.getValue());
       registerMessage.setTranId(DtsXID.getTransactionId(DtsContext.getCurrentXid()));
       try {
         RegisterResultMessage resultMessage = (RegisterResultMessage) resourceMessageSender
@@ -98,6 +76,43 @@ public abstract class BaseResourceManager implements ResourceManager {
       }
     } else {
       throw new IllegalStateException("current thread is not bind to txc transaction.");
+    }
+  }
+
+  @Override
+  public void branchCommit(String xid, long branchId, String key, String udata, int commitMode,
+      String retrySql) throws DtsException {
+    try {
+      ContextStep2 context = new ContextStep2();
+      context.setXid(xid);
+      context.setBranchId(branchId);
+      context.setDbname(key);
+      context.setUdata(udata);
+      context.setRetrySql(retrySql);
+      context.setGlobalXid(DtsXID.getGlobalXID(xid, branchId));
+      DtsLogManager.getInstance().branchCommit(context);
+    } catch (DtsException e) {
+      throw e;
+    } catch (SQLException e) {
+      throw new DtsException(e);
+    }
+  }
+
+  @Override
+  public void branchRollback(String xid, long branchId, String key, String udata, int commitMode)
+      throws DtsException {
+    ContextStep2 context = new ContextStep2();
+    context.setXid(xid);
+    context.setBranchId(branchId);
+    context.setDbname(key);
+    context.setUdata(udata);
+    context.setGlobalXid(DtsXID.getGlobalXID(xid, branchId));
+    try {
+      DtsLogManager.getInstance().branchRollback(context);
+    } catch (DtsException e) {
+      throw e;
+    } catch (SQLException e) {
+      throw new DtsException(e);
     }
   }
 

@@ -10,7 +10,6 @@ import org.aopalliance.intercept.MethodInvocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.dts.client.aop.annotation.DtsModel;
 import io.dts.client.aop.annotation.DtsTransaction;
 import io.dts.client.template.TxcCallback;
 import io.dts.client.template.TxcTransactionTemplate;
@@ -30,23 +29,14 @@ public class TransactionDtsInterceptor implements MethodInterceptor {
 
   @Override
   public Object invoke(final MethodInvocation arg0) throws Throwable {
-    DtsTransaction txc = getTxcTransaction(arg0);
-    if (txc != NULL) {
-      if (txc.type() == DtsModel.RT) {
-        return template.runRT(new TxcCallback() {
-          @Override
-          public Object callback() throws Throwable {
-            return arg0.proceed();
-          }
-        }, txc.effectiveTime());
-      } else if (txc.type() == DtsModel.ATMT) {
-        return template.runATMT(new TxcCallback() {
-          @Override
-          public Object callback() throws Throwable {
-            return arg0.proceed();
-          }
-        }, txc.timeout());
-      }
+    DtsTransaction annotaion = getTxcTransaction(arg0);
+    if (annotaion != NULL) {
+      return template.run(new TxcCallback() {
+        @Override
+        public Object callback() throws Throwable {
+          return arg0.proceed();
+        }
+      }, annotaion.timeout());
     }
     return arg0.proceed();
   }
@@ -59,16 +49,6 @@ public class TransactionDtsInterceptor implements MethodInterceptor {
 
     @Override
     public int timeout() {
-      return 0;
-    }
-
-    @Override
-    public DtsModel type() {
-      return null;
-    }
-
-    @Override
-    public int effectiveTime() {
       return 0;
     }
   };

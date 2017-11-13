@@ -24,8 +24,6 @@ import io.dts.common.protocol.RequestMessage;
 import io.dts.common.protocol.ResponseCode;
 import io.dts.common.protocol.header.BeginMessage;
 import io.dts.common.protocol.header.BeginResultMessage;
-import io.dts.common.protocol.header.BeginRetryBranchMessage;
-import io.dts.common.protocol.header.BeginRetryBranchResultMessage;
 import io.dts.common.protocol.header.GlobalCommitMessage;
 import io.dts.common.protocol.header.GlobalCommitResultMessage;
 import io.dts.common.protocol.header.GlobalRollbackMessage;
@@ -108,14 +106,6 @@ public class DtsMessageProcessor implements NettyRequestProcessor {
         responseHeader = response.readCustomHeader();
         createMessageHandler().handleMessage(clientIp, (RegisterMessage) dtsMessage,
             (RegisterResultMessage) responseHeader);
-        response.setCode(ResponseCode.SUCCESS);
-        return response;
-      } else if (dtsMessage instanceof BeginRetryBranchMessage) {
-        // 可重试事务分支处理
-        response = RemotingCommand.createResponseCommand(BeginRetryBranchResultMessage.class);
-        responseHeader = response.readCustomHeader();
-        createMessageHandler().handleMessage(clientIp, (BeginRetryBranchMessage) dtsMessage,
-            (BeginRetryBranchResultMessage) responseHeader);
         response.setCode(ResponseCode.SUCCESS);
         return response;
       }

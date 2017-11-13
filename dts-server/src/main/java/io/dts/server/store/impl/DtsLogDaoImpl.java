@@ -22,7 +22,6 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import io.dts.common.common.CommitMode;
 import io.dts.common.util.BlobUtil;
 import io.dts.server.config.AppConfig;
 import io.dts.server.store.DtsLogDao;
@@ -100,20 +99,12 @@ public class DtsLogDaoImpl implements DtsLogDao {
 
   @Override
   public void insertBranchLog(BranchLog branchLog, int mid) {
-    if (branchLog.getCommitMode() == CommitMode.COMMIT_RETRY_MODE.getValue()) {
-      insertRtBranchLog(branchLog, mid);
-    } else {
-      insertBranchLog0(branchLog, mid);
-    }
-  }
-
-  private void insertBranchLog0(final BranchLog branchLog, final int mid) {
     PreparedStatementCreator psc = new PreparedStatementCreator() {
       @Override
       public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
         PreparedStatement ps = con.prepareStatement(
-            "insert into dts_branch_log (tx_id,state,client_ip,client_app_name,client_info,gmt_created,gmt_modified,commit_mode,udata,mid)"
-                + " values (?,?,?,?,?, now(),now(),?,?,?)",
+            "insert into dts_branch_log (tx_id,state,client_ip,client_app_name,client_info,gmt_created,gmt_modified,udata,mid)"
+                + " values (?,?,?,?,?, now(),now(),?,?)",
             Statement.RETURN_GENERATED_KEYS);
 
         ps.setLong(1, branchLog.getTransId());
@@ -121,9 +112,8 @@ public class DtsLogDaoImpl implements DtsLogDao {
         ps.setString(3, branchLog.getClientIp());
         ps.setString(4, branchLog.getClientAppName());
         ps.setString(5, branchLog.getClientInfo());
-        ps.setInt(6, branchLog.getCommitMode());
-        ps.setString(7, branchLog.getUdata());
-        ps.setInt(8, mid);
+        ps.setString(6, branchLog.getUdata());
+        ps.setInt(7, mid);
         return ps;
       }
     };
@@ -132,42 +122,11 @@ public class DtsLogDaoImpl implements DtsLogDao {
     jdbcTemplate.update(psc, keyHolder);
     long branchId = keyHolder.getKey().longValue();
     branchLog.setBranchId(branchId);
-    if (branchLog.getCommitMode() == CommitMode.COMMIT_RETRY_MODE.getValue()) {
-      branchLog.setGmtCreated(Calendar.getInstance().getTime());
-      branchLog.setGmtModified(Calendar.getInstance().getTime());
-    }
+    branchLog.setGmtCreated(Calendar.getInstance().getTime());
+    branchLog.setGmtModified(Calendar.getInstance().getTime());
   }
 
-  private void insertRtBranchLog(final BranchLog rtBranchLog, final int mid) {
-    transactionTemplate.execute(new TransactionCallbackWithoutResult() {
-      @Override
-      protected void doInTransactionWithoutResult(TransactionStatus status) {
-        try {
-          logger.info(
-              "insertRtBranchLog:" + rtBranchLog.getBranchId() + ":" + rtBranchLog.getRetrySql());
 
-          insertBranchLog0(rtBranchLog, mid);
-          jdbcTemplate.update(new PreparedStatementCreator() {
-            @Override
-            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-              PreparedStatement ps = con.prepareStatement(
-                  "insert into dts_rt_sql (tx_id,branch_id,rt_sql,mid,gmt_created,gmt_modified)"
-                      + " values (?,?,?,?,now(),now())");
-
-              ps.setLong(1, rtBranchLog.getTransId());
-              ps.setLong(2, rtBranchLog.getBranchId());
-              ps.setBlob(3, BlobUtil.string2blob(rtBranchLog.getRetrySql()));
-              ps.setInt(4, mid);
-              return ps;
-            }
-          });
-        } catch (DataAccessException ex) {
-          status.setRollbackOnly();
-          throw ex;
-        }
-      }
-    });
-  }
 
   @Override
   public void updateBranchLog(BranchLog branchLog, int mid) {
@@ -212,7 +171,6 @@ public class DtsLogDaoImpl implements DtsLogDao {
     log.setClientIp(rs.getString("client_ip"));
     log.setClientAppName(rs.getString("client_app_name"));
     log.setClientInfo(rs.getString("client_info"));
-    log.setCommitMode(rs.getInt("commit_mode"));
     log.setUdata(rs.getString("udata"));
     log.setGmtCreated(rs.getTimestamp("gmt_created"));
     log.setGmtModified(rs.getTimestamp("gmt_modified"));

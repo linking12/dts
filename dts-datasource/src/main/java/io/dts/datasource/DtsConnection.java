@@ -6,7 +6,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import io.dts.common.common.CommitMode;
 import io.dts.common.common.DtsContext;
 import io.dts.common.common.DtsXID;
 import io.dts.datasource.wrapper.DtsPrepareStatementWrapper;
@@ -65,8 +64,7 @@ public class DtsConnection extends AbstractDtsConnection {
     if (getAutoCommit() == true) {
       throw new SQLException("should set autocommit false first.");
     }
-    long branchId = dtsDataSource.getResourceManager().register(dtsDataSource.getDbName(),
-        CommitMode.COMMIT_IN_PHASE1);
+    long branchId = dtsDataSource.getResourceManager().register(dtsDataSource.getDbName());
     txcContext = new TxcRuntimeContext();
     txcContext.setBranchId(branchId);
     txcContext.setXid(DtsContext.getCurrentXid());
