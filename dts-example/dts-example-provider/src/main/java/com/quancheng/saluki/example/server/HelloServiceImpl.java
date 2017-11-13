@@ -29,10 +29,10 @@ public class HelloServiceImpl implements HelloService {
 
   @Override
   public HelloReply dtsException(HelloRequest hellorequest) {
-    // throw new RuntimeException("rollback");
-    HelloReply reply = new HelloReply();
-    reply.setMessage("none");
-    return reply;
+    throw new RuntimeException("rollback");
+    // HelloReply reply = new HelloReply();
+    // reply.setMessage("none");
+    // return reply;
   }
 
 
