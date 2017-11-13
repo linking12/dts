@@ -27,7 +27,7 @@ import io.dts.resourcemanager.struct.ContextStep2;
 public class AtResourceManager extends BaseResourceManager {
 
   @Override
-  public String branchCommit(String xid, long branchId, String key, String udata, int commitMode,
+  public void branchCommit(String xid, long branchId, String key, String udata, int commitMode,
       String retrySql) throws DtsException {
     try {
       ContextStep2 context = new ContextStep2();
@@ -38,7 +38,6 @@ public class AtResourceManager extends BaseResourceManager {
       context.setRetrySql(retrySql);
       context.setGlobalXid(DtsXID.getGlobalXID(xid, branchId));
       DtsLogManager.getInstance().branchCommit(context);
-      return context.getReportSql();
     } catch (DtsException e) {
       throw e;
     } catch (SQLException e) {
@@ -47,7 +46,7 @@ public class AtResourceManager extends BaseResourceManager {
   }
 
   @Override
-  public String branchRollback(String xid, long branchId, String key, String udata, int commitMode)
+  public void branchRollback(String xid, long branchId, String key, String udata, int commitMode)
       throws DtsException {
     ContextStep2 context = new ContextStep2();
     context.setXid(xid);
@@ -57,7 +56,6 @@ public class AtResourceManager extends BaseResourceManager {
     context.setGlobalXid(DtsXID.getGlobalXID(xid, branchId));
     try {
       DtsLogManager.getInstance().branchRollback(context);
-      return context.getReportSql();
     } catch (DtsException e) {
       throw e;
     } catch (SQLException e) {

@@ -103,7 +103,6 @@ public interface SyncRmMessagHandler {
         } else if (message.getResult() == ResultCode.ERROR.getValue()) {
           BranchLog branchLog = dtsTransStatusDao.removeBranchLog(branchId);
           if (branchLog != null) {
-            branchLog.setReportSql(message.getReportSql());
             dtsLogDao.insertBranchErrorLog(branchLog, DtsServerContainer.mid);
             dtsLogDao.deleteBranchLog(branchLog, DtsServerContainer.mid);
             logger.error("Logic error occurs while rollback branch:" + message.getBranchId()

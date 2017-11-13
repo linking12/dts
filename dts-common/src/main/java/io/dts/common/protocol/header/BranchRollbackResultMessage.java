@@ -35,10 +35,6 @@ public class BranchRollbackResultMessage implements CommandCustomHeader, Respons
   private long branchId;
 
   /**
-   * 回滚执行sql
-   */
-  private String reportSql;
-  /**
    * 回滚结果
    */
   @CFNotNull
@@ -66,16 +62,6 @@ public class BranchRollbackResultMessage implements CommandCustomHeader, Respons
 
   public void setResult(int result) {
     this.result = result;
-  }
-
-
-
-  public String getReportSql() {
-    return reportSql;
-  }
-
-  public void setReportSql(String reportSql) {
-    this.reportSql = reportSql;
   }
 
   @Override

@@ -24,10 +24,10 @@ public interface ResourceManager {
 
   public long register(String key, CommitMode commitMode) throws DtsException;
 
-  public String branchCommit(String xid, long branchId, String key, String udata, int commitMode,
+  public void branchCommit(String xid, long branchId, String key, String udata, int commitMode,
       String retrySql) throws DtsException;
 
-  public String branchRollback(String xid, long branchId, String key, String udata, int commitMode)
+  public void branchRollback(String xid, long branchId, String key, String udata, int commitMode)
       throws DtsException;
 
 }

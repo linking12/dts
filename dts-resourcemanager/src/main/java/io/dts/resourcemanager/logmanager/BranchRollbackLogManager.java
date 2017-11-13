@@ -22,7 +22,6 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -105,7 +104,6 @@ public class BranchRollbackLogManager extends DtsLogManagerImpl {
           }
           logger.info(String.format("[logid:%d:xid:%s:branch:%d]", undolog.getId(),
               undolog.getXid(), undolog.getBranchId()));
-          StringBuilder rollbackSqlsSB = new StringBuilder();
           for (int i = undolog.getInfor().size(); i > 0; i--) {
             RollbackInfor info = undolog.getInfor().get(i - 1);
             // 检查脏写
@@ -115,10 +113,8 @@ public class BranchRollbackLogManager extends DtsLogManagerImpl {
             if (!CollectionUtils.isEmpty(rollbackSqls)) {
               String[] rollbackSqlArray = rollbackSqls.toArray(new String[rollbackSqls.size()]);
               template.batchUpdate(rollbackSqlArray);
-              rollbackSqlsSB.append(StringUtils.join(rollbackSqlArray, ";"));
             }
           }
-          context.setReportSql(rollbackSqlsSB.toString());
           // 删除undolog
           String deleteSql = getDeleteUndoLogSql(Arrays.asList(context));
           logger.info("delete undo log sql" + deleteSql);
