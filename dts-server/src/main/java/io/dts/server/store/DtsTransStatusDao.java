@@ -16,6 +16,7 @@ package io.dts.server.store;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
+import io.dts.server.handler.support.ClientMessageHandler;
 import io.dts.server.struct.BranchLog;
 import io.dts.server.struct.GlobalLog;
 
@@ -25,28 +26,21 @@ import io.dts.server.struct.GlobalLog;
  */
 public interface DtsTransStatusDao {
 
-  public void insertGlobalLog(Long transId, GlobalLog globalLog);
+  public void saveGlobalLog(Long tranId, GlobalLog globalLog, long liveTime);
 
   public GlobalLog queryGlobalLog(Long transId);
 
-  public void clearGlobalLog(Long transId);
+  public GlobalLog removeGlobalLog(Long transId);
 
-  public void insertBranchLog(Long branchId, BranchLog branchLog);
+  public void saveBranchLog(Long branchId, BranchLog branchLog);
 
   public BranchLog queryBranchLog(Long branchId);
 
-
-  public BranchLog clearBranchLog(Long branchId);
+  public BranchLog removeBranchLog(Long branchId);
 
   public List<BranchLog> queryBranchLogByTransId(long tranId);
 
-  public boolean queryTimeOut(Long transId);
-
-  public boolean removeTimeOut(Long transId);
-
-  public GlobalLog getRetryGlobalLog();
-
-  public void setRetryGlobalLog(GlobalLog retryGlobalLog);
+  public void setClientMessageHandler(ClientMessageHandler handler);
 
   static final AtomicLong txcid = new AtomicLong(1000);
 

@@ -14,15 +14,19 @@
 package io.dts.server.store.impl;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.DelayQueue;
+import java.util.concurrent.Delayed;
+import java.util.concurrent.TimeUnit;
+
+import javax.annotation.PostConstruct;
 
 import org.springframework.stereotype.Repository;
 
-import com.google.common.collect.Lists;
-
+import io.dts.common.protocol.header.GlobalRollbackMessage;
+import io.dts.server.handler.support.ClientMessageHandler;
 import io.dts.server.store.DtsTransStatusDao;
 import io.dts.server.struct.BranchLog;
 import io.dts.server.struct.GlobalLog;
@@ -38,40 +42,68 @@ public class DtsTransStatusDaoImpl implements DtsTransStatusDao {
    */
   private static final ConcurrentHashMap<Long, GlobalLog> activeTranMap =
       new ConcurrentHashMap<Long, GlobalLog>();
+  private final DelayQueue<DelayedItem<Long>> queue = new DelayQueue<DelayedItem<Long>>();
+  private ClientMessageHandler handler;
   /**
    * 当前活动的所有事务分支
    */
   private static final ConcurrentHashMap<Long, BranchLog> activeTranBranchMap =
       new ConcurrentHashMap<Long, BranchLog>();
 
-  /**
-   * 超时的事务列表
-   */
-  private static final List<Long> timeoutTranList =
-      Collections.synchronizedList(Lists.newArrayList());
-
-  /**
-   * 对于可重试分支，没有必要建立多个事务，这些分支对应同一个global log即可
-   */
-  private GlobalLog retryGlobalLog = null;
-
-  @Override
-  public void insertGlobalLog(Long tranId, GlobalLog globalLog) {
-    activeTranMap.put(tranId, globalLog);
+  @PostConstruct
+  public void init() {
+    Thread t = new Thread() {
+      @Override
+      public void run() {
+        while (true) {
+          DelayedItem<Long> delayedItem = queue.poll();
+          if (delayedItem != null) {
+            Long transId = delayedItem.getT();
+            activeTranMap.remove(transId);
+            if (handler != null) {
+              GlobalRollbackMessage rollback = new GlobalRollbackMessage();
+              rollback.setTranId(transId);
+              handler.processMessage(rollback);
+            }
+          }
+          try {
+            Thread.sleep(300);
+          } catch (Exception e) {
+          }
+        }
+      }
+    };
+    t.setDaemon(true);
+    t.start();
   }
 
   @Override
-  public void clearGlobalLog(Long transId) {
-    activeTranMap.remove(transId);
+  public void setClientMessageHandler(ClientMessageHandler handler) {
+    this.handler = handler;
   }
 
   @Override
-  public void insertBranchLog(Long branchId, BranchLog branchLog) {
+  public void saveGlobalLog(Long tranId, GlobalLog globalLog, long liveTime) {
+    GlobalLog v2 = activeTranMap.put(tranId, globalLog);
+    DelayedItem<Long> tmpItem = new DelayedItem<Long>(tranId, liveTime);
+    if (v2 != null) {
+      queue.remove(tmpItem);
+    }
+    queue.put(tmpItem);
+  }
+
+  @Override
+  public GlobalLog removeGlobalLog(Long transId) {
+    return activeTranMap.remove(transId);
+  }
+
+  @Override
+  public void saveBranchLog(Long branchId, BranchLog branchLog) {
     activeTranBranchMap.put(branchId, branchLog);
   }
 
   @Override
-  public BranchLog clearBranchLog(Long branchId) {
+  public BranchLog removeBranchLog(Long branchId) {
     return activeTranBranchMap.remove(branchId);
   }
 
@@ -102,25 +134,67 @@ public class DtsTransStatusDaoImpl implements DtsTransStatusDao {
     return branchLogs;
   }
 
-  @Override
-  public boolean queryTimeOut(Long transId) {
-    return timeoutTranList.contains(transId);
+  private static class DelayedItem<T> implements Delayed {
+
+    private T t;
+    private long liveTime;
+    private long removeTime;
+
+    public DelayedItem(T t, long liveTime) {
+      this.setT(t);
+      this.liveTime = liveTime;
+      this.removeTime =
+          TimeUnit.NANOSECONDS.convert(liveTime, TimeUnit.NANOSECONDS) + System.nanoTime();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public int compareTo(Delayed o) {
+      if (o == null)
+        return 1;
+      if (o == this)
+        return 0;
+      if (o instanceof DelayedItem) {
+        DelayedItem<T> tmpDelayedItem = (DelayedItem<T>) o;
+        if (liveTime > tmpDelayedItem.liveTime) {
+          return 1;
+        } else if (liveTime == tmpDelayedItem.liveTime) {
+          return 0;
+        } else {
+          return -1;
+        }
+      }
+      long diff = getDelay(TimeUnit.NANOSECONDS) - o.getDelay(TimeUnit.NANOSECONDS);
+      return diff > 0 ? 1 : diff == 0 ? 0 : -1;
+    }
+
+    @Override
+    public long getDelay(TimeUnit unit) {
+      return unit.convert(removeTime - System.nanoTime(), unit);
+    }
+
+    public T getT() {
+      return t;
+    }
+
+    public void setT(T t) {
+      this.t = t;
+    }
+
+    @Override
+    public int hashCode() {
+      return t.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object object) {
+      if (object instanceof DelayedItem) {
+        return object.hashCode() == hashCode() ? true : false;
+      }
+      return false;
+    }
+
   }
 
-  @Override
-  public boolean removeTimeOut(Long transId) {
-    timeoutTranList.remove(transId);
-    return true;
-  }
-
-  @Override
-  public GlobalLog getRetryGlobalLog() {
-    return retryGlobalLog;
-  }
-
-  @Override
-  public void setRetryGlobalLog(GlobalLog retryGlobalLog) {
-    this.retryGlobalLog = retryGlobalLog;
-  }
 
 }

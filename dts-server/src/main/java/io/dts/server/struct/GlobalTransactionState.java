@@ -22,19 +22,9 @@ public enum GlobalTransactionState {
   Rollbacked(3),
 
   /**
-   * 提交中
+   * 未知状态，已发送请求，但是未返回成功结果，同步未返回成功结果
    */
-  Committing(4),
-
-  /**
-   * 回滚中
-   */
-  Rollbacking(5),
-
-  /**
-   * Commit未决状态（同步到slave失败）
-   */
-  CommitHeuristic(6);
+  InDoubt(4);
 
   /**
    * @param value

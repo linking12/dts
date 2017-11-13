@@ -62,6 +62,7 @@ public class DefaultDtsServerMessageHandler implements DtsServerMessageHandler {
   public void init() {
     clientHandler = ClientMessageHandler.createClientMessageProcessor(dtsTransStatusDao, dtsLogDao,
         serverMessageServer);
+    dtsTransStatusDao.setClientMessageHandler(clientHandler);
     resourceHandler =
         RmMessageHandler.createResourceManagerMessageProcessor(dtsTransStatusDao, dtsLogDao);
   }
@@ -84,7 +85,7 @@ public class DefaultDtsServerMessageHandler implements DtsServerMessageHandler {
   public void handleMessage(String clientIp, GlobalCommitMessage message,
       GlobalCommitResultMessage resultMessage) {
     resultMessage.setTranId(message.getTranId());
-    clientHandler.processMessage(message, clientIp);
+    clientHandler.processMessage(message);
     return;
   }
 
@@ -96,7 +97,7 @@ public class DefaultDtsServerMessageHandler implements DtsServerMessageHandler {
   public void handleMessage(String clientIp, GlobalRollbackMessage message,
       GlobalRollbackResultMessage resultMessage) {
     resultMessage.setTranId(message.getTranId());
-    clientHandler.processMessage(message, clientIp);
+    clientHandler.processMessage(message);
     return;
   }
 

@@ -13,13 +13,10 @@
  */
 package io.dts.server.handler.support;
 
-import java.util.Calendar;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.dts.common.common.CommitMode;
-import io.dts.common.common.DtsXID;
 import io.dts.common.exception.DtsException;
 import io.dts.common.protocol.header.BeginRetryBranchMessage;
 import io.dts.common.protocol.header.BeginRetryBranchResultMessage;
@@ -80,59 +77,58 @@ public interface RmMessageHandler {
           throw new DtsException("insert branch log failed");
         }
         Long branchId = branchLog.getBranchId();
-        dtsTransStatusDao.insertBranchLog(branchId, branchLog);
+        dtsTransStatusDao.saveBranchLog(branchId, branchLog);
         globalLog.getBranchIds().add(branchId);
-        dtsTransStatusDao.insertGlobalLog(tranId, globalLog);
         return branchId;
       }
 
       @Override
       public void processMessage(BeginRetryBranchMessage beginRetryBranchMessage,
           BeginRetryBranchResultMessage resultMessage, String clientIp) {
-        GlobalLog retryGlobalLog = dtsTransStatusDao.getRetryGlobalLog();
-        if (retryGlobalLog == null) {
-          retryGlobalLog = new GlobalLog();
-          retryGlobalLog.setState(GlobalTransactionState.Committing.getValue());
-          // if (this.clusterWorker != null) {
-          retryGlobalLog.setTransId(dtsTransStatusDao.generateGlobalId());
-          retryGlobalLog.setGmtCreated(Calendar.getInstance().getTime());
-          retryGlobalLog.setGmtModified(retryGlobalLog.getGmtCreated());
-          retryGlobalLog.setRecvTime(System.currentTimeMillis());
-          // }
-          try {
-            dtsLogDao.insertGlobalLog(retryGlobalLog, DtsServerContainer.mid);
-          } catch (Exception e) {
-            throw new DtsException("insert global retry log failed");
-          }
-          retryGlobalLog.setTimeout(0);
-          retryGlobalLog.setContainPhase2CommitBranch(false);
-          dtsTransStatusDao.insertGlobalLog(retryGlobalLog.getTransId(), retryGlobalLog);
-          dtsTransStatusDao.setRetryGlobalLog(retryGlobalLog);
-        }
-        long tranId = retryGlobalLog.getTransId();
-        String xid = DtsXID.generateXID(tranId);
-        resultMessage.setXid(xid);
-        BranchLog branchLog = new BranchLog();
-        branchLog.setTransId(tranId);
-        branchLog.setWaitPeriods(0);
-        branchLog.setClientInfo(beginRetryBranchMessage.getDbName());
-        branchLog.setClientIp(clientIp);
-        branchLog.setState(BranchLogState.Success.getValue());
-        branchLog.setCommitMode(CommitMode.COMMIT_RETRY_MODE.getValue());
-        branchLog.setUdata(Long.toString(beginRetryBranchMessage.getEffectiveTime()));
-        branchLog.setRetrySql(beginRetryBranchMessage.getSql());
-        branchLog.setBranchId(dtsTransStatusDao.generateBranchId());
-        branchLog.setGmtCreated(Calendar.getInstance().getTime());
-        branchLog.setGmtModified(branchLog.getGmtCreated());
-        branchLog.setRecvTime(System.currentTimeMillis());
-        try {
-          dtsLogDao.insertBranchLog(branchLog, DtsServerContainer.mid);
-        } catch (Exception e) {
-          throw new DtsException("insert branch retry log failed");
-        }
-        dtsTransStatusDao.insertBranchLog(branchLog.getBranchId(), branchLog);
-        retryGlobalLog.getBranchIds().add(branchLog.getBranchId());
-        resultMessage.setBranchId(branchLog.getBranchId());
+        // GlobalLog retryGlobalLog = dtsTransStatusDao.getRetryGlobalLog();
+        // if (retryGlobalLog == null) {
+        // retryGlobalLog = new GlobalLog();
+        // retryGlobalLog.setState(GlobalTransactionState.Committing.getValue());
+        // // if (this.clusterWorker != null) {
+        // retryGlobalLog.setTransId(dtsTransStatusDao.generateGlobalId());
+        // retryGlobalLog.setGmtCreated(Calendar.getInstance().getTime());
+        // retryGlobalLog.setGmtModified(retryGlobalLog.getGmtCreated());
+        // retryGlobalLog.setRecvTime(System.currentTimeMillis());
+        // // }
+        // try {
+        // dtsLogDao.insertGlobalLog(retryGlobalLog, DtsServerContainer.mid);
+        // } catch (Exception e) {
+        // throw new DtsException("insert global retry log failed");
+        // }
+        // retryGlobalLog.setTimeout(0);
+        // retryGlobalLog.setContainPhase2CommitBranch(false);
+        // dtsTransStatusDao.insertGlobalLog(retryGlobalLog.getTransId(), retryGlobalLog);
+        // dtsTransStatusDao.setRetryGlobalLog(retryGlobalLog);
+        // }
+        // long tranId = retryGlobalLog.getTransId();
+        // String xid = DtsXID.generateXID(tranId);
+        // resultMessage.setXid(xid);
+        // BranchLog branchLog = new BranchLog();
+        // branchLog.setTransId(tranId);
+        // branchLog.setWaitPeriods(0);
+        // branchLog.setClientInfo(beginRetryBranchMessage.getDbName());
+        // branchLog.setClientIp(clientIp);
+        // branchLog.setState(BranchLogState.Success.getValue());
+        // branchLog.setCommitMode(CommitMode.COMMIT_RETRY_MODE.getValue());
+        // branchLog.setUdata(Long.toString(beginRetryBranchMessage.getEffectiveTime()));
+        // branchLog.setRetrySql(beginRetryBranchMessage.getSql());
+        // branchLog.setBranchId(dtsTransStatusDao.generateBranchId());
+        // branchLog.setGmtCreated(Calendar.getInstance().getTime());
+        // branchLog.setGmtModified(branchLog.getGmtCreated());
+        // branchLog.setRecvTime(System.currentTimeMillis());
+        // try {
+        // dtsLogDao.insertBranchLog(branchLog, DtsServerContainer.mid);
+        // } catch (Exception e) {
+        // throw new DtsException("insert branch retry log failed");
+        // }
+        // dtsTransStatusDao.saveBranchLog(branchLog.getBranchId(), branchLog);
+        // retryGlobalLog.getBranchIds().add(branchLog.getBranchId());
+        // resultMessage.setBranchId(branchLog.getBranchId());
       }
 
 

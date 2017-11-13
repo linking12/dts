@@ -48,7 +48,7 @@ public interface SyncRmMessagHandler {
         Long tranId = message.getTranId();
         Long branchId = message.getBranchId();
         if (message.getResult() == ResultCode.OK.getValue()) {
-          BranchLog branchLog = dtsTransStatusDao.clearBranchLog(branchId);
+          BranchLog branchLog = dtsTransStatusDao.removeBranchLog(branchId);
           if (branchLog != null) {
             dtsLogDao.deleteBranchLog(branchLog, DtsServerContainer.mid);
           }
@@ -57,13 +57,13 @@ public interface SyncRmMessagHandler {
             globalLog.getBranchIds().remove(branchId);
             int leftBranches = globalLog.getLeftBranches();
             if (leftBranches == 0) {
-              dtsTransStatusDao.clearGlobalLog(tranId);
+              dtsTransStatusDao.removeGlobalLog(tranId);
               dtsLogDao.deleteGlobalLog(tranId, DtsServerContainer.mid);
             }
           }
 
         } else if (message.getResult() == ResultCode.ERROR.getValue()) {
-          BranchLog branchLog = dtsTransStatusDao.clearBranchLog(branchId);
+          BranchLog branchLog = dtsTransStatusDao.removeBranchLog(branchId);
           if (branchLog != null) {
             dtsLogDao.insertBranchErrorLog(branchLog, DtsServerContainer.mid);
             dtsLogDao.deleteBranchLog(branchLog, 1);
@@ -75,7 +75,7 @@ public interface SyncRmMessagHandler {
             globalLog.getBranchIds().remove(branchId);
             int leftBranches = globalLog.getLeftBranches();
             if (leftBranches == 0) {
-              dtsTransStatusDao.clearGlobalLog(tranId);
+              dtsTransStatusDao.removeGlobalLog(tranId);
               dtsLogDao.deleteGlobalLog(tranId, 1);
 
             }
@@ -88,7 +88,7 @@ public interface SyncRmMessagHandler {
         Long tranId = message.getTranId();
         Long branchId = message.getBranchId();
         if (message.getResult() == ResultCode.OK.getValue()) {
-          BranchLog branchLog = dtsTransStatusDao.clearBranchLog(branchId);
+          BranchLog branchLog = dtsTransStatusDao.removeBranchLog(branchId);
           if (branchLog != null) {
             dtsLogDao.deleteBranchLog(branchLog, DtsServerContainer.mid);
           }
@@ -97,12 +97,12 @@ public interface SyncRmMessagHandler {
             globalLog.getBranchIds().remove(branchId);
             int leftBranches = globalLog.getLeftBranches();
             if (leftBranches == 0) {
-              dtsTransStatusDao.clearGlobalLog(tranId);
+              dtsTransStatusDao.removeGlobalLog(tranId);
               dtsLogDao.deleteGlobalLog(tranId, DtsServerContainer.mid);
             }
           }
         } else if (message.getResult() == ResultCode.ERROR.getValue()) {
-          BranchLog branchLog = dtsTransStatusDao.clearBranchLog(branchId);
+          BranchLog branchLog = dtsTransStatusDao.removeBranchLog(branchId);
           if (branchLog != null) {
             branchLog.setReportSql(message.getReportSql());
             dtsLogDao.insertBranchErrorLog(branchLog, DtsServerContainer.mid);
@@ -115,7 +115,7 @@ public interface SyncRmMessagHandler {
             globalLog.getBranchIds().remove(branchId);
             int leftBranches = globalLog.getLeftBranches();
             if (leftBranches == 0) {
-              dtsTransStatusDao.clearGlobalLog(tranId);
+              dtsTransStatusDao.removeGlobalLog(tranId);
               dtsLogDao.deleteGlobalLog(tranId, 1);
             }
           }
