@@ -1,5 +1,5 @@
-package io.dts.common.common;
+package io.dts.remoting;
 
-public class Constants {
+public interface RemoteConstant {
   public static final long RPC_INVOKE_TIMEOUT = 30 * 1000;
 }

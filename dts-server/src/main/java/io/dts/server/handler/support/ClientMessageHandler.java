@@ -19,7 +19,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.dts.common.api.DtsServerMessageSender;
-import io.dts.common.common.Constants;
 import io.dts.common.common.DtsXID;
 import io.dts.common.exception.DtsException;
 import io.dts.common.protocol.header.BeginMessage;
@@ -29,6 +28,7 @@ import io.dts.common.protocol.header.BranchRollBackMessage;
 import io.dts.common.protocol.header.BranchRollbackResultMessage;
 import io.dts.common.protocol.header.GlobalCommitMessage;
 import io.dts.common.protocol.header.GlobalRollbackMessage;
+import io.dts.remoting.RemoteConstant;
 import io.dts.server.network.DtsServerContainer;
 import io.dts.server.store.DtsLogDao;
 import io.dts.server.store.DtsTransStatusDao;
@@ -154,7 +154,7 @@ public interface ClientMessageHandler {
           BranchCommitResultMessage branchCommitResult = null;
           try {
             branchCommitResult = serverMessageServer.invokeSync(clientAddress, branchCommitMessage,
-                Constants.RPC_INVOKE_TIMEOUT);
+                RemoteConstant.RPC_INVOKE_TIMEOUT);
           } catch (DtsException e) {
             dtsLogDao.insertBranchErrorLog(branchLog, DtsServerContainer.mid);
             logger.error(
@@ -181,7 +181,7 @@ public interface ClientMessageHandler {
           BranchRollbackResultMessage branchRollbackResult = null;
           try {
             branchRollbackResult = serverMessageServer.invokeSync(clientAddress,
-                branchRollbackMessage, Constants.RPC_INVOKE_TIMEOUT);
+                branchRollbackMessage, RemoteConstant.RPC_INVOKE_TIMEOUT);
           } catch (DtsException e) {
             dtsLogDao.insertBranchErrorLog(branchLog, DtsServerContainer.mid);
             logger.error(

@@ -19,13 +19,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.dts.common.api.DtsClientMessageSender;
-import io.dts.common.common.Constants;
 import io.dts.common.common.DtsContext;
 import io.dts.common.common.DtsXID;
 import io.dts.common.exception.DtsException;
 import io.dts.common.protocol.RequestMessage;
 import io.dts.common.protocol.header.RegisterMessage;
 import io.dts.common.protocol.header.RegisterResultMessage;
+import io.dts.remoting.RemoteConstant;
 import io.dts.resourcemanager.logmanager.DtsLogManager;
 import io.dts.resourcemanager.network.DefaultDtsResourcMessageSender;
 import io.dts.resourcemanager.struct.ContextStep2;
@@ -61,7 +61,7 @@ public class DefaultResourceManager implements ResourceManager {
       registerMessage.setTranId(DtsXID.getTransactionId(DtsContext.getCurrentXid()));
       try {
         RegisterResultMessage resultMessage = (RegisterResultMessage) resourceMessageSender
-            .invoke(registerMessage, Constants.RPC_INVOKE_TIMEOUT);
+            .invoke(registerMessage, RemoteConstant.RPC_INVOKE_TIMEOUT);
         if (logger.isDebugEnabled())
           logger.debug(registerMessage.toString());
         if (resultMessage == null) {
@@ -116,6 +116,6 @@ public class DefaultResourceManager implements ResourceManager {
   }
 
   protected <T> T invoke(RequestMessage msg) throws DtsException {
-    return resourceMessageSender.invoke(msg, Constants.RPC_INVOKE_TIMEOUT);
+    return resourceMessageSender.invoke(msg, RemoteConstant.RPC_INVOKE_TIMEOUT);
   }
 }

@@ -7,7 +7,6 @@ import io.dts.client.aop.TransactionDtsInterceptor;
 import io.dts.client.api.DtsTransactionManager;
 import io.dts.common.common.DtsContext;
 import io.dts.common.api.DtsClientMessageSender;
-import io.dts.common.common.Constants;
 import io.dts.common.common.DtsXID;
 import io.dts.common.exception.DtsException;
 import io.dts.common.protocol.header.BeginMessage;
@@ -16,6 +15,7 @@ import io.dts.common.protocol.header.GlobalCommitMessage;
 import io.dts.common.protocol.header.GlobalCommitResultMessage;
 import io.dts.common.protocol.header.GlobalRollbackMessage;
 import io.dts.common.protocol.header.GlobalRollbackResultMessage;
+import io.dts.remoting.RemoteConstant;
 
 /**
  * Created by guoyubo on 2017/8/24.
@@ -45,7 +45,7 @@ public class DefaultDtsTransactionManager implements DtsTransactionManager {
     beginMessage.setTimeout(timeout);
     try {
       BeginResultMessage beginResultMessage =
-          dtsClient.invoke(beginMessage, Constants.RPC_INVOKE_TIMEOUT);
+          dtsClient.invoke(beginMessage, RemoteConstant.RPC_INVOKE_TIMEOUT);
       String transId = beginResultMessage.getXid();
       DtsContext.bind(transId, beginResultMessage.getNextSvrAddr());
     } catch (Throwable th) {
@@ -75,7 +75,7 @@ public class DefaultDtsTransactionManager implements DtsTransactionManager {
       do {
         try {
           resultMessage = (GlobalCommitResultMessage) dtsClient.invoke(commitMessage,
-              Constants.RPC_INVOKE_TIMEOUT);
+              RemoteConstant.RPC_INVOKE_TIMEOUT);
           Thread.sleep(3000);
         } catch (Exception e) {
           ex = e;
@@ -123,7 +123,7 @@ public class DefaultDtsTransactionManager implements DtsTransactionManager {
       do {
         try {
           resultMessage = (GlobalRollbackResultMessage) dtsClient.invoke(rollbackMessage,
-              Constants.RPC_INVOKE_TIMEOUT);
+              RemoteConstant.RPC_INVOKE_TIMEOUT);
           Thread.sleep(3000);
         } catch (Exception e) {
           ex = e;

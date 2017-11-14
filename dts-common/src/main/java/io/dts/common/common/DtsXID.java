@@ -63,7 +63,6 @@ public class DtsXID {
     if (xid == null) {
       return null;
     }
-
     int idx = xid.lastIndexOf(":");
     return xid.substring(0, idx);
   }

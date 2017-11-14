@@ -12,12 +12,12 @@ import com.google.common.collect.Queues;
 
 import io.dts.common.api.DtsClientMessageSender;
 import io.dts.common.common.AbstractLifecycleComponent;
-import io.dts.common.common.Constants;
 import io.dts.common.exception.DtsException;
 import io.dts.common.protocol.RequestCode;
 import io.dts.common.protocol.RequestMessage;
 import io.dts.common.protocol.heatbeat.HeartbeatRequestHeader;
 import io.dts.common.util.ThreadFactoryImpl;
+import io.dts.remoting.RemoteConstant;
 import io.dts.remoting.RemotingClient;
 import io.dts.remoting.exception.RemotingCommandException;
 import io.dts.remoting.exception.RemotingConnectException;
@@ -121,7 +121,7 @@ public class DefaultDtsResourcMessageSender extends AbstractLifecycleComponent
 
   @Override
   public <T> T invoke(RequestMessage msg) throws DtsException {
-    return this.invoke(msg, Constants.RPC_INVOKE_TIMEOUT);
+    return this.invoke(msg, RemoteConstant.RPC_INVOKE_TIMEOUT);
   }
 
   @Override
