@@ -27,17 +27,15 @@ public class DtsLogDaoImpl implements DtsLogDao {
   @Autowired
   private JdbcTemplate jdbcTemplate;
 
-
   @Override
-  public void insertGlobalLog(final GlobalLog globalLog, final int mid) {
+  public void insertGlobalLog(final GlobalLog globalLog) {
     PreparedStatementCreator psc = new PreparedStatementCreator() {
       @Override
       public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
         PreparedStatement ps = con.prepareStatement(
-            "insert into dts_global_log (state,mid,gmt_created,gmt_modified) values (?,?,now(),now())",
+            "insert into dts_global_log (state,mid,gmt_created,gmt_modified) values (?,now(),now())",
             Statement.RETURN_GENERATED_KEYS);
         ps.setInt(1, globalLog.getState());
-        ps.setInt(2, mid);
         return ps;
       }
     };
@@ -50,22 +48,20 @@ public class DtsLogDaoImpl implements DtsLogDao {
   }
 
   @Override
-  public void updateGlobalLog(GlobalLog globalLog, int mid) {
-    jdbcTemplate.update(
-        "update dts_global_log set state =?, gmt_modified= now() where tx_id = ? and mid = ?",
-        new Object[] {globalLog.getState(), globalLog.getTransId(), mid});
+  public void updateGlobalLog(GlobalLog globalLog) {
+    jdbcTemplate.update("update dts_global_log set state =?, gmt_modified= now() where tx_id = ?",
+        new Object[] {globalLog.getState(), globalLog.getTransId()});
   }
 
   @Override
-  public void deleteGlobalLog(long tx_id, int mid) {
-    jdbcTemplate.update("delete from dts_global_log where tx_id = ? and mid = ?",
-        new Object[] {tx_id, mid});
+  public void deleteGlobalLog(long tx_id) {
+    jdbcTemplate.update("delete from dts_global_log where tx_id = ?", new Object[] {tx_id});
   }
 
   @Override
-  public GlobalLog getGlobalLog(long tx_id, int mid) {
-    return jdbcTemplate.queryForObject("select * from dts_global_log where tx_id = ? and mid = ?",
-        new Object[] {tx_id, mid}, new RowMapper<GlobalLog>() {
+  public GlobalLog getGlobalLog(long tx_id) {
+    return jdbcTemplate.queryForObject("select * from dts_global_log where tx_id = ?",
+        new Object[] {tx_id}, new RowMapper<GlobalLog>() {
           @Override
           public GlobalLog mapRow(ResultSet rs, int rowNum) throws SQLException {
             GlobalLog log = new GlobalLog();
@@ -79,19 +75,18 @@ public class DtsLogDaoImpl implements DtsLogDao {
   }
 
   @Override
-  public void insertBranchLog(BranchLog branchLog, int mid) {
+  public void insertBranchLog(BranchLog branchLog) {
     PreparedStatementCreator psc = new PreparedStatementCreator() {
       @Override
       public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
         PreparedStatement ps = con.prepareStatement(
-            "insert into dts_branch_log (tx_id,state,client_ip,client_info,gmt_created,gmt_modified,mid)"
-                + " values (?,?,?,?,now(),now(),?)",
+            "insert into dts_branch_log (tx_id,state,client_ip,client_info,gmt_created,gmt_modified)"
+                + " values (?,?,?,?,now(),now())",
             Statement.RETURN_GENERATED_KEYS);
         ps.setLong(1, branchLog.getTransId());
         ps.setInt(2, branchLog.getState());
         ps.setString(3, branchLog.getClientIp());
         ps.setString(4, branchLog.getClientInfo());
-        ps.setInt(5, mid);
         return ps;
       }
     };
@@ -106,21 +101,21 @@ public class DtsLogDaoImpl implements DtsLogDao {
 
 
   @Override
-  public void updateBranchLog(BranchLog branchLog, int mid) {
-    jdbcTemplate.update("update dts_branch_log set state = ? where branch_id = ? and mid = ?",
-        new Object[] {branchLog.getState(), branchLog.getBranchId(), mid});
+  public void updateBranchLog(BranchLog branchLog) {
+    jdbcTemplate.update("update dts_branch_log set state = ? where branch_id = ?",
+        new Object[] {branchLog.getState(), branchLog.getBranchId()});
   }
 
   @Override
-  public void updateBranchState(BranchLog branchLog, int mid) {
-    jdbcTemplate.update("update dts_branch_log set state = ?" + " where branch_id = ? and mid = ?",
-        new Object[] {branchLog.getState(), branchLog.getBranchId(), mid});
+  public void updateBranchState(BranchLog branchLog) {
+    jdbcTemplate.update("update dts_branch_log set state = ?" + " where branch_id = ?",
+        new Object[] {branchLog.getState(), branchLog.getBranchId()});
   }
 
   @Override
-  public List<BranchLog> getBranchLogs(long txId, int mid) {
-    return jdbcTemplate.query("select * from dts_branch_log where tx_id = ? and mid = ?",
-        new Object[] {txId, mid}, new RowMapper<BranchLog>() {
+  public List<BranchLog> getBranchLogs(long txId) {
+    return jdbcTemplate.query("select * from dts_branch_log where tx_id = ?", new Object[] {txId},
+        new RowMapper<BranchLog>() {
           @Override
           public BranchLog mapRow(ResultSet rs, int rowNum) throws SQLException {
             return rowToObject(rs);
@@ -129,8 +124,8 @@ public class DtsLogDaoImpl implements DtsLogDao {
   }
 
   @Override
-  public List<BranchLog> getBranchLogs(int mid) {
-    return jdbcTemplate.query("select * from dts_branch_log where mid = ?", new Object[] {mid},
+  public List<BranchLog> getBranchLogs() {
+    return jdbcTemplate.query("select * from dts_branch_log", new Object[] {},
         new RowMapper<BranchLog>() {
           @Override
           public BranchLog mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -152,10 +147,9 @@ public class DtsLogDaoImpl implements DtsLogDao {
   }
 
   @Override
-  public BranchLog getBranchLog(long branchId, int mid) {
-    return jdbcTemplate.queryForObject(
-        "select * from dts_branch_log where branch_id = ? and mid = ?",
-        new Object[] {branchId, mid}, new RowMapper<BranchLog>() {
+  public BranchLog getBranchLog(long branchId) {
+    return jdbcTemplate.queryForObject("select * from dts_branch_log where branch_id = ?",
+        new Object[] {branchId}, new RowMapper<BranchLog>() {
           @Override
           public BranchLog mapRow(ResultSet rs, int rowNum) throws SQLException {
             return rowToObject(rs);
@@ -164,8 +158,8 @@ public class DtsLogDaoImpl implements DtsLogDao {
   }
 
   @Override
-  public List<GlobalLog> getGlobalLogs(int mid) {
-    return jdbcTemplate.query("select * from dts_global_log where mid=?", new Object[] {mid},
+  public List<GlobalLog> getGlobalLogs() {
+    return jdbcTemplate.query("select * from dts_global_log where mid=?", new Object[] {},
         new RowMapper<GlobalLog>() {
           @Override
           public GlobalLog mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -180,19 +174,19 @@ public class DtsLogDaoImpl implements DtsLogDao {
   }
 
   @Override
-  public void insertBranchErrorLog(final BranchLog branchLog, final int mid) {
+  public void insertBranchErrorLog(final BranchLog branchLog) {
     jdbcTemplate.update(
-        "insert into dts_branch_error_log (branch_id,tx_id,state,client_ip,client_info,gmt_created,gmt_modified,mid) values (?,?,?,?,?,now(),now(),?)",
+        "insert into dts_branch_error_log (branch_id,tx_id,state,client_ip,client_info,gmt_created,gmt_modified,mid) values (?,?,?,?,?,now(),now())",
         new Object[] {branchLog.getBranchId(), branchLog.getTransId(), branchLog.getState(),
-            branchLog.getClientIp(), branchLog.getClientInfo(), mid});
+            branchLog.getClientIp(), branchLog.getClientInfo()});
   }
 
   @Override
-  public void updateBranchErrorLog(BranchLog branchLog, int mid) {
+  public void updateBranchErrorLog(BranchLog branchLog) {
     jdbcTemplate.update(
-        "update dts_branch_error_log set tx_id=?,state=?,client_ip=?,client_info=?,gmt_modified=now(),is_notify= ? where branch_id=? and mid=?",
+        "update dts_branch_error_log set tx_id=?,state=?,client_ip=?,client_info=?,gmt_modified=now(),is_notify= ? where branch_id=?",
         new Object[] {branchLog.getTransId(), branchLog.getState(), branchLog.getClientIp(),
-            branchLog.getClientInfo(), branchLog.getIsNotify(), branchLog.getBranchId(), mid});
+            branchLog.getClientInfo(), branchLog.getIsNotify(), branchLog.getBranchId()});
   }
 
   @Override
@@ -216,9 +210,8 @@ public class DtsLogDaoImpl implements DtsLogDao {
   }
 
   @Override
-  public void deleteBranchLog(BranchLog branchLog, int mid) {
-    jdbcTemplate.update("delete from dts_branch_log where branch_id = ? and mid = ?",
-        new Object[] {branchLog.getBranchId(), mid});
+  public void deleteBranchLog(long branchId) {
+    jdbcTemplate.update("delete from dts_branch_log where branch_id = ?", new Object[] {branchId});
   }
 
 }

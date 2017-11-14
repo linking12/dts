@@ -16,15 +16,13 @@ package io.dts.server.handler.support;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.dts.common.api.DtsServerMessageSender;
 import io.dts.common.protocol.ResultCode;
 import io.dts.common.protocol.header.BranchCommitResultMessage;
 import io.dts.common.protocol.header.BranchRollbackResultMessage;
-import io.dts.server.network.DtsServerContainer;
 import io.dts.server.store.DtsLogDao;
-import io.dts.server.store.DtsTransStatusDao;
 import io.dts.server.struct.BranchLog;
 import io.dts.server.struct.BranchLogState;
-import io.dts.server.struct.GlobalLog;
 
 /**
  * @author liushiming
@@ -37,8 +35,8 @@ public interface SyncRmMessagHandler {
   void processMessage(String clientIp, BranchRollbackResultMessage message);
 
 
-  public static SyncRmMessagHandler createSyncGlobalResultProcess(
-      DtsTransStatusDao dtsTransStatusDao, DtsLogDao dtsLogDao) {
+  public static SyncRmMessagHandler createSyncGlobalResultProcess(final DtsLogDao dtsLogDao,
+      final DtsServerMessageSender messageSender) {
 
     return new SyncRmMessagHandler() {
 
@@ -46,52 +44,35 @@ public interface SyncRmMessagHandler {
 
       @Override
       public void processMessage(String clientIp, BranchCommitResultMessage message) {
-        Long tranId = message.getTranId();
         Long branchId = message.getBranchId();
-        GlobalLog globalLog = dtsTransStatusDao.queryGlobalLog(tranId);
         if (message.getResult() == ResultCode.OK.getValue()) {
-          BranchLog branchLog = dtsTransStatusDao.removeBranchLog(branchId);
-          dtsLogDao.deleteBranchLog(branchLog, DtsServerContainer.mid);
+          dtsLogDao.deleteBranchLog(branchId);
         } else if (message.getResult() == ResultCode.ERROR.getValue()) {
-          BranchLog branchLog = dtsTransStatusDao.removeBranchLog(branchId);
-          branchLog.setState(BranchLogState.Failed.getValue());
-          dtsLogDao.updateBranchLog(branchLog, DtsServerContainer.mid);
-          dtsLogDao.insertBranchErrorLog(branchLog, DtsServerContainer.mid);
+          synchronized (messageSender) {
+            BranchLog branchLog = dtsLogDao.getBranchLog(branchId);
+            branchLog.setState(BranchLogState.Failed.getValue());
+            dtsLogDao.updateBranchLog(branchLog);
+            dtsLogDao.insertBranchErrorLog(branchLog);
+          }
           logger.error("Logic error occurs while commit branch:" + branchId
               + ". Please check server table:txc_branch_error_log.");
-        }
-        synchronized (globalLog) {
-          globalLog.getBranchIds().remove(branchId);
-          int leftBranches = globalLog.getLeftBranches();
-          if (leftBranches == 0) {
-            dtsTransStatusDao.removeGlobalLog(tranId);
-          }
         }
       }
 
       @Override
       public void processMessage(String clientIp, BranchRollbackResultMessage message) {
-        Long tranId = message.getTranId();
         Long branchId = message.getBranchId();
-        GlobalLog globalLog = dtsTransStatusDao.queryGlobalLog(tranId);
         if (message.getResult() == ResultCode.OK.getValue()) {
-          BranchLog branchLog = dtsTransStatusDao.removeBranchLog(branchId);
-          branchLog.setState(BranchLogState.Success.getValue());
-          dtsLogDao.deleteBranchLog(branchLog, DtsServerContainer.mid);
+          dtsLogDao.deleteBranchLog(branchId);
         } else if (message.getResult() == ResultCode.ERROR.getValue()) {
-          BranchLog branchLog = dtsTransStatusDao.removeBranchLog(branchId);
-          branchLog.setState(BranchLogState.Failed.getValue());
-          dtsLogDao.updateBranchLog(branchLog, DtsServerContainer.mid);
-          dtsLogDao.insertBranchErrorLog(branchLog, DtsServerContainer.mid);
+          synchronized (messageSender) {
+            BranchLog branchLog = dtsLogDao.getBranchLog(branchId);
+            branchLog.setState(BranchLogState.Failed.getValue());
+            dtsLogDao.updateBranchLog(branchLog);
+            dtsLogDao.insertBranchErrorLog(branchLog);
+          }
           logger.error("Logic error occurs while rollback branch:" + message.getBranchId()
               + ". Please check server table:txc_branch_error_log.");
-        }
-        synchronized (globalLog) {
-          globalLog.getBranchIds().remove(branchId);
-          int leftBranches = globalLog.getLeftBranches();
-          if (leftBranches == 0) {
-            dtsTransStatusDao.removeGlobalLog(tranId);
-          }
         }
       }
     };

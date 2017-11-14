@@ -13,11 +13,10 @@
  */
 package io.dts.server.handler.support;
 
+import io.dts.common.api.DtsServerMessageSender;
 import io.dts.common.exception.DtsException;
 import io.dts.common.protocol.header.RegisterMessage;
-import io.dts.server.network.DtsServerContainer;
 import io.dts.server.store.DtsLogDao;
-import io.dts.server.store.DtsTransStatusDao;
 import io.dts.server.struct.BranchLog;
 import io.dts.server.struct.BranchLogState;
 import io.dts.server.struct.GlobalLog;
@@ -31,15 +30,15 @@ public interface RmMessageHandler {
 
   Long processMessage(RegisterMessage registerMessage, String clientIp);
 
-  public static RmMessageHandler createResourceManagerMessageProcessor(
-      DtsTransStatusDao dtsTransStatusDao, DtsLogDao dtsLogDao) {
+  public static RmMessageHandler createResourceManagerMessageProcessor(DtsLogDao dtsLogDao,
+      DtsServerMessageSender messageSender) {
 
     return new RmMessageHandler() {
 
       @Override
       public Long processMessage(RegisterMessage registerMessage, String clientIp) {
         long tranId = registerMessage.getTranId();
-        GlobalLog globalLog = dtsTransStatusDao.queryGlobalLog(tranId);
+        GlobalLog globalLog = dtsLogDao.getGlobalLog(tranId);
         if (globalLog == null || globalLog.getState() != GlobalLogState.Begin.getValue()) {
           if (globalLog == null) {
             throw new DtsException("Transaction " + tranId + " doesn't exist");
@@ -53,9 +52,8 @@ public interface RmMessageHandler {
         branchLog.setClientInfo(registerMessage.getDbName());
         branchLog.setClientIp(clientIp);
         branchLog.setState(BranchLogState.Begin.getValue());
-        dtsLogDao.insertBranchLog(branchLog, DtsServerContainer.mid);
+        dtsLogDao.insertBranchLog(branchLog);
         Long branchId = branchLog.getBranchId();
-        dtsTransStatusDao.saveBranchLog(branchId, branchLog);
         globalLog.getBranchIds().add(branchId);
         return branchId;
       }

@@ -8,33 +8,33 @@ import io.dts.server.struct.GlobalLog;
 
 public interface DtsLogDao {
 
-	public void insertGlobalLog(GlobalLog globalLog, int mid);
+  public void insertGlobalLog(GlobalLog globalLog);
 
-	public void updateGlobalLog(GlobalLog globalLog, int mid);
+  public void updateGlobalLog(GlobalLog globalLog);
 
-	public void deleteGlobalLog(long tx_id, int mid);
+  public void deleteGlobalLog(long tx_id);
 
-	public GlobalLog getGlobalLog(long tx_id, int mid);
+  public GlobalLog getGlobalLog(long tx_id);
 
-	public List<GlobalLog> getGlobalLogs(int mid);
+  public List<GlobalLog> getGlobalLogs();
 
-	public void insertBranchLog(BranchLog branchLog, int mid);
+  public void insertBranchLog(BranchLog branchLog);
 
-	public void updateBranchLog(BranchLog branchLog, int mid);
+  public void updateBranchLog(BranchLog branchLog);
 
-	public void updateBranchState(BranchLog branchLog, int mid);
+  public void updateBranchState(BranchLog branchLog);
 
-	public void deleteBranchLog(BranchLog branchLog, int mid);
+  public void deleteBranchLog(long branchId);
 
-	public List<BranchLog> getBranchLogs(long txId, int mid);
-	
-	public List<BranchLog> getBranchLogs(int mid);
+  public List<BranchLog> getBranchLogs(long txId);
 
-	public BranchLog getBranchLog(long branchId, int mid);
+  public List<BranchLog> getBranchLogs();
 
-	public void insertBranchErrorLog(BranchLog branchLog, int mid);
+  public BranchLog getBranchLog(long branchId);
 
-	public void updateBranchErrorLog(BranchLog branchLog, int mid);
+  public void insertBranchErrorLog(BranchLog branchLog);
 
-	public List<BranchLog> findWaitNotifyErrorLog(int commit_type);
+  public void updateBranchErrorLog(BranchLog branchLog);
+
+  public List<BranchLog> findWaitNotifyErrorLog(int commit_type);
 }

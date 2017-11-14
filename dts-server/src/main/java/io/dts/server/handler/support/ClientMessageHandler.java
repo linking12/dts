@@ -29,9 +29,7 @@ import io.dts.common.protocol.header.BranchRollbackResultMessage;
 import io.dts.common.protocol.header.GlobalCommitMessage;
 import io.dts.common.protocol.header.GlobalRollbackMessage;
 import io.dts.remoting.RemoteConstant;
-import io.dts.server.network.DtsServerContainer;
 import io.dts.server.store.DtsLogDao;
-import io.dts.server.store.DtsTransStatusDao;
 import io.dts.server.struct.BranchLog;
 import io.dts.server.struct.GlobalLog;
 import io.dts.server.struct.GlobalLogState;
@@ -50,15 +48,14 @@ public interface ClientMessageHandler {
   void processMessage(GlobalRollbackMessage globalRollbackMessage);
 
 
-  public static ClientMessageHandler createClientMessageProcessor(
-      DtsTransStatusDao dtsTransStatusDao, DtsLogDao dtsLogDao,
+  public static ClientMessageHandler createClientMessageProcessor(DtsLogDao dtsLogDao,
       DtsServerMessageSender messageSender) {
 
     return new ClientMessageHandler() {
       private final Logger logger = LoggerFactory.getLogger(RmMessageHandler.class);
 
       private final SyncRmMessagHandler globalResultMessageHandler =
-          SyncRmMessagHandler.createSyncGlobalResultProcess(dtsTransStatusDao, dtsLogDao);
+          SyncRmMessagHandler.createSyncGlobalResultProcess(dtsLogDao, messageSender);
 
       // 开始一个事务
       @Override
@@ -67,9 +64,8 @@ public interface ClientMessageHandler {
         globalLog.setState(GlobalLogState.Begin.getValue());
         globalLog.setTimeout(beginMessage.getTimeout());
         globalLog.setClientAppName(clientIp);
-        dtsLogDao.insertGlobalLog(globalLog, DtsServerContainer.mid);;
+        dtsLogDao.insertGlobalLog(globalLog);
         long tranId = globalLog.getTransId();
-        dtsTransStatusDao.saveGlobalLog(tranId, globalLog, beginMessage.getTimeout());
         String xid = DtsXID.generateXID(tranId);
         return xid;
       }
@@ -78,23 +74,22 @@ public interface ClientMessageHandler {
       @Override
       public void processMessage(GlobalCommitMessage globalCommitMessage) {
         Long tranId = globalCommitMessage.getTranId();
-        GlobalLog globalLog = dtsTransStatusDao.queryGlobalLog(tranId);
+        GlobalLog globalLog = dtsLogDao.getGlobalLog(tranId);
         if (globalLog == null) {
           throw new DtsException("transaction doesn't exist.");
         } else {
           switch (GlobalLogState.parse(globalLog.getState())) {
             case Begin:
-              List<BranchLog> branchLogs =
-                  dtsTransStatusDao.queryBranchLogByTransId(globalLog.getTransId());
+              List<BranchLog> branchLogs = dtsLogDao.getBranchLogs(tranId);
               // 通知各个分支开始提交
               try {
                 this.syncGlobalCommit(branchLogs, globalLog.getTransId());
                 globalLog.setState(GlobalLogState.Committed.getValue());
-                dtsLogDao.deleteGlobalLog(globalLog.getTransId(), DtsServerContainer.mid);
+                dtsLogDao.deleteGlobalLog(globalLog.getTransId());
               } catch (Exception e) {
                 logger.error(e.getMessage(), e);
                 globalLog.setState(GlobalLogState.CmmittedFailed.getValue());
-                dtsLogDao.updateGlobalLog(globalLog, DtsServerContainer.mid);
+                dtsLogDao.updateGlobalLog(globalLog);
                 throw new DtsException(e, "notify resourcemanager to commit failed");
               }
               return;
@@ -109,23 +104,22 @@ public interface ClientMessageHandler {
       @Override
       public void processMessage(GlobalRollbackMessage globalRollbackMessage) {
         long tranId = globalRollbackMessage.getTranId();
-        GlobalLog globalLog = dtsTransStatusDao.queryGlobalLog(tranId);
+        GlobalLog globalLog = dtsLogDao.getGlobalLog(tranId);
         if (globalLog == null) {
           throw new DtsException("transaction doesn't exist.");
         } else {
           switch (GlobalLogState.parse(globalLog.getState())) {
             case Begin:
-              List<BranchLog> branchLogs =
-                  dtsTransStatusDao.queryBranchLogByTransId(globalLog.getTransId());
+              List<BranchLog> branchLogs = dtsLogDao.getBranchLogs(tranId);
               // 通知各个分支开始回滚
               try {
                 this.syncGlobalRollback(branchLogs, globalLog.getTransId());
                 globalLog.setState(GlobalLogState.Rollbacked.getValue());
-                dtsLogDao.deleteGlobalLog(globalLog.getTransId(), DtsServerContainer.mid);
+                dtsLogDao.deleteGlobalLog(globalLog.getTransId());
               } catch (Exception e) {
                 logger.error(e.getMessage(), e);
                 globalLog.setState(GlobalLogState.RollbackFailed.getValue());
-                dtsLogDao.updateGlobalLog(globalLog, DtsServerContainer.mid);
+                dtsLogDao.updateGlobalLog(globalLog);
                 throw new DtsException("notify resourcemanager to commit failed");
               }
               return;

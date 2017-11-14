@@ -32,7 +32,6 @@ import io.dts.common.protocol.header.RegisterResultMessage;
 import io.dts.server.handler.support.ClientMessageHandler;
 import io.dts.server.handler.support.RmMessageHandler;
 import io.dts.server.store.DtsLogDao;
-import io.dts.server.store.DtsTransStatusDao;
 
 /**
  * @author liushiming
@@ -42,8 +41,6 @@ import io.dts.server.store.DtsTransStatusDao;
 @Scope("prototype")
 public class DtsServerMessageHandlerImpl implements DtsServerMessageHandler {
 
-  @Autowired
-  private DtsTransStatusDao dtsTransStatusDao;
 
   @Autowired
   private DtsLogDao dtsLogDao;
@@ -54,15 +51,14 @@ public class DtsServerMessageHandlerImpl implements DtsServerMessageHandler {
 
   private ClientMessageHandler clientHandler;
 
-  private RmMessageHandler resourceHandler;
+  private RmMessageHandler rmHandler;
 
   @PostConstruct
   public void init() {
-    clientHandler = ClientMessageHandler.createClientMessageProcessor(dtsTransStatusDao, dtsLogDao,
-        serverMessageSender);
-    dtsTransStatusDao.setClientMessageHandler(clientHandler);
-    resourceHandler =
-        RmMessageHandler.createResourceManagerMessageProcessor(dtsTransStatusDao, dtsLogDao);
+    clientHandler =
+        ClientMessageHandler.createClientMessageProcessor(dtsLogDao, serverMessageSender);
+    rmHandler =
+        RmMessageHandler.createResourceManagerMessageProcessor(dtsLogDao, serverMessageSender);
   }
 
   /**
@@ -104,7 +100,7 @@ public class DtsServerMessageHandlerImpl implements DtsServerMessageHandler {
   public void handleMessage(String clientIp, RegisterMessage registerMessage,
       RegisterResultMessage resultMessage) {
     long tranId = registerMessage.getTranId();
-    Long branchId = resourceHandler.processMessage(registerMessage, clientIp);
+    Long branchId = rmHandler.processMessage(registerMessage, clientIp);
     resultMessage.setBranchId(branchId);
     resultMessage.setTranId(tranId);
     return;
