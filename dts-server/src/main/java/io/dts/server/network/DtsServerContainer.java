@@ -20,10 +20,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Lookup;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Queues;
@@ -37,7 +39,6 @@ import io.dts.common.util.ThreadFactoryImpl;
 import io.dts.remoting.RemotingServer;
 import io.dts.remoting.netty.NettyRemotingServer;
 import io.dts.remoting.netty.NettyServerConfig;
-import io.dts.server.DtsServerProperties;
 import io.dts.server.network.channel.ChannelkeepingComponent;
 import io.dts.server.network.processor.DtsMessageProcessor;
 import io.dts.server.network.processor.HeatBeatProcessor;
@@ -53,33 +54,31 @@ public class DtsServerContainer extends AbstractLifecycleComponent {
   private ChannelkeepingComponent channelKeeping;
 
   @Autowired
-  private DtsServerProperties serverProperties;
-
-  @Autowired
   @Qualifier("heatBeatProcessor")
   private HeatBeatProcessor heatBeatProccessor;
 
+  @Value("${tcp.listenPort}")
+  private int port;
+
   private RemotingServer remotingServer;
 
-  public static Integer mid;
+  private static final Integer cpus = Runtime.getRuntime().availableProcessors();
 
   @PostConstruct
   public void init() {
     NettyServerConfig nettyServerConfig = new NettyServerConfig();
-    nettyServerConfig.setListenPort(serverProperties.getListenPort());
+    nettyServerConfig.setListenPort(port);
     this.remotingServer = new NettyRemotingServer(nettyServerConfig, channelKeeping);
     this.registerProcessor();
     DtsXID.setIpAddress(NetUtil.getLocalIp());
-    DtsXID.setPort(serverProperties.getListenPort());
+    DtsXID.setPort(port);
   }
 
   private void registerHeaderRequest() {
     DtsMessageProcessor messageProcessor = createMessageProcessor();
-    BlockingQueue<Runnable> clientThreadPoolQueue =
-        Queues.newLinkedBlockingDeque(serverProperties.getClientThreadPoolQueueSize());
+    BlockingQueue<Runnable> clientThreadPoolQueue = Queues.newLinkedBlockingDeque(10000);
     ExecutorService clientMessageExecutor =
-        new ServerFixedThreadPoolExecutor(serverProperties.getClientThreadPoolSize(),
-            serverProperties.getClientThreadPoolSize(), 1000 * 60, TimeUnit.MILLISECONDS,
+        new ServerFixedThreadPoolExecutor(cpus * 3, cpus * 3, 1000 * 60, TimeUnit.MILLISECONDS,
             clientThreadPoolQueue, new ThreadFactoryImpl("ServerHeaderThread_"));
     this.remotingServer.registerProcessor(RequestCode.HEADER_REQUEST, messageProcessor,
         clientMessageExecutor);
@@ -87,11 +86,9 @@ public class DtsServerContainer extends AbstractLifecycleComponent {
 
   private void registerBodyRequest() {
     DtsMessageProcessor messageProcessor = createMessageProcessor();
-    BlockingQueue<Runnable> resourceThreadPoolQueue =
-        Queues.newLinkedBlockingDeque(serverProperties.getResourceThreadPoolQueueSize());
+    BlockingQueue<Runnable> resourceThreadPoolQueue = Queues.newLinkedBlockingDeque(10000);
     ExecutorService resourceMessageExecutor =
-        new ServerFixedThreadPoolExecutor(serverProperties.getResourceThreadPoolSize(),
-            serverProperties.getResourceThreadPoolSize(), 1000 * 60, TimeUnit.MILLISECONDS,
+        new ServerFixedThreadPoolExecutor(cpus, cpus, 1000 * 60, TimeUnit.MILLISECONDS,
             resourceThreadPoolQueue, new ThreadFactoryImpl("ServerBodyThread_"));
     this.remotingServer.registerProcessor(RequestCode.BODY_REQUEST, messageProcessor,
         resourceMessageExecutor);
@@ -99,8 +96,7 @@ public class DtsServerContainer extends AbstractLifecycleComponent {
 
   private void registerHeatBeatRequest() {
     ExecutorService heatBeatProcessorExecutor =
-        Executors.newFixedThreadPool(serverProperties.getChannelHeatThreadPoolSize(),
-            new ThreadFactoryImpl("ServerHeadBeatThread_"));
+        Executors.newFixedThreadPool(cpus, new ThreadFactoryImpl("ServerHeadBeatThread_"));
     this.remotingServer.registerProcessor(RequestCode.HEART_BEAT, heatBeatProccessor,
         heatBeatProcessorExecutor);
   }
@@ -124,10 +120,11 @@ public class DtsServerContainer extends AbstractLifecycleComponent {
     if (this.channelKeeping != null) {
       this.channelKeeping.start();
     }
-    mid = ServerCluster.getServerCluster().registry(serverProperties.getListenPort());
+    ServerCluster.getServerCluster().registry(port);
   }
 
   @Override
+  @PreDestroy
   protected void doStop() {
     if (this.channelKeeping != null) {
       this.channelKeeping.stop();

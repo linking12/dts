@@ -16,7 +16,6 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
-import io.dts.server.network.DtsServerContainer;
 import io.dts.server.store.DtsLogDao;
 import io.dts.server.struct.BranchLog;
 import io.dts.server.struct.GlobalLog;
@@ -192,8 +191,8 @@ public class DtsLogDaoImpl implements DtsLogDao {
   @Override
   public List<BranchLog> findWaitNotifyErrorLog(int commit_type) {
     return jdbcTemplate.query(
-        "select * from dts_branch_error_log where is_notify<>1 and mid=? order by client_ip",
-        new Object[] {commit_type, DtsServerContainer.mid}, new RowMapper<BranchLog>() {
+        "select * from dts_branch_error_log where is_notify<>1 order by client_ip",
+        new Object[] {commit_type}, new RowMapper<BranchLog>() {
           @Override
           public BranchLog mapRow(ResultSet rs, int rowNum) throws SQLException {
             BranchLog log = new BranchLog();
