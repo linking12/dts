@@ -41,9 +41,6 @@ public class DefaultDtsTransactionManager implements DtsTransactionManager {
 
   @Override
   public void begin(final long timeout) throws DtsException {
-    if (DtsContext.inRetryContext()) {
-      throw new DtsException("This transaction has been RT model!");
-    }
     BeginMessage beginMessage = new BeginMessage();
     beginMessage.setTimeout(timeout);
     try {

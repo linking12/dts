@@ -24,7 +24,6 @@ import io.dts.common.exception.DtsException;
 public class DtsContext {
 
   private static final String TXC_XID_KEY = "XID";
-  private static final String TXC_RETRY_BRANCH_KEY = "RETRY_BRANCH";
   private static final String COMMIT_COUNT = "COMMIT_COUNT";
   private static final String BEGIN_COUNT = "BEGIN_COUNT";
   private static final String TXC_NEXT_SVR_ADDR = "NEXT_SVR_ADDR";
@@ -69,26 +68,6 @@ public class DtsContext {
 
   public static boolean inTxcTransaction() {
     return getCurrentXid() != null;
-  }
-
-  public static void startRetryBranch(long effectiveTime) {
-    RpcContext.getContext().setAttachment(TXC_RETRY_BRANCH_KEY, Long.toString(effectiveTime));
-  }
-
-  public static void endRetryBranch() {
-    RpcContext.getContext().removeAttachment(TXC_RETRY_BRANCH_KEY);
-  }
-
-  public static boolean inRetryContext() {
-    return RpcContext.getContext().getAttachment(TXC_RETRY_BRANCH_KEY) != null;
-  }
-
-  public static long getEffectiveTime() {
-    String s = RpcContext.getContext().getAttachment(TXC_RETRY_BRANCH_KEY);
-    if (s != null) {
-      return Long.parseLong(s);
-    } else
-      return -1;
   }
 
 

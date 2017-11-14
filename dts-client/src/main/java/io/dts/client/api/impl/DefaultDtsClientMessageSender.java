@@ -6,8 +6,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import io.dts.common.api.DtsClientMessageSender;
+import io.dts.common.common.AbstractLifecycleComponent;
 import io.dts.common.common.Constants;
-import io.dts.common.component.AbstractLifecycleComponent;
 import io.dts.common.exception.DtsException;
 import io.dts.common.protocol.RequestMessage;
 import io.dts.common.protocol.heatbeat.HeartbeatRequestHeader;
