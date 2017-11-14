@@ -29,7 +29,6 @@ import org.springframework.stereotype.Repository;
 
 import io.dts.common.protocol.header.GlobalRollbackMessage;
 import io.dts.server.handler.support.ClientMessageHandler;
-import io.dts.server.network.channel.ChannelkeepingComponent;
 import io.dts.server.store.DtsTransStatusDao;
 import io.dts.server.struct.BranchLog;
 import io.dts.server.struct.GlobalLog;
