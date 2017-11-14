@@ -24,28 +24,7 @@ import io.dts.common.exception.DtsException;
 public class DtsContext {
 
   private static final String TXC_XID_KEY = "XID";
-  private static final String COMMIT_COUNT = "COMMIT_COUNT";
-  private static final String BEGIN_COUNT = "BEGIN_COUNT";
   private static final String TXC_NEXT_SVR_ADDR = "NEXT_SVR_ADDR";
-
-
-  public static final int getBeginCount() {
-    String num = RpcContext.getContext().getAttachment(BEGIN_COUNT);
-    return num == null ? 0 : Integer.parseInt(num);
-  }
-
-  public static final void setBegin(int beginCount) {
-    RpcContext.getContext().setAttachment(BEGIN_COUNT, String.valueOf(beginCount));
-  }
-
-  public static final int getCommitCount() {
-    String num = RpcContext.getContext().getAttachment(COMMIT_COUNT);
-    return num == null ? 0 : Integer.parseInt(num);
-  }
-
-  public static final void setCommitCount(int commitCount) {
-    RpcContext.getContext().setAttachment(COMMIT_COUNT, String.valueOf(commitCount));
-  }
 
   public static String getTxcNextSvrAddr() {
     return RpcContext.getContext().getAttachment(TXC_NEXT_SVR_ADDR);
