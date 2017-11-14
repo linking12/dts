@@ -13,7 +13,6 @@
  */
 package io.dts.server.network.channel;
 
-import java.io.IOException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -23,7 +22,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import io.dts.common.common.AbstractLifecycleComponent;
 import io.dts.common.util.ThreadFactoryImpl;
 import io.dts.remoting.ChannelEventListener;
 import io.netty.channel.Channel;
@@ -33,8 +31,7 @@ import io.netty.channel.Channel;
  * @version ChannelHousekeepingService.java, v 0.0.1 2017年9月6日 上午10:16:20 liushiming
  */
 @Component
-public class ChannelkeepingComponent extends AbstractLifecycleComponent
-    implements ChannelEventListener {
+public class ChannelkeepingComponent implements ChannelEventListener {
 
   private static final Logger logger = LoggerFactory.getLogger(ChannelkeepingComponent.class);
 
@@ -44,8 +41,7 @@ public class ChannelkeepingComponent extends AbstractLifecycleComponent
   private final ScheduledExecutorService scheduledExecutorService = Executors
       .newSingleThreadScheduledExecutor(new ThreadFactoryImpl("ClientHousekeepingScheduledThread"));
 
-  @Override
-  protected void doStart() {
+  public void start() {
     this.scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
       @Override
       public void run() {
@@ -58,13 +54,10 @@ public class ChannelkeepingComponent extends AbstractLifecycleComponent
     }, 1000 * 10, 1000 * 10, TimeUnit.MILLISECONDS);
   }
 
-  @Override
-  protected void doStop() {
+  public void stop() {
     this.scheduledExecutorService.shutdown();
   }
 
-  @Override
-  protected void doClose() throws IOException {}
 
   @Override
   public void onChannelConnect(String remoteAddr, Channel channel) {}

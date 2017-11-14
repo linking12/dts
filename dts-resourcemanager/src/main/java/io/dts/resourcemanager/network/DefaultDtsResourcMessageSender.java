@@ -1,6 +1,5 @@
 package io.dts.resourcemanager.network;
 
-import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -11,7 +10,6 @@ import java.util.concurrent.TimeUnit;
 import com.google.common.collect.Queues;
 
 import io.dts.common.api.DtsClientMessageSender;
-import io.dts.common.common.AbstractLifecycleComponent;
 import io.dts.common.exception.DtsException;
 import io.dts.common.protocol.RequestCode;
 import io.dts.common.protocol.RequestMessage;
@@ -32,8 +30,7 @@ import io.dts.resourcemanager.network.processor.RmMessageProcessor;
 /**
  * Created by guoyubo on 2017/9/13.
  */
-public class DefaultDtsResourcMessageSender extends AbstractLifecycleComponent
-    implements DtsClientMessageSender {
+public class DefaultDtsResourcMessageSender implements DtsClientMessageSender {
 
   private final RemotingClient remotingClient;
   private final ScheduledExecutorService scheduledExecutorService;
@@ -81,8 +78,7 @@ public class DefaultDtsResourcMessageSender extends AbstractLifecycleComponent
         clientMessageExecutor);
   }
 
-  @Override
-  protected void doStart() {
+  public void start() {
     this.remotingClient.start();
     this.scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
       @Override
@@ -98,8 +94,8 @@ public class DefaultDtsResourcMessageSender extends AbstractLifecycleComponent
     }, 0, 5, TimeUnit.SECONDS);
   }
 
-  @Override
-  protected void doStop() {
+
+  public void stop() {
     this.remotingClient.shutdown();
     this.scheduledExecutorService.shutdownNow();
   }
@@ -126,12 +122,5 @@ public class DefaultDtsResourcMessageSender extends AbstractLifecycleComponent
   public <T> T invoke(RequestMessage msg) throws DtsException {
     return this.invoke(msg, RemoteConstant.RPC_INVOKE_TIMEOUT);
   }
-
-  @Override
-  protected void doClose() throws IOException {
-
-  }
-
-
 
 }

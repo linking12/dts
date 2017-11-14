@@ -13,7 +13,6 @@
  */
 package io.dts.server.network;
 
-import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -31,7 +30,6 @@ import org.springframework.stereotype.Component;
 import com.google.common.collect.Queues;
 
 import io.dts.common.cluster.ServerCluster;
-import io.dts.common.common.AbstractLifecycleComponent;
 import io.dts.common.common.DtsXID;
 import io.dts.common.protocol.RequestCode;
 import io.dts.common.util.NetUtil;
@@ -48,7 +46,7 @@ import io.dts.server.network.processor.HeatBeatProcessor;
  * @version DtsServerControllerComponent.java, v 0.0.1 2017年9月13日 下午1:58:27 liushiming
  */
 @Component
-public class DtsServerContainer extends AbstractLifecycleComponent {
+public class NettyServerController {
 
   @Autowired
   private ChannelkeepingComponent channelKeeping;
@@ -73,6 +71,27 @@ public class DtsServerContainer extends AbstractLifecycleComponent {
     DtsXID.setIpAddress(NetUtil.getLocalIp());
     DtsXID.setPort(port);
   }
+
+  @PreDestroy
+  public void stop() {
+    if (this.channelKeeping != null) {
+      this.channelKeeping.stop();
+    }
+    if (this.remotingServer != null) {
+      this.remotingServer.shutdown();
+    }
+  }
+
+  public void start() {
+    if (this.remotingServer != null) {
+      this.remotingServer.start();
+    }
+    if (this.channelKeeping != null) {
+      this.channelKeeping.start();
+    }
+    ServerCluster.getServerCluster().registry(port);
+  }
+
 
   private void registerHeaderRequest() {
     DtsMessageProcessor messageProcessor = createMessageProcessor();
@@ -112,32 +131,6 @@ public class DtsServerContainer extends AbstractLifecycleComponent {
     registerHeatBeatRequest();
   }
 
-  @Override
-  protected void doStart() {
-    if (this.remotingServer != null) {
-      this.remotingServer.start();
-    }
-    if (this.channelKeeping != null) {
-      this.channelKeeping.start();
-    }
-    ServerCluster.getServerCluster().registry(port);
-  }
-
-  @Override
-  @PreDestroy
-  protected void doStop() {
-    if (this.channelKeeping != null) {
-      this.channelKeeping.stop();
-    }
-    if (this.remotingServer != null) {
-      this.remotingServer.shutdown();
-    }
-  }
-
-  @Override
-  protected void doClose() throws IOException {
-
-  }
 
   public RemotingServer getRemotingServer() {
     return remotingServer;

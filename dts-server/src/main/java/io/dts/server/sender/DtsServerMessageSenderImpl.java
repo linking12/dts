@@ -24,7 +24,7 @@ import io.dts.remoting.exception.RemotingSendRequestException;
 import io.dts.remoting.exception.RemotingTimeoutException;
 import io.dts.remoting.exception.RemotingTooMuchRequestException;
 import io.dts.remoting.protocol.RemotingCommand;
-import io.dts.server.network.DtsServerContainer;
+import io.dts.server.network.NettyServerController;
 import io.dts.server.network.channel.ChannelRepository;
 import io.netty.channel.Channel;
 
@@ -39,7 +39,7 @@ public class DtsServerMessageSenderImpl implements DtsServerMessageSender {
   private ChannelRepository channelRepository;
 
   @Autowired
-  private DtsServerContainer dtsServerContainer;
+  private NettyServerController dtsServerContainer;
 
 
   @Override

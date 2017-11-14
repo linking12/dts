@@ -25,7 +25,7 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import io.dts.server.network.DtsServerContainer;
+import io.dts.server.network.NettyServerController;
 
 /**
  * @author liushiming
@@ -36,8 +36,8 @@ public class DtsServerApp {
 
   public static void main(String[] args) throws Exception {
     ConfigurableApplicationContext context = SpringApplication.run(DtsServerApp.class, args);
-    DtsServerContainer nettyServer = context.getBean(DtsServerContainer.class);
-    nettyServer.start();
+    NettyServerController controller = context.getBean(NettyServerController.class);
+    controller.start();
   }
 
   @Bean
