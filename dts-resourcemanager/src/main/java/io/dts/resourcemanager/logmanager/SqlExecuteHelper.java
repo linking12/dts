@@ -55,7 +55,7 @@ public class SqlExecuteHelper {
     }
   }
 
-  public static <T> List<T> querySql(final JdbcTemplate template, final RowMapper rowMapper,
+  public static <T> List<T> querySql(final JdbcTemplate template, final RowMapper<T> rowMapper,
       final String sql) {
     List<T> contents;
     long start = 0;
