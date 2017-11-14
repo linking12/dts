@@ -25,7 +25,6 @@ import javax.annotation.PostConstruct;
 
 import org.springframework.stereotype.Repository;
 
-import io.dts.common.protocol.header.GlobalRollbackMessage;
 import io.dts.server.handler.support.ClientMessageHandler;
 import io.dts.server.store.DtsTransStatusDao;
 import io.dts.server.struct.BranchLog;
@@ -59,12 +58,11 @@ public class DtsTransStatusDaoImpl implements DtsTransStatusDao {
           DelayedItem<Long> delayedItem = queue.poll();
           if (delayedItem != null) {
             Long transId = delayedItem.getT();
-            activeTranMap.remove(transId);
-            if (handler != null) {
-              GlobalRollbackMessage rollback = new GlobalRollbackMessage();
-              rollback.setTranId(transId);
-              handler.processMessage(rollback);
-            }
+            // if (handler != null) {
+            // GlobalRollbackMessage rollback = new GlobalRollbackMessage();
+            // rollback.setTranId(transId);
+            // handler.processMessage(rollback);
+            // }
           }
           try {
             Thread.sleep(300);
