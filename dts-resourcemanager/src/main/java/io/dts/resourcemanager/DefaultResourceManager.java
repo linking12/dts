@@ -41,6 +41,8 @@ public class DefaultResourceManager implements ResourceManager {
 
   private final DtsClientMessageSender resourceMessageSender;
 
+  private volatile String dbName;
+
   private DefaultResourceManager() {
     DefaultDtsResourcMessageSender messageSender = DefaultDtsResourcMessageSender.getInstance();
     messageSender.registerResourceManager(this);
@@ -52,9 +54,14 @@ public class DefaultResourceManager implements ResourceManager {
     return resourceManager;
   }
 
+  @Override
+  public String getRegisterDb() {
+    return this.dbName;
+  }
 
   @Override
   public long register(String dbName) throws DtsException {
+    this.dbName = dbName;
     if (DtsContext.inTxcTransaction()) {
       RegisterMessage registerMessage = new RegisterMessage();
       registerMessage.setDbName(dbName);
@@ -72,7 +79,6 @@ public class DefaultResourceManager implements ResourceManager {
       } catch (Throwable th) {
         logger.error("invoke msg failed. " + registerMessage, th);
         throw new DtsException(th);
-      } finally {
       }
     } else {
       throw new IllegalStateException("current thread is not bind to txc transaction.");
@@ -118,4 +124,6 @@ public class DefaultResourceManager implements ResourceManager {
   protected <T> T invoke(RequestMessage msg) throws DtsException {
     return resourceMessageSender.invoke(msg, RemoteConstant.RPC_INVOKE_TIMEOUT);
   }
+
+
 }

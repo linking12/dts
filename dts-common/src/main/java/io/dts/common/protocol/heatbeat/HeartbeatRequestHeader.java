@@ -7,6 +7,16 @@ import io.dts.remoting.exception.RemotingCommandException;
 
 public class HeartbeatRequestHeader implements CommandCustomHeader, RequestMessage {
 
+  private String dbName;
+
+  public String getDbName() {
+    return dbName;
+  }
+
+  public void setDbName(String dbName) {
+    this.dbName = dbName;
+  }
+
   @Override
   public void checkFields() throws RemotingCommandException {}
 

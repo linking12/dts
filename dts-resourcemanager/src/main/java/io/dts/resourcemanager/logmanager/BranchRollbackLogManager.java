@@ -62,7 +62,6 @@ public class BranchRollbackLogManager extends DtsLogManagerImpl {
     DataSourceTransactionManager tm = new DataSourceTransactionManager(datasource);
     TransactionTemplate transactionTemplate = new TransactionTemplate(tm);
     final JdbcTemplate template = new JdbcTemplate(datasource);
-
     transactionTemplate.execute(new TransactionCallbackWithoutResult() {
       @Override
       protected void doInTransactionWithoutResult(TransactionStatus status) {
@@ -73,12 +72,10 @@ public class BranchRollbackLogManager extends DtsLogManagerImpl {
           if (undolog == null) {
             return;
           }
-
           for (RollbackInfor info : undolog.getInfor()) {
             // 设置表meta
             TxcTable o = info.getOriginalValue();
             TxcTable p = info.getPresentValue();
-
             String tablename = o.getTableName() == null ? p.getTableName() : o.getTableName();
             TxcTableMeta tablemeta = null;
             try {

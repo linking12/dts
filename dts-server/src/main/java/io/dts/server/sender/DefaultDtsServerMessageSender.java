@@ -43,9 +43,9 @@ public class DefaultDtsServerMessageSender implements DtsServerMessageSender {
 
 
   @Override
-  public <T> T invokeSync(String clientAddress, RequestMessage msg, long timeout)
+  public <T> T invokeSync(String clientAddress, String clientInfo, RequestMessage msg, long timeout)
       throws DtsException {
-    Channel channel = channelRepository.getChannelByAddress(clientAddress);
+    Channel channel = channelRepository.getChannelByAddress(clientAddress, clientInfo);
     if (channel != null) {
       RemotingCommand request = this.buildRequest(msg);
       try {
@@ -61,9 +61,9 @@ public class DefaultDtsServerMessageSender implements DtsServerMessageSender {
   }
 
   @Override
-  public void invokeAsync(String clientAddress, RequestMessage msg, long timeout)
+  public void invokeAsync(String clientAddress, String clientInfo, RequestMessage msg, long timeout)
       throws DtsException {
-    Channel channel = channelRepository.getChannelByAddress(clientAddress);
+    Channel channel = channelRepository.getChannelByAddress(clientAddress, clientInfo);
     if (channel != null) {
       RemotingCommand request = this.buildRequest(msg);
       try {

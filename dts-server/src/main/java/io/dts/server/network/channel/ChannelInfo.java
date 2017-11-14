@@ -24,22 +24,23 @@ public class ChannelInfo {
   private final Channel channel;
   private final LanguageCode language;
   private final int version;
+  private final String dbName;
   private volatile long lastUpdateTimestamp = System.currentTimeMillis();
 
   public ChannelInfo(Channel channel) {
-    this(channel, null, 0);
+    this(channel, null, null, 0);
   }
 
-  public ChannelInfo(Channel channel, LanguageCode language, int version) {
+  public ChannelInfo(Channel channel, String dbName, LanguageCode language, int version) {
     this.channel = channel;
     this.language = language;
     this.version = version;
+    this.dbName = dbName;
   }
 
   public Channel getChannel() {
     return channel;
   }
-
 
   public LanguageCode getLanguage() {
     return language;
@@ -59,13 +60,16 @@ public class ChannelInfo {
     this.lastUpdateTimestamp = lastUpdateTimestamp;
   }
 
-
+  public String getDbName() {
+    return dbName;
+  }
 
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;
     result = prime * result + ((channel == null) ? 0 : channel.hashCode());
+    result = prime * result + ((dbName == null) ? 0 : dbName.hashCode());
     result = prime * result + ((language == null) ? 0 : language.hashCode());
     result = prime * result + (int) (lastUpdateTimestamp ^ (lastUpdateTimestamp >>> 32));
     result = prime * result + version;
@@ -86,6 +90,11 @@ public class ChannelInfo {
         return false;
     } else if (!channel.equals(other.channel))
       return false;
+    if (dbName == null) {
+      if (other.dbName != null)
+        return false;
+    } else if (!dbName.equals(other.dbName))
+      return false;
     if (language != other.language)
       return false;
     if (lastUpdateTimestamp != other.lastUpdateTimestamp)
@@ -98,8 +107,7 @@ public class ChannelInfo {
   @Override
   public String toString() {
     return "ChannelInfo [channel=" + channel + ", language=" + language + ", version=" + version
-        + ", lastUpdateTimestamp=" + lastUpdateTimestamp + "]";
+        + ", dbName=" + dbName + ", lastUpdateTimestamp=" + lastUpdateTimestamp + "]";
   }
-
 
 }

@@ -97,13 +97,20 @@ public class ChannelRepository {
     }
   }
 
-  public Channel getChannelByAddress(String address) {
+  public Channel getChannelByAddress(String address, String clientInfo) {
     Iterator<Map.Entry<Channel, ChannelInfo>> it = channelTable.entrySet().iterator();
     while (it.hasNext()) {
       Map.Entry<Channel, ChannelInfo> item = it.next();
       final Channel channel = item.getKey();
       final String clientIp = NetUtil.toStringAddress(channel.remoteAddress());
       if (clientIp.equals(address)) {
+        return channel;
+      }
+    }
+    for (Map.Entry<Channel, ChannelInfo> entry : channelTable.entrySet()) {
+      final Channel channel = entry.getKey();
+      final ChannelInfo channelInfo = entry.getValue();
+      if (channelInfo.getDbName().equals(clientInfo)) {
         return channel;
       }
     }

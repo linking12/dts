@@ -138,6 +138,7 @@ public interface ClientMessageHandler {
       protected void syncGlobalCommit(List<BranchLog> branchLogs, long transId) {
         for (BranchLog branchLog : branchLogs) {
           String clientAddress = branchLog.getClientIp();
+          String clientInfo = branchLog.getClientInfo();
           Long branchId = branchLog.getBranchId();
           BranchCommitMessage branchCommitMessage = new BranchCommitMessage();
           branchCommitMessage.setServerAddr(DtsXID.getSvrAddr());
@@ -146,8 +147,8 @@ public interface ClientMessageHandler {
           branchCommitMessage.setDbName(branchLog.getClientInfo());
           BranchCommitResultMessage branchCommitResult = null;
           try {
-            branchCommitResult = serverMessageServer.invokeSync(clientAddress, branchCommitMessage,
-                RemoteConstant.RPC_INVOKE_TIMEOUT);
+            branchCommitResult = serverMessageServer.invokeSync(clientAddress, clientInfo,
+                branchCommitMessage, RemoteConstant.RPC_INVOKE_TIMEOUT);
           } catch (DtsException e) {
             String message =
                 "notify " + clientAddress + " commit occur system error,branchId:" + branchId;
@@ -169,6 +170,7 @@ public interface ClientMessageHandler {
           BranchLog branchLog = branchLogs.get(i);
           Long branchId = branchLog.getBranchId();
           String clientAddress = branchLog.getClientIp();
+          String clientInfo = branchLog.getClientInfo();
           BranchRollBackMessage branchRollbackMessage = new BranchRollBackMessage();
           branchRollbackMessage.setServerAddr(DtsXID.getSvrAddr());
           branchRollbackMessage.setTranId(transId);
@@ -176,7 +178,7 @@ public interface ClientMessageHandler {
           branchRollbackMessage.setDbName(branchLog.getClientInfo());
           BranchRollbackResultMessage branchRollbackResult = null;
           try {
-            branchRollbackResult = serverMessageServer.invokeSync(clientAddress,
+            branchRollbackResult = serverMessageServer.invokeSync(clientAddress, clientInfo,
                 branchRollbackMessage, RemoteConstant.RPC_INVOKE_TIMEOUT);
           } catch (DtsException e) {
             String message =

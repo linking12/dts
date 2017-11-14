@@ -40,6 +40,7 @@ public class DefaultDtsResourcMessageSender extends AbstractLifecycleComponent
   private final NettyClientConfig nettyClientConfig;
   private static DefaultDtsResourcMessageSender resourceManagerSender =
       new DefaultDtsResourcMessageSender();
+  private ResourceManager rm;
 
   private DefaultDtsResourcMessageSender() {
     this.nettyClientConfig = new NettyClientConfig();
@@ -53,6 +54,7 @@ public class DefaultDtsResourcMessageSender extends AbstractLifecycleComponent
   }
 
   public void registerResourceManager(ResourceManager rm) {
+    this.rm = rm;
     registerHeaderRequest(rm);
     registerBodyRequest(rm);
   }
@@ -87,6 +89,7 @@ public class DefaultDtsResourcMessageSender extends AbstractLifecycleComponent
       public void run() {
         try {
           HeartbeatRequestHeader hearbeat = new HeartbeatRequestHeader();
+          hearbeat.setDbName(rm.getRegisterDb());
           DefaultDtsResourcMessageSender.this.invoke(hearbeat);
         } catch (Throwable e) {
           e.printStackTrace();

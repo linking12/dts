@@ -23,6 +23,8 @@ public interface ResourceManager {
 
   public long register(String dbName) throws DtsException;
 
+  public String getRegisterDb();
+
   public void branchCommit(String xid, long branchId, String key, String udata) throws DtsException;
 
   public void branchRollback(String xid, long branchId, String key, String udata)
