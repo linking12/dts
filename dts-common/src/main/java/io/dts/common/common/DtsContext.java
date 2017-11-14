@@ -53,7 +53,7 @@ public abstract class DtsContext {
     return contexts.get(0);
   }
 
-  protected abstract int priority();
+  public abstract int priority();
 
   public abstract String getCurrentXid();
 

@@ -11,7 +11,7 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-package io.dts.common.common;
+package io.dts.common.context;
 
 import com.quancheng.saluki.core.common.RpcContext;
 
@@ -23,25 +23,29 @@ import io.dts.common.common.DtsContext;
  */
 public class SalukiContext extends DtsContext {
 
+  @Override
   public String getCurrentXid() {
     return RpcContext.getContext().getAttachment(TXC_XID_KEY);
   }
 
+  @Override
   public void bind(String xid) {
     RpcContext.getContext().setAttachment(TXC_XID_KEY, xid);
   }
 
+  @Override
   public void unbind() {
     RpcContext.getContext().removeAttachment(TXC_XID_KEY);
     RpcContext.getContext().removeAttachment(TXC_NEXT_SVR_ADDR);
   }
 
+  @Override
   public boolean inTxcTransaction() {
     return getCurrentXid() != null;
   }
 
   @Override
-  protected int priority() {
+  public int priority() {
     return 0;
   }
 
