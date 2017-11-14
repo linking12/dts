@@ -37,7 +37,7 @@ public class AtExecutorRunCommiter {
 
 
   public TxcTable beforeExecute() throws SQLException {
-    if (!DtsContext.inTxcTransaction()) {
+    if (!DtsContext.getInstance().inTxcTransaction()) {
       return null;
     }
     TxcTable nRet = null;
@@ -56,7 +56,7 @@ public class AtExecutorRunCommiter {
   }
 
   public TxcTable afterExecute() throws SQLException {
-    if (!DtsContext.inTxcTransaction()) {
+    if (!DtsContext.getInstance().inTxcTransaction()) {
       return null;
     }
 

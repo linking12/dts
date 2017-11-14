@@ -48,7 +48,7 @@ public class DtsPrepareStatementWrapper extends AbstractDtsPrepareStatement {
 
   @Override
   public void addBatch() throws SQLException {
-    if (DtsContext.inTxcTransaction()) {
+    if (DtsContext.getInstance().inTxcTransaction()) {
       throw new UnsupportedOperationException("unsupport add batch in dts transaction");
     }
     getRawStatement().addBatch();
@@ -56,7 +56,7 @@ public class DtsPrepareStatementWrapper extends AbstractDtsPrepareStatement {
 
   @Override
   public void addBatch(final String sql) throws SQLException {
-    if (DtsContext.inTxcTransaction()) {
+    if (DtsContext.getInstance().inTxcTransaction()) {
       throw new UnsupportedOperationException("unsupport add batch in dts transaction");
     }
     getRawStatement().addBatch(sql);
@@ -64,7 +64,7 @@ public class DtsPrepareStatementWrapper extends AbstractDtsPrepareStatement {
 
   @Override
   public void clearBatch() throws SQLException {
-    if (DtsContext.inTxcTransaction()) {
+    if (DtsContext.getInstance().inTxcTransaction()) {
       throw new UnsupportedOperationException("unsupport clear batch in dts transaction");
     }
     getRawStatement().clearBatch();
@@ -72,7 +72,7 @@ public class DtsPrepareStatementWrapper extends AbstractDtsPrepareStatement {
 
   @Override
   public int[] executeBatch() throws SQLException {
-    if (DtsContext.inTxcTransaction()) {
+    if (DtsContext.getInstance().inTxcTransaction()) {
       throw new UnsupportedOperationException("unsupport execute batch in dts transaction");
     }
     return getRawStatement().executeBatch();

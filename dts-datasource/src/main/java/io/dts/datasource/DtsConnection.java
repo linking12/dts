@@ -58,7 +58,7 @@ public class DtsConnection extends AbstractDtsConnection {
   }
 
   private void registerBranch() throws SQLException {
-    if (!DtsContext.inTxcTransaction()) {
+    if (!DtsContext.getInstance().inTxcTransaction()) {
       return;
     }
     if (getAutoCommit() == true) {
@@ -67,7 +67,7 @@ public class DtsConnection extends AbstractDtsConnection {
     long branchId = dtsDataSource.getResourceManager().register(dtsDataSource.getDbName());
     txcContext = new TxcRuntimeContext();
     txcContext.setBranchId(branchId);
-    txcContext.setXid(DtsContext.getCurrentXid());
+    txcContext.setXid(DtsContext.getInstance().getCurrentXid());
   }
 
   @Override
@@ -78,7 +78,7 @@ public class DtsConnection extends AbstractDtsConnection {
   @Override
   public void commit() throws SQLException {
     try {
-      if (DtsContext.inTxcTransaction()) {
+      if (DtsContext.getInstance().inTxcTransaction()) {
         // 日志写库
         txcContext.setServer(DtsXID.getServerAddress(txcContext.getXid()));
         txcContext.setStatus(UndoLogMode.COMMON_LOG.getValue());
@@ -96,7 +96,7 @@ public class DtsConnection extends AbstractDtsConnection {
   @Override
   public void rollback() throws SQLException {
     try {
-      if (DtsContext.inTxcTransaction()) {
+      if (DtsContext.getInstance().inTxcTransaction()) {
         getRawConnection().rollback();
       } else {
         getRawConnection().rollback();

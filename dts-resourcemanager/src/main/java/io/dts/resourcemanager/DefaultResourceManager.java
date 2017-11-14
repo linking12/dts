@@ -62,10 +62,10 @@ public class DefaultResourceManager implements ResourceManager {
   @Override
   public long register(String dbName) throws DtsException {
     this.dbName = dbName;
-    if (DtsContext.inTxcTransaction()) {
+    if (DtsContext.getInstance().inTxcTransaction()) {
       RegisterMessage registerMessage = new RegisterMessage();
       registerMessage.setDbName(dbName);
-      registerMessage.setTranId(DtsXID.getTransactionId(DtsContext.getCurrentXid()));
+      registerMessage.setTranId(DtsXID.getTransactionId(DtsContext.getInstance().getCurrentXid()));
       try {
         RegisterResultMessage resultMessage = (RegisterResultMessage) resourceMessageSender
             .invoke(registerMessage, RemoteConstant.RPC_INVOKE_TIMEOUT);

@@ -34,5 +34,11 @@
 			<artifactId>spring-tx</artifactId>
 			<version>${spring.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.quancheng.saluki</groupId>
+			<artifactId>saluki-core</artifactId>
+			<version>1.5.7.RELEASE</version>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 </project>

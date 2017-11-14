@@ -13,41 +13,55 @@
  */
 package io.dts.common.common;
 
-import com.quancheng.saluki.core.common.RpcContext;
-
-import io.dts.common.exception.DtsException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.ServiceLoader;
 
 /**
  * @author liushiming
  * @version DtsContext2Helper.java, v 0.0.1 2017年10月27日 下午3:24:34 liushiming
  */
-public class DtsContext {
-
-  private static final String TXC_XID_KEY = "XID";
-  private static final String TXC_NEXT_SVR_ADDR = "NEXT_SVR_ADDR";
-
-  public static String getTxcNextSvrAddr() {
-    return RpcContext.getContext().getAttachment(TXC_NEXT_SVR_ADDR);
+public abstract class DtsContext {
+  protected static final String TXC_XID_KEY = "XID";
+  protected static final String TXC_NEXT_SVR_ADDR = "NEXT_SVR_ADDR";
+  private static List<DtsContext> contexts;
+  static {
+    contexts = load(DtsContext.class.getClassLoader());
   }
 
-  public static String getCurrentXid() {
-    return RpcContext.getContext().getAttachment(TXC_XID_KEY);
+  private static List<DtsContext> load(ClassLoader classLoader) {
+    Iterable<DtsContext> candidates = ServiceLoader.load(DtsContext.class, classLoader);
+    List<DtsContext> list = new ArrayList<DtsContext>();
+    for (DtsContext current : candidates) {
+      list.add(current);
+    }
+    Collections.sort(list, Collections.reverseOrder(new Comparator<DtsContext>() {
+      @Override
+      public int compare(DtsContext f1, DtsContext f2) {
+        return f1.priority() - f2.priority();
+      }
+    }));
+    return Collections.unmodifiableList(list);
   }
 
-  public static void bind(String xid, String nextSvrAddr) throws DtsException {
-    RpcContext.getContext().setAttachment(TXC_XID_KEY, xid);
-    if (nextSvrAddr != null)
-      RpcContext.getContext().setAttachment(TXC_NEXT_SVR_ADDR, nextSvrAddr);
+  public static DtsContext getInstance() {
+    if (contexts == null || contexts.isEmpty()) {
+      contexts = load(DtsContext.class.getClassLoader());
+    }
+    return contexts.get(0);
   }
 
-  public static void unbind() {
-    RpcContext.getContext().removeAttachment(TXC_XID_KEY);
-    RpcContext.getContext().removeAttachment(TXC_NEXT_SVR_ADDR);
-  }
+  protected abstract int priority();
 
-  public static boolean inTxcTransaction() {
-    return getCurrentXid() != null;
-  }
+  public abstract String getCurrentXid();
+
+  public abstract void bind(String xid);
+
+  public abstract void unbind();
+
+  public abstract boolean inTxcTransaction();
 
 
 }

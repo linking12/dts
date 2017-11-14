@@ -47,7 +47,7 @@ public class DefaultDtsTransactionManager implements DtsTransactionManager {
       BeginResultMessage beginResultMessage =
           dtsClient.invoke(beginMessage, RemoteConstant.RPC_INVOKE_TIMEOUT);
       String transId = beginResultMessage.getXid();
-      DtsContext.bind(transId, beginResultMessage.getNextSvrAddr());
+      DtsContext.getInstance().bind(transId);
     } catch (Throwable th) {
       throw new DtsException(th);
     }
@@ -61,10 +61,10 @@ public class DefaultDtsTransactionManager implements DtsTransactionManager {
   @Override
   public void commit(int retryTimes) throws DtsException {
     GlobalCommitMessage commitMessage = new GlobalCommitMessage();
-    if (DtsContext.getCurrentXid() == null) {
+    if (DtsContext.getInstance().getCurrentXid() == null) {
       throw new DtsException("the thread is not in transaction when invoke commit.");
     }
-    int transId = DtsXID.getTransactionId(DtsContext.getCurrentXid());
+    int transId = DtsXID.getTransactionId(DtsContext.getInstance().getCurrentXid());
     commitMessage.setTranId(transId);
     long start = 0;
     if (logger.isDebugEnabled())
@@ -86,15 +86,15 @@ public class DefaultDtsTransactionManager implements DtsTransactionManager {
         }
       } while (retryTimes-- > 0);
       if (resultMessage == null) {
-        throw new DtsException("transaction " + DtsContext.getCurrentXid()
+        throw new DtsException("transaction " + DtsContext.getInstance().getCurrentXid()
             + " Global commit failed.server response is null");
       }
       if (ex != null) {
         throw new DtsException(ex,
-            "transaction " + DtsContext.getCurrentXid() + " Global commit failed.");
+            "transaction " + DtsContext.getInstance().getCurrentXid() + " Global commit failed.");
       }
     } finally {
-      DtsContext.unbind();
+      DtsContext.getInstance().unbind();
       if (logger.isDebugEnabled()) {
         long end = System.currentTimeMillis();
         logger.debug(
@@ -112,7 +112,7 @@ public class DefaultDtsTransactionManager implements DtsTransactionManager {
   @Override
   public void rollback(int retryTimes) throws DtsException {
     GlobalRollbackMessage rollbackMessage = new GlobalRollbackMessage();
-    int transId = DtsXID.getTransactionId(DtsContext.getCurrentXid());
+    int transId = DtsXID.getTransactionId(DtsContext.getInstance().getCurrentXid());
     rollbackMessage.setTranId(transId);
     long start = 0;
     if (logger.isDebugEnabled())
@@ -134,15 +134,15 @@ public class DefaultDtsTransactionManager implements DtsTransactionManager {
         }
       } while (retryTimes-- > 0);
       if (resultMessage == null) {
-        throw new DtsException("transaction " + DtsContext.getCurrentXid()
+        throw new DtsException("transaction " + DtsContext.getInstance().getCurrentXid()
             + " Global rollback failed.server response is null");
       }
       if (ex != null) {
         throw new DtsException(ex,
-            "transaction " + DtsContext.getCurrentXid() + " Global rollback failed.");
+            "transaction " + DtsContext.getInstance().getCurrentXid() + " Global rollback failed.");
       }
     } finally {
-      DtsContext.unbind();
+      DtsContext.getInstance().unbind();
       if (logger.isDebugEnabled()) {
         long end = System.currentTimeMillis();
         logger.debug("invoke global rollback message:" + rollbackMessage + " cost " + (end - start)

@@ -16,147 +16,147 @@ import io.dts.common.common.DtsXID;
 
 public class TxcRuntimeContext {
 
-	private final Logger logger = LoggerFactory.getLogger(TxcRuntimeContext.class);
-	/**
-	 * 主键，自增
-	 */
-	private long id;
+  private final Logger logger = LoggerFactory.getLogger(TxcRuntimeContext.class);
+  /**
+   * 主键，自增
+   */
+  private long id;
 
-	/**
-	 * 全局事务ID
-	 */
-	private String xid;
+  /**
+   * 全局事务ID
+   */
+  private String xid;
 
-	/**
-	 * 分支事务ID
-	 */
-	private long branch_id;
+  /**
+   * 分支事务ID
+   */
+  private long branch_id;
 
-	/**
-	 * 分支日志
-	 */
-	private List<RollbackInfor> rollback_infor = new ArrayList<RollbackInfor>();
+  /**
+   * 分支日志
+   */
+  private List<RollbackInfor> rollback_infor = new ArrayList<RollbackInfor>();
 
-	/**
-	 * 处理状态
-	 */
-	private int status;
+  /**
+   * 处理状态
+   */
+  private int status;
 
-	/**
-	 * 服务所在IP
-	 */
-	private String server;
+  /**
+   * 服务所在IP
+   */
+  private String server;
 
-	/**
-	 * 开始时间
-	 */
-	private final long start;
+  /**
+   * 开始时间
+   */
+  private final long start;
 
-	/**
-	 * 开始时间，每次打点时重新计时
-	 */
-	@JSONField(serialize = false)
-	private long start0;
+  /**
+   * 开始时间，每次打点时重新计时
+   */
+  @JSONField(serialize = false)
+  private long start0;
 
-	public TxcRuntimeContext() {
-		if (logger.isDebugEnabled()) {
-			start = System.currentTimeMillis();
-			start0 = System.currentTimeMillis();
-		} else {
-			start = 0;
-			start0 = 0;
-		}
-	}
-	
-	/**
-	 * 转换为String
-	 * 
-	 * @return
-	 */
-	public String encode() {
-		return JSON.toJSONString(this, SerializerFeature.WriteDateUseDateFormat);
-	}
+  public TxcRuntimeContext() {
+    if (logger.isDebugEnabled()) {
+      start = System.currentTimeMillis();
+      start0 = System.currentTimeMillis();
+    } else {
+      start = 0;
+      start0 = 0;
+    }
+  }
 
-	/**
-	 * 转换为Object
-	 * 
-	 * @param jsonString
-	 * @return
-	 */
-	public static TxcRuntimeContext decode(String jsonString) {
-		return JSON.parseObject(jsonString, TxcRuntimeContext.class);
-	}
+  /**
+   * 转换为String
+   * 
+   * @return
+   */
+  public String encode() {
+    return JSON.toJSONString(this, SerializerFeature.WriteDateUseDateFormat);
+  }
 
-	public long getId() {
-		return id;
-	}
+  /**
+   * 转换为Object
+   * 
+   * @param jsonString
+   * @return
+   */
+  public static TxcRuntimeContext decode(String jsonString) {
+    return JSON.parseObject(jsonString, TxcRuntimeContext.class);
+  }
 
-	public void setId(long id) {
-		this.id = id;
-	}
+  public long getId() {
+    return id;
+  }
 
-	public String getXid() {
-		return xid;
-	}
+  public void setId(long id) {
+    this.id = id;
+  }
 
-	public void setXid(String xid) {
-		this.xid = xid;
-	}
+  public String getXid() {
+    return xid;
+  }
 
-	public long getBranchId() {
-		return branch_id;
-	}
+  public void setXid(String xid) {
+    this.xid = xid;
+  }
 
-	public void setBranchId(long branch_id) {
-		this.branch_id = branch_id;
-	}
+  public long getBranchId() {
+    return branch_id;
+  }
 
-	public void setInfor(List<RollbackInfor> rollback_infor) {
-		this.rollback_infor = rollback_infor;
-	}
+  public void setBranchId(long branch_id) {
+    this.branch_id = branch_id;
+  }
 
-	public List<RollbackInfor> getInfor() {
-		return rollback_infor;
-	}
+  public void setInfor(List<RollbackInfor> rollback_infor) {
+    this.rollback_infor = rollback_infor;
+  }
 
-	public void addInfor(RollbackInfor undoLogInfor) {
-		rollback_infor.add(undoLogInfor);
-	}
+  public List<RollbackInfor> getInfor() {
+    return rollback_infor;
+  }
 
-	public int getStatus() {
-		return status;
-	}
+  public void addInfor(RollbackInfor undoLogInfor) {
+    rollback_infor.add(undoLogInfor);
+  }
 
-	public void setStatus(int status) {
-		this.status = status;
-	}
+  public int getStatus() {
+    return status;
+  }
 
-	public String getServer() {
-		return server;
-	}
+  public void setStatus(int status) {
+    this.status = status;
+  }
 
-	public void setServer(String server) {
-		this.server = server;
-	}
+  public String getServer() {
+    return server;
+  }
 
-	public long getRT() {
-		return System.currentTimeMillis() - start;
-	}
+  public void setServer(String server) {
+    this.server = server;
+  }
 
-	/**
-	 * 每次调用重新计算打点的开始时间
-	 */
-	public long getRTFromLastPoint() {
-		long fromLastPoint = System.currentTimeMillis() - start0;
-		start0 = System.currentTimeMillis();
-		return fromLastPoint;
-	}
+  public long getRT() {
+    return System.currentTimeMillis() - start;
+  }
 
-	public String txcStr() throws SQLException {
-		if (DtsContext.inTxcTransaction()) {
-			return DtsXID.formatXid(getXid(), getBranchId());
-		}
+  /**
+   * 每次调用重新计算打点的开始时间
+   */
+  public long getRTFromLastPoint() {
+    long fromLastPoint = System.currentTimeMillis() - start0;
+    start0 = System.currentTimeMillis();
+    return fromLastPoint;
+  }
 
-		return " [NULL TXC] ";
-	}
+  public String txcStr() throws SQLException {
+    if (DtsContext.getInstance().inTxcTransaction()) {
+      return DtsXID.formatXid(getXid(), getBranchId());
+    }
+
+    return " [NULL TXC] ";
+  }
 }
