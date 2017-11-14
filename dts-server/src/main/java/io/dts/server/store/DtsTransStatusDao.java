@@ -14,7 +14,6 @@
 package io.dts.server.store;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 
 import io.dts.server.handler.support.ClientMessageHandler;
 import io.dts.server.struct.BranchLog;
@@ -42,13 +41,4 @@ public interface DtsTransStatusDao {
 
   public void setClientMessageHandler(ClientMessageHandler handler);
 
-  static final AtomicLong txcid = new AtomicLong(1000);
-
-  default long generateGlobalId() {
-    return txcid.incrementAndGet();
-  }
-
-  default long generateBranchId() {
-    return txcid.incrementAndGet();
-  }
 }

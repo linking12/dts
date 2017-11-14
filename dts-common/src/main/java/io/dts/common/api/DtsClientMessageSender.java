@@ -7,8 +7,6 @@ import io.dts.common.protocol.RequestMessage;
 /**
  * client同步调用server端接口
  * 
- * @author hanjie
- *
  */
 public interface DtsClientMessageSender extends BaseMessageSender {
 

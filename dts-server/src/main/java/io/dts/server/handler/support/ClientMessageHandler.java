@@ -52,7 +52,7 @@ public interface ClientMessageHandler {
 
   public static ClientMessageHandler createClientMessageProcessor(
       DtsTransStatusDao dtsTransStatusDao, DtsLogDao dtsLogDao,
-      DtsServerMessageSender serverMessageServer) {
+      DtsServerMessageSender messageSender) {
 
     return new ClientMessageHandler() {
       private final Logger logger = LoggerFactory.getLogger(RmMessageHandler.class);
@@ -147,7 +147,7 @@ public interface ClientMessageHandler {
           branchCommitMessage.setDbName(branchLog.getClientInfo());
           BranchCommitResultMessage branchCommitResult = null;
           try {
-            branchCommitResult = serverMessageServer.invokeSync(clientAddress, clientInfo,
+            branchCommitResult = messageSender.invokeSync(clientAddress, clientInfo,
                 branchCommitMessage, RemoteConstant.RPC_INVOKE_TIMEOUT);
           } catch (DtsException e) {
             String message =
@@ -178,7 +178,7 @@ public interface ClientMessageHandler {
           branchRollbackMessage.setDbName(branchLog.getClientInfo());
           BranchRollbackResultMessage branchRollbackResult = null;
           try {
-            branchRollbackResult = serverMessageServer.invokeSync(clientAddress, clientInfo,
+            branchRollbackResult = messageSender.invokeSync(clientAddress, clientInfo,
                 branchRollbackMessage, RemoteConstant.RPC_INVOKE_TIMEOUT);
           } catch (DtsException e) {
             String message =

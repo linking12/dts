@@ -9,11 +9,7 @@ import io.dts.common.protocol.header.GlobalRollbackResultMessage;
 import io.dts.common.protocol.header.RegisterMessage;
 import io.dts.common.protocol.header.RegisterResultMessage;
 
-/**
- * @author jiangyu.jy
- * 
- *         TXC 消息处理器
- */
+
 public interface DtsServerMessageHandler {
 
   /**

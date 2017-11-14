@@ -40,7 +40,7 @@ import io.dts.server.store.DtsTransStatusDao;
  */
 @Component
 @Scope("prototype")
-public class DefaultDtsServerMessageHandler implements DtsServerMessageHandler {
+public class DtsServerMessageHandlerImpl implements DtsServerMessageHandler {
 
   @Autowired
   private DtsTransStatusDao dtsTransStatusDao;
@@ -49,7 +49,7 @@ public class DefaultDtsServerMessageHandler implements DtsServerMessageHandler {
   private DtsLogDao dtsLogDao;
 
   @Autowired
-  private DtsServerMessageSender serverMessageServer;
+  private DtsServerMessageSender serverMessageSender;
 
 
   private ClientMessageHandler clientHandler;
@@ -59,7 +59,7 @@ public class DefaultDtsServerMessageHandler implements DtsServerMessageHandler {
   @PostConstruct
   public void init() {
     clientHandler = ClientMessageHandler.createClientMessageProcessor(dtsTransStatusDao, dtsLogDao,
-        serverMessageServer);
+        serverMessageSender);
     dtsTransStatusDao.setClientMessageHandler(clientHandler);
     resourceHandler =
         RmMessageHandler.createResourceManagerMessageProcessor(dtsTransStatusDao, dtsLogDao);

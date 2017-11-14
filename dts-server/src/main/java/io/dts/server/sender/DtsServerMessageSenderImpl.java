@@ -33,7 +33,7 @@ import io.netty.channel.Channel;
  * @version DefaultDtsMessageSenderImpl.java, v 0.0.1 2017年9月20日 下午2:47:01 liushiming
  */
 @Component
-public class DefaultDtsServerMessageSender implements DtsServerMessageSender {
+public class DtsServerMessageSenderImpl implements DtsServerMessageSender {
 
   @Autowired
   private ChannelRepository channelRepository;
