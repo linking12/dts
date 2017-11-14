@@ -87,13 +87,10 @@ public class RmMessageProcessor implements NettyRequestProcessor {
     String servAddr = commitMessage.getServerAddr();
     String dbName = commitMessage.getDbName();
     String udata = commitMessage.getUdata();
-    int commitMode = commitMessage.getCommitMode();
-    String retrySql = commitMessage.getRetrySql();
-
     resultMessage.setBranchId(branchId);
     resultMessage.setTranId(tranId);
     try {
-      rm.branchCommit(servAddr + ":" + tranId, branchId, dbName, udata, commitMode, retrySql);
+      rm.branchCommit(servAddr + ":" + tranId, branchId, dbName, udata);
       resultMessage.setResult(ResultCode.OK.getValue());
     } catch (Exception e) {
       resultMessage.setResult(ResultCode.ERROR.getValue());
@@ -108,12 +105,10 @@ public class RmMessageProcessor implements NettyRequestProcessor {
     String servAddr = rollBackMessage.getServerAddr();
     String dbName = rollBackMessage.getDbName();
     String udata = rollBackMessage.getUdata();
-    int commitMode = rollBackMessage.getCommitMode();
-
     resultMessage.setBranchId(branchId);
     resultMessage.setTranId(tranId);
     try {
-      rm.branchRollback(servAddr + ":" + tranId, branchId, dbName, udata, commitMode);
+      rm.branchRollback(servAddr + ":" + tranId, branchId, dbName, udata);
       resultMessage.setResult(ResultCode.OK.getValue());
     } catch (Exception e) {
       resultMessage.setResult(ResultCode.ERROR.getValue());

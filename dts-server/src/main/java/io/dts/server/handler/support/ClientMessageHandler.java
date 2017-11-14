@@ -68,7 +68,6 @@ public interface ClientMessageHandler {
         globalLog.setState(GlobalTransactionState.Begin.getValue());
         globalLog.setTimeout(beginMessage.getTimeout());
         globalLog.setClientAppName(clientIp);
-        globalLog.setContainPhase2CommitBranch(false);
         dtsLogDao.insertGlobalLog(globalLog, DtsServerContainer.mid);;
         long tranId = globalLog.getTransId();
         dtsTransStatusDao.saveGlobalLog(tranId, globalLog, beginMessage.getTimeout());
@@ -151,7 +150,6 @@ public interface ClientMessageHandler {
           branchCommitMessage.setTranId(transId);
           branchCommitMessage.setBranchId(branchId);
           branchCommitMessage.setUdata(branchLog.getUdata());
-          branchCommitMessage.setRetrySql(branchLog.getRetrySql());
           branchCommitMessage.setDbName(branchLog.getClientInfo());
           BranchCommitResultMessage branchCommitResult = null;
           try {

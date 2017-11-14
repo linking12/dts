@@ -37,7 +37,6 @@ public class BeginMessage implements CommandCustomHeader, RequestMessage {
     this.timeout = timeout;
   }
 
-
   @Override
   public void checkFields() throws RemotingCommandException {
 

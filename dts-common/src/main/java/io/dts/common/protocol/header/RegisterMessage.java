@@ -64,16 +64,6 @@ public class RegisterMessage implements CommandCustomHeader, RequestMessage {
     this.businessKey = businessKey;
   }
 
-
-
-  public int getCommitMode() {
-    return commitMode;
-  }
-
-  public void setCommitMode(int commitMode) {
-    this.commitMode = commitMode;
-  }
-
   @Override
   public void checkFields() throws RemotingCommandException {
 

@@ -80,15 +80,14 @@ public class DefaultResourceManager implements ResourceManager {
   }
 
   @Override
-  public void branchCommit(String xid, long branchId, String key, String udata, int commitMode,
-      String retrySql) throws DtsException {
+  public void branchCommit(String xid, long branchId, String key, String udata)
+      throws DtsException {
     try {
       ContextStep2 context = new ContextStep2();
       context.setXid(xid);
       context.setBranchId(branchId);
       context.setDbname(key);
       context.setUdata(udata);
-      context.setRetrySql(retrySql);
       context.setGlobalXid(DtsXID.getGlobalXID(xid, branchId));
       DtsLogManager.getInstance().branchCommit(context);
     } catch (DtsException e) {
@@ -99,7 +98,7 @@ public class DefaultResourceManager implements ResourceManager {
   }
 
   @Override
-  public void branchRollback(String xid, long branchId, String key, String udata, int commitMode)
+  public void branchRollback(String xid, long branchId, String key, String udata)
       throws DtsException {
     ContextStep2 context = new ContextStep2();
     context.setXid(xid);

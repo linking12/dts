@@ -40,10 +40,6 @@ public class GlobalLog {
    */
   private String clientAppName;
 
-  /**
-   * 全局事务中是否有第二阶段提交的分支（典型为MT分支)
-   */
-  private boolean containPhase2CommitBranch = true;
 
   private List<Long> branchIds = Collections.synchronizedList(new ArrayList<Long>());
 
@@ -58,20 +54,6 @@ public class GlobalLog {
 
   public void setRecvTime(long recvTime) {
     this.recvTime = recvTime;
-  }
-
-  /**
-   * @return
-   */
-  public boolean isContainPhase2CommitBranch() {
-    return containPhase2CommitBranch;
-  }
-
-  /**
-   * @param containPhase2CommitBranch
-   */
-  public void setContainPhase2CommitBranch(boolean containPhase2CommitBranch) {
-    this.containPhase2CommitBranch = containPhase2CommitBranch;
   }
 
 

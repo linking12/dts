@@ -39,10 +39,6 @@ public class BranchCommitMessage implements CommandCustomHeader, RequestMessage 
 
   private String dbName;
 
-  private String retrySql;
-
-  private int commitMode;
-
   private String udata;
 
   public String getServerAddr() {
@@ -91,22 +87,6 @@ public class BranchCommitMessage implements CommandCustomHeader, RequestMessage 
 
   public void setDbName(String dbName) {
     this.dbName = dbName;
-  }
-
-  public String getRetrySql() {
-    return retrySql;
-  }
-
-  public void setRetrySql(String retrySql) {
-    this.retrySql = retrySql;
-  }
-
-  public int getCommitMode() {
-    return commitMode;
-  }
-
-  public void setCommitMode(int commitMode) {
-    this.commitMode = commitMode;
   }
 
   public String getUdata() {

@@ -7,7 +7,6 @@ public class ContextStep2 {
   private long branchId;
   private String dbname;
   private String udata;
-  private String retrySql;
 
   public long getGlobalXid() {
     return globalXid;
@@ -41,14 +40,6 @@ public class ContextStep2 {
     this.udata = udata;
   }
 
-
-  public String getRetrySql() {
-    return retrySql;
-  }
-
-  public void setRetrySql(String retrySql) {
-    this.retrySql = retrySql;
-  }
 
   public String getDbname() {
     return dbname;

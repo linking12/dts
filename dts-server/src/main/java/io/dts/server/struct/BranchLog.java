@@ -39,7 +39,7 @@ public class BranchLog {
   private String clientInfo;
 
   /**
-   * 用户自定义信息，MT服务可以把一阶段的一些用户数据上报给Server，Server在二阶段把这个信息再传下来； 这样MT服务二阶段可以节省一次查询
+   * 用户自定义信息
    */
   private String udata;
 
@@ -64,13 +64,6 @@ public class BranchLog {
   private int waitPeriods;
 
   /**
-   * 重试Sql
-   */
-  private String retrySql;
-
-  private String reportSql;
-
-  /**
    * slave节点接收时间
    */
   private long recvTime;
@@ -86,14 +79,6 @@ public class BranchLog {
 
   public void setRecvTime(long recvTime) {
     this.recvTime = recvTime;
-  }
-
-  public String getRetrySql() {
-    return retrySql;
-  }
-
-  public void setRetrySql(String retrySql) {
-    this.retrySql = retrySql;
   }
 
   /**
@@ -261,16 +246,6 @@ public class BranchLog {
     this.gmtModified = gmtModified;
   }
 
-
-
-  public String getReportSql() {
-    return reportSql;
-  }
-
-  public void setReportSql(String reportSql) {
-    this.reportSql = reportSql;
-  }
-
   /*
    * (non-Javadoc)
    * 
@@ -278,6 +253,6 @@ public class BranchLog {
    */
   public String toString() {
     return "tranId:" + this.transId + ",branchId:" + this.branchId + ",state:" + this.state
-        + ",udata:" + this.udata + ",retrySql:" + this.retrySql;
+        + ",udata:" + this.udata;
   }
 }
