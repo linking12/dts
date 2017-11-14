@@ -84,16 +84,14 @@ public class DtsLogDaoImpl implements DtsLogDao {
       @Override
       public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
         PreparedStatement ps = con.prepareStatement(
-            "insert into dts_branch_log (tx_id,state,client_ip,client_app_name,client_info,gmt_created,gmt_modified,udata,mid)"
-                + " values (?,?,?,?,?,now(),now(),?,?)",
+            "insert into dts_branch_log (tx_id,state,client_ip,client_info,gmt_created,gmt_modified,mid)"
+                + " values (?,?,?,?,now(),now(),?)",
             Statement.RETURN_GENERATED_KEYS);
         ps.setLong(1, branchLog.getTransId());
         ps.setInt(2, branchLog.getState());
         ps.setString(3, branchLog.getClientIp());
-        ps.setString(4, branchLog.getClientAppName());
-        ps.setString(5, branchLog.getClientInfo());
-        ps.setString(6, branchLog.getUdata());
-        ps.setInt(7, mid);
+        ps.setString(4, branchLog.getClientInfo());
+        ps.setInt(5, mid);
         return ps;
       }
     };
@@ -109,9 +107,8 @@ public class DtsLogDaoImpl implements DtsLogDao {
 
   @Override
   public void updateBranchLog(BranchLog branchLog, int mid) {
-    jdbcTemplate.update(
-        "update dts_branch_log set state = ?,udata = ? where branch_id = ? and mid = ?",
-        new Object[] {branchLog.getState(), branchLog.getUdata(), branchLog.getBranchId(), mid});
+    jdbcTemplate.update("update dts_branch_log set state = ? where branch_id = ? and mid = ?",
+        new Object[] {branchLog.getState(), branchLog.getBranchId(), mid});
   }
 
   @Override
@@ -148,9 +145,7 @@ public class DtsLogDaoImpl implements DtsLogDao {
     log.setTransId(rs.getLong("tx_id"));
     log.setState(rs.getInt("state"));
     log.setClientIp(rs.getString("client_ip"));
-    log.setClientAppName(rs.getString("client_app_name"));
     log.setClientInfo(rs.getString("client_info"));
-    log.setUdata(rs.getString("udata"));
     log.setGmtCreated(rs.getTimestamp("gmt_created"));
     log.setGmtModified(rs.getTimestamp("gmt_modified"));
     return log;
@@ -187,36 +182,29 @@ public class DtsLogDaoImpl implements DtsLogDao {
   @Override
   public void insertBranchErrorLog(final BranchLog branchLog, final int mid) {
     jdbcTemplate.update(
-        "insert into dts_branch_error_log ("
-            + "branch_id,tx_id,state,client_ip,client_app_name,client_info,"
-            + "gmt_created,gmt_modified,mid)" + " values (?,?,?,?,?,?, now(),now(),?)",
+        "insert into dts_branch_error_log (branch_id,tx_id,state,client_ip,client_info,gmt_created,gmt_modified,mid) values (?,?,?,?,?,now(),now(),?)",
         new Object[] {branchLog.getBranchId(), branchLog.getTransId(), branchLog.getState(),
-            branchLog.getClientIp(), branchLog.getClientAppName(), branchLog.getClientInfo(), mid});
+            branchLog.getClientIp(), branchLog.getClientInfo(), mid});
   }
 
   @Override
   public void updateBranchErrorLog(BranchLog branchLog, int mid) {
     jdbcTemplate.update(
-        "update dts_branch_error_log  set "
-            + "tx_id=?,state=?,client_ip=?,client_app_name=?,client_info=?,gmt_modified=now(),"
-            + "is_notify= ? where branch_id=? and mid=?",
+        "update dts_branch_error_log set tx_id=?,state=?,client_ip=?,client_info=?,gmt_modified=now(),is_notify= ? where branch_id=? and mid=?",
         new Object[] {branchLog.getTransId(), branchLog.getState(), branchLog.getClientIp(),
-            branchLog.getClientAppName(), branchLog.getClientInfo(), branchLog.getIsNotify(),
-            branchLog.getBranchId(), mid});
+            branchLog.getClientInfo(), branchLog.getIsNotify(), branchLog.getBranchId(), mid});
   }
 
   @Override
   public List<BranchLog> findWaitNotifyErrorLog(int commit_type) {
     return jdbcTemplate.query(
-        "select * from dts_branch_error_log where is_notify<>1 and mid=? "
-            + "order by client_app_name",
+        "select * from dts_branch_error_log where is_notify<>1 and mid=? order by client_ip",
         new Object[] {commit_type, AppConfig.mId}, new RowMapper<BranchLog>() {
           @Override
           public BranchLog mapRow(ResultSet rs, int rowNum) throws SQLException {
             BranchLog log = new BranchLog();
             log.setTransId(rs.getLong("tx_id"));
             log.setState(rs.getInt("state"));
-            log.setClientAppName(rs.getString("client_app_name"));
             log.setClientInfo(rs.getString("client_info"));
             log.setClientIp(rs.getString("client_ip"));
             log.setBranchId(rs.getLong("branch_id"));

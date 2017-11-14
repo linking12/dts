@@ -29,19 +29,9 @@ public class BranchLog {
   private String clientIp;
 
   /**
-   * 客户端应用
-   */
-  private String clientAppName;
-
-  /**
    * 客户端信息，如dbkey
    */
   private String clientInfo;
-
-  /**
-   * 用户自定义信息
-   */
-  private String udata;
 
   /**
    * 创建时间
@@ -58,20 +48,12 @@ public class BranchLog {
    */
   private int isNotify;
 
-  /**
-   * 当事务超时时，如果有的分支状态还没有上报，则需要等待N个周期。这个属性记录已等待的周期数。
-   */
-  private int waitPeriods;
 
   /**
    * slave节点接收时间
    */
   private long recvTime;
 
-  /**
-   * 业务主键，用于强隔离。分支上报给server，自己修改了哪些表的哪些行的主键。格式如下： "tableName1:key1,key2,key3;tableName2:key1,key2"
-   */
-  String businessKey;
 
   public long getRecvTime() {
     return recvTime;
@@ -79,27 +61,6 @@ public class BranchLog {
 
   public void setRecvTime(long recvTime) {
     this.recvTime = recvTime;
-  }
-
-  /**
-   * @return
-   */
-  public int getWaitPeriods() {
-    return waitPeriods;
-  }
-
-  /**
-   * @param waitPeriods
-   */
-  public void setWaitPeriods(int waitPeriods) {
-    this.waitPeriods = waitPeriods;
-  }
-
-  /**
-   * increte wait periods
-   */
-  public void incWaitPeriods() {
-    this.waitPeriods++;
   }
 
   /**
@@ -129,8 +90,6 @@ public class BranchLog {
   public void setBranchId(long branchId) {
     this.branchId = branchId;
   }
-
-
 
   public long getTransId() {
     return transId;
@@ -171,20 +130,6 @@ public class BranchLog {
   /**
    * @return
    */
-  public String getClientAppName() {
-    return clientAppName;
-  }
-
-  /**
-   * @param clientAppName
-   */
-  public void setClientAppName(String clientAppName) {
-    this.clientAppName = clientAppName;
-  }
-
-  /**
-   * @return
-   */
   public String getClientInfo() {
     return clientInfo;
   }
@@ -194,28 +139,6 @@ public class BranchLog {
    */
   public void setClientInfo(String clientInfo) {
     this.clientInfo = clientInfo;
-  }
-
-  /**
-   * @return
-   */
-  public String getUdata() {
-    return udata;
-  }
-
-  /**
-   * @param udata
-   */
-  public void setUdata(String udata) {
-    this.udata = udata;
-  }
-
-  public String getBusinessKey() {
-    return businessKey;
-  }
-
-  public void setBusinessKey(String businessKey) {
-    this.businessKey = businessKey;
   }
 
   /**
@@ -246,13 +169,12 @@ public class BranchLog {
     this.gmtModified = gmtModified;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.lang.Object#toString()
-   */
+  @Override
   public String toString() {
-    return "tranId:" + this.transId + ",branchId:" + this.branchId + ",state:" + this.state
-        + ",udata:" + this.udata;
+    return "BranchLog [branchId=" + branchId + ", transId=" + transId + ", state=" + state
+        + ", clientIp=" + clientIp + ", clientInfo=" + clientInfo + ", gmtCreated=" + gmtCreated
+        + ", gmtModified=" + gmtModified + ", isNotify=" + isNotify + ", recvTime=" + recvTime
+        + "]";
   }
+
 }

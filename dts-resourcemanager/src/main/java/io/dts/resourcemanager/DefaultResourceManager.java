@@ -54,10 +54,10 @@ public class DefaultResourceManager implements ResourceManager {
 
 
   @Override
-  public long register(String key) throws DtsException {
+  public long register(String dbName) throws DtsException {
     if (DtsContext.inTxcTransaction()) {
       RegisterMessage registerMessage = new RegisterMessage();
-      registerMessage.setKey(key);
+      registerMessage.setDbName(dbName);
       registerMessage.setTranId(DtsXID.getTransactionId(DtsContext.getCurrentXid()));
       try {
         RegisterResultMessage resultMessage = (RegisterResultMessage) resourceMessageSender

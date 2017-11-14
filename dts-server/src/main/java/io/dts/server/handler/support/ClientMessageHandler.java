@@ -60,7 +60,6 @@ public interface ClientMessageHandler {
       private final SyncRmMessagHandler globalResultMessageHandler =
           SyncRmMessagHandler.createSyncGlobalResultProcess(dtsTransStatusDao, dtsLogDao);
 
-
       // 开始一个事务
       @Override
       public String processMessage(BeginMessage beginMessage, String clientIp) {
@@ -87,21 +86,16 @@ public interface ClientMessageHandler {
             case Begin:
               List<BranchLog> branchLogs =
                   dtsTransStatusDao.queryBranchLogByTransId(globalLog.getTransId());
-              if (branchLogs.size() == 0) {
-                dtsLogDao.deleteGlobalLog(globalLog.getTransId(), DtsServerContainer.mid);
-                dtsTransStatusDao.removeGlobalLog(tranId);
-                return;
-              }
               // 通知各个分支开始提交
               try {
                 this.syncGlobalCommit(branchLogs, globalLog.getTransId());
                 globalLog.setState(GlobalTransactionState.Committed.getValue());
-                dtsLogDao.updateGlobalLog(globalLog, DtsServerContainer.mid);
+                dtsLogDao.deleteGlobalLog(globalLog.getTransId(), DtsServerContainer.mid);
               } catch (Exception e) {
                 logger.error(e.getMessage(), e);
-                globalLog.setState(GlobalTransactionState.InDoubt.getValue());
+                globalLog.setState(GlobalTransactionState.CmmittedFailed.getValue());
                 dtsLogDao.updateGlobalLog(globalLog, DtsServerContainer.mid);
-                throw new DtsException("notify resourcemanager to commit failed");
+                throw new DtsException(e, "notify resourcemanager to commit failed");
               }
               return;
             default:
@@ -127,10 +121,10 @@ public interface ClientMessageHandler {
               try {
                 this.syncGlobalRollback(branchLogs, globalLog.getTransId());
                 globalLog.setState(GlobalTransactionState.Rollbacked.getValue());
-                dtsLogDao.updateGlobalLog(globalLog, DtsServerContainer.mid);
+                dtsLogDao.deleteGlobalLog(globalLog.getTransId(), DtsServerContainer.mid);
               } catch (Exception e) {
                 logger.error(e.getMessage(), e);
-                globalLog.setState(GlobalTransactionState.InDoubt.getValue());
+                globalLog.setState(GlobalTransactionState.RollbackFailed.getValue());
                 dtsLogDao.updateGlobalLog(globalLog, DtsServerContainer.mid);
                 throw new DtsException("notify resourcemanager to commit failed");
               }
@@ -149,20 +143,23 @@ public interface ClientMessageHandler {
           branchCommitMessage.setServerAddr(DtsXID.getSvrAddr());
           branchCommitMessage.setTranId(transId);
           branchCommitMessage.setBranchId(branchId);
-          branchCommitMessage.setUdata(branchLog.getUdata());
           branchCommitMessage.setDbName(branchLog.getClientInfo());
           BranchCommitResultMessage branchCommitResult = null;
           try {
             branchCommitResult = serverMessageServer.invokeSync(clientAddress, branchCommitMessage,
                 RemoteConstant.RPC_INVOKE_TIMEOUT);
           } catch (DtsException e) {
-            dtsLogDao.insertBranchErrorLog(branchLog, DtsServerContainer.mid);
-            logger.error(
-                "notify " + clientAddress + " to commit occur system error,branchId:" + branchId,
-                e);
+            String message =
+                "notify " + clientAddress + " commit occur system error,branchId:" + branchId;
+            logger.error(message, e);
+            throw new DtsException(e, message);
           }
-          if (branchCommitResult != null)
+          if (branchCommitResult != null) {
             globalResultMessageHandler.processMessage(clientAddress, branchCommitResult);
+          } else {
+            throw new DtsException(
+                "notify " + clientAddress + " commit response null,branchId:" + branchId);
+          }
         }
 
       }
@@ -177,18 +174,22 @@ public interface ClientMessageHandler {
           branchRollbackMessage.setTranId(transId);
           branchRollbackMessage.setBranchId(branchId);
           branchRollbackMessage.setDbName(branchLog.getClientInfo());
-          branchRollbackMessage.setUdata(branchLog.getUdata());
           BranchRollbackResultMessage branchRollbackResult = null;
           try {
             branchRollbackResult = serverMessageServer.invokeSync(clientAddress,
                 branchRollbackMessage, RemoteConstant.RPC_INVOKE_TIMEOUT);
           } catch (DtsException e) {
-            dtsLogDao.insertBranchErrorLog(branchLog, DtsServerContainer.mid);
-            logger.error(
-                "notify " + clientAddress + " rollback occur system error,branchId:" + branchId, e);
+            String message =
+                "notify " + clientAddress + " rollback occur system error,branchId:" + branchId;
+            logger.error(message, e);
+            throw new DtsException(e, message);
           }
-          if (branchRollbackResult != null)
+          if (branchRollbackResult != null) {
             globalResultMessageHandler.processMessage(clientAddress, branchRollbackResult);
+          } else {
+            throw new DtsException(
+                "notify " + clientAddress + " rollback response null,branchId:" + branchId);
+          }
         }
       }
     };

@@ -18,12 +18,8 @@ public enum BranchLogState {
   /**
    * 分支失败
    */
-  Failed(3),
+  Failed(3);
 
-  /**
-   * 分支上报状态超时
-   */
-  Timeout(4);
 
   /**
    * @param value

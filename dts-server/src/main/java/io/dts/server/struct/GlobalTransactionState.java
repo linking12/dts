@@ -22,10 +22,14 @@ public enum GlobalTransactionState {
   Rollbacked(3),
 
   /**
-   * 未知状态，已发送请求，但是未返回成功结果，同步未返回成功结果
+   * 提交失败
    */
-  InDoubt(4);
+  CmmittedFailed(4),
 
+  /**
+   * 回滚失败
+   */
+  RollbackFailed(5);
   /**
    * @param value
    */

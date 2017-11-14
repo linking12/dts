@@ -21,7 +21,7 @@ import io.dts.common.exception.DtsException;
  */
 public interface ResourceManager {
 
-  public long register(String key) throws DtsException;
+  public long register(String dbName) throws DtsException;
 
   public void branchCommit(String xid, long branchId, String key, String udata) throws DtsException;
 

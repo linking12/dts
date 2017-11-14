@@ -28,16 +28,10 @@ public class RegisterMessage implements CommandCustomHeader, RequestMessage {
    */
   @CFNotNull
   private long tranId;
-
   /**
-   * 这个域为dbKey；
+   * 数据库名称
    */
-  private String key;
-
-  /**
-   * 业务主键，用于强隔离。分支上报给server，自己修改了哪些表的哪些行的主键。格式如下： "tableName1:key1,key2,key3;tableName2:key1,key2"
-   */
-  private String businessKey;
+  private String dbName;
 
 
   public long getTranId() {
@@ -48,20 +42,12 @@ public class RegisterMessage implements CommandCustomHeader, RequestMessage {
     this.tranId = tranId;
   }
 
-  public String getKey() {
-    return key;
+  public String getDbName() {
+    return dbName;
   }
 
-  public void setKey(String key) {
-    this.key = key;
-  }
-
-  public String getBusinessKey() {
-    return businessKey;
-  }
-
-  public void setBusinessKey(String businessKey) {
-    this.businessKey = businessKey;
+  public void setDbName(String dbName) {
+    this.dbName = dbName;
   }
 
   @Override
