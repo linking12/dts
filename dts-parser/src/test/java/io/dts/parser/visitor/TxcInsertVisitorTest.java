@@ -1,24 +1,22 @@
 package io.dts.parser.visitor;
 
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.List;
+
+import javax.sql.DataSource;
+
 import org.junit.Before;
 import org.junit.Test;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import com.google.common.collect.Lists;
 
-import javax.sql.DataSource;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.List;
-
 import io.dts.parser.DtsVisitorFactory;
 import io.dts.parser.struct.DatabaseType;
 import io.dts.parser.vistor.ITxcVisitor;
-import sun.swing.BakedArrayList;
 
 /**
  * Created by guoyubo on 2017/10/20.
