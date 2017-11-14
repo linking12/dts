@@ -23,9 +23,13 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
+import io.dts.common.protocol.header.GlobalRollbackMessage;
 import io.dts.server.handler.support.ClientMessageHandler;
+import io.dts.server.network.channel.ChannelkeepingComponent;
 import io.dts.server.store.DtsTransStatusDao;
 import io.dts.server.struct.BranchLog;
 import io.dts.server.struct.GlobalLog;
@@ -36,6 +40,8 @@ import io.dts.server.struct.GlobalLog;
  */
 @Repository
 public class DtsTransStatusDaoImpl implements DtsTransStatusDao {
+
+  private static final Logger logger = LoggerFactory.getLogger(DtsTransStatusDao.class);
   /**
    * 当前活动的所有事务
    */
@@ -55,18 +61,19 @@ public class DtsTransStatusDaoImpl implements DtsTransStatusDao {
       @Override
       public void run() {
         while (true) {
-          DelayedItem<Long> delayedItem = queue.poll();
-          if (delayedItem != null) {
-            Long transId = delayedItem.getT();
-            // if (handler != null) {
-            // GlobalRollbackMessage rollback = new GlobalRollbackMessage();
-            // rollback.setTranId(transId);
-            // handler.processMessage(rollback);
-            // }
-          }
           try {
+            DelayedItem<Long> delayedItem = queue.poll();
+            if (delayedItem != null) {
+              Long transId = delayedItem.getT();
+              if (handler != null) {
+                GlobalRollbackMessage rollback = new GlobalRollbackMessage();
+                rollback.setTranId(transId);
+                handler.processMessage(rollback);
+              }
+            }
             Thread.sleep(300);
-          } catch (Exception e) {
+          } catch (Throwable e) {
+            logger.error(e.getMessage(), e);
           }
         }
       }
