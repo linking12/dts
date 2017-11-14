@@ -4,7 +4,7 @@ package io.dts.server.struct;
  * 
  * 全局事务状态
  */
-public enum GlobalTransactionState {
+public enum GlobalLogState {
 
   /**
    * 开始
@@ -33,7 +33,7 @@ public enum GlobalTransactionState {
   /**
    * @param value
    */
-  private GlobalTransactionState(int value) {
+  private GlobalLogState(int value) {
     this.value = value;
   }
 
@@ -49,8 +49,8 @@ public enum GlobalTransactionState {
    */
   private int value;
 
-  public static GlobalTransactionState parse(int value) {
-    for (GlobalTransactionState state : GlobalTransactionState.values()) {
+  public static GlobalLogState parse(int value) {
+    for (GlobalLogState state : GlobalLogState.values()) {
       if (state.getValue() == value) {
         return state;
       }

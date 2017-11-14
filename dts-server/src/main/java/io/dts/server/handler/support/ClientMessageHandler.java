@@ -34,7 +34,7 @@ import io.dts.server.store.DtsLogDao;
 import io.dts.server.store.DtsTransStatusDao;
 import io.dts.server.struct.BranchLog;
 import io.dts.server.struct.GlobalLog;
-import io.dts.server.struct.GlobalTransactionState;
+import io.dts.server.struct.GlobalLogState;
 
 /**
  * @author liushiming
@@ -64,7 +64,7 @@ public interface ClientMessageHandler {
       @Override
       public String processMessage(BeginMessage beginMessage, String clientIp) {
         GlobalLog globalLog = new GlobalLog();
-        globalLog.setState(GlobalTransactionState.Begin.getValue());
+        globalLog.setState(GlobalLogState.Begin.getValue());
         globalLog.setTimeout(beginMessage.getTimeout());
         globalLog.setClientAppName(clientIp);
         dtsLogDao.insertGlobalLog(globalLog, DtsServerContainer.mid);;
@@ -82,18 +82,18 @@ public interface ClientMessageHandler {
         if (globalLog == null) {
           throw new DtsException("transaction doesn't exist.");
         } else {
-          switch (GlobalTransactionState.parse(globalLog.getState())) {
+          switch (GlobalLogState.parse(globalLog.getState())) {
             case Begin:
               List<BranchLog> branchLogs =
                   dtsTransStatusDao.queryBranchLogByTransId(globalLog.getTransId());
               // 通知各个分支开始提交
               try {
                 this.syncGlobalCommit(branchLogs, globalLog.getTransId());
-                globalLog.setState(GlobalTransactionState.Committed.getValue());
+                globalLog.setState(GlobalLogState.Committed.getValue());
                 dtsLogDao.deleteGlobalLog(globalLog.getTransId(), DtsServerContainer.mid);
               } catch (Exception e) {
                 logger.error(e.getMessage(), e);
-                globalLog.setState(GlobalTransactionState.CmmittedFailed.getValue());
+                globalLog.setState(GlobalLogState.CmmittedFailed.getValue());
                 dtsLogDao.updateGlobalLog(globalLog, DtsServerContainer.mid);
                 throw new DtsException(e, "notify resourcemanager to commit failed");
               }
@@ -113,18 +113,18 @@ public interface ClientMessageHandler {
         if (globalLog == null) {
           throw new DtsException("transaction doesn't exist.");
         } else {
-          switch (GlobalTransactionState.parse(globalLog.getState())) {
+          switch (GlobalLogState.parse(globalLog.getState())) {
             case Begin:
               List<BranchLog> branchLogs =
                   dtsTransStatusDao.queryBranchLogByTransId(globalLog.getTransId());
               // 通知各个分支开始回滚
               try {
                 this.syncGlobalRollback(branchLogs, globalLog.getTransId());
-                globalLog.setState(GlobalTransactionState.Rollbacked.getValue());
+                globalLog.setState(GlobalLogState.Rollbacked.getValue());
                 dtsLogDao.deleteGlobalLog(globalLog.getTransId(), DtsServerContainer.mid);
               } catch (Exception e) {
                 logger.error(e.getMessage(), e);
-                globalLog.setState(GlobalTransactionState.RollbackFailed.getValue());
+                globalLog.setState(GlobalLogState.RollbackFailed.getValue());
                 dtsLogDao.updateGlobalLog(globalLog, DtsServerContainer.mid);
                 throw new DtsException("notify resourcemanager to commit failed");
               }

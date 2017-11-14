@@ -21,7 +21,7 @@ import io.dts.server.store.DtsTransStatusDao;
 import io.dts.server.struct.BranchLog;
 import io.dts.server.struct.BranchLogState;
 import io.dts.server.struct.GlobalLog;
-import io.dts.server.struct.GlobalTransactionState;
+import io.dts.server.struct.GlobalLogState;
 
 /**
  * @author liushiming
@@ -40,7 +40,7 @@ public interface RmMessageHandler {
       public Long processMessage(RegisterMessage registerMessage, String clientIp) {
         long tranId = registerMessage.getTranId();
         GlobalLog globalLog = dtsTransStatusDao.queryGlobalLog(tranId);
-        if (globalLog == null || globalLog.getState() != GlobalTransactionState.Begin.getValue()) {
+        if (globalLog == null || globalLog.getState() != GlobalLogState.Begin.getValue()) {
           if (globalLog == null) {
             throw new DtsException("Transaction " + tranId + " doesn't exist");
           } else {
