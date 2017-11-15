@@ -21,12 +21,21 @@
 # Compile
 ```
    mvn install -Dmaven.test.skip=true
-   
 ```
 # 关于Sample
   详细请查看 <a href="https://github.com/linking12/dts/tree/master/dts-example">sample</a>
   
 # Quick Start
+* 客户端及资源端添加pom依赖
+
+```
+<dependency>
+			<groupId>io.dts</groupId>
+			<artifactId>dts-saluki-support</artifactId>
+			<version>${dts.version}</version>
+		</dependency>
+```
+
 * 在Dts客户端、Dts资源端、Dts服务端的启动参数加上-DZK_CONNECTION=127.0.0.1:2181，zookeeper的连接地址，Dts使用zookeeper来做集群管理
 
 * 客户端，在服务调用不同的接口添加@DtsTransaction注解，将两个服务调用纳入整个分布式事务管理
