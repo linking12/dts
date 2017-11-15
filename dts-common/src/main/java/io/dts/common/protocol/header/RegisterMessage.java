@@ -29,9 +29,9 @@ public class RegisterMessage implements CommandCustomHeader, RequestMessage {
   @CFNotNull
   private long tranId;
   /**
-   * 数据库名称
+   * 资源名称
    */
-  private String dbName;
+  private String clientInfo;
 
 
   public long getTranId() {
@@ -42,12 +42,12 @@ public class RegisterMessage implements CommandCustomHeader, RequestMessage {
     this.tranId = tranId;
   }
 
-  public String getDbName() {
-    return dbName;
+  public String getClientInfo() {
+    return clientInfo;
   }
 
-  public void setDbName(String dbName) {
-    this.dbName = dbName;
+  public void setClientInfo(String dbName) {
+    this.clientInfo = dbName;
   }
 
   @Override

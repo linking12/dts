@@ -64,7 +64,7 @@ public class DataSourceResourceManager implements ResourceManager {
     this.dbName = dbName;
     if (DtsContext.getInstance().inTxcTransaction()) {
       RegisterMessage registerMessage = new RegisterMessage();
-      registerMessage.setDbName(dbName);
+      registerMessage.setClientInfo(dbName);
       registerMessage.setTranId(DtsXID.getTransactionId(DtsContext.getInstance().getCurrentXid()));
       try {
         RegisterResultMessage resultMessage = (RegisterResultMessage) resourceMessageSender

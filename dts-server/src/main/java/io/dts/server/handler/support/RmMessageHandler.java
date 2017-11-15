@@ -49,7 +49,7 @@ public interface RmMessageHandler {
         }
         BranchLog branchLog = new BranchLog();
         branchLog.setTransId(tranId);
-        branchLog.setClientInfo(registerMessage.getDbName());
+        branchLog.setClientInfo(registerMessage.getClientInfo());
         branchLog.setClientIp(clientIp);
         branchLog.setState(BranchLogState.Begin.getValue());
         dtsLogDao.insertBranchLog(branchLog);
