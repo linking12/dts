@@ -16,16 +16,16 @@ import io.dts.parser.struct.TxcTable;
 import io.dts.parser.vistor.ITxcVisitor;
 import io.dts.resourcemanager.api.IDtsConnection;
 
-public class AtExecutorRunCommiter {
+public class DataSourceExecutorCommiter {
 
-  private static final Logger logger = LoggerFactory.getLogger(AtExecutorRunCommiter.class);
+  private static final Logger logger = LoggerFactory.getLogger(DataSourceExecutorCommiter.class);
 
   private ITxcVisitor txcVisitor;
 
   private StatementModel stateModel;
 
 
-  public AtExecutorRunCommiter(StatementModel stateModel, final List<Object> parameterSet)
+  public DataSourceExecutorCommiter(StatementModel stateModel, final List<Object> parameterSet)
       throws SQLException {
     this.stateModel = stateModel;
     IDtsConnection txcConnection = stateModel.getStatement().getDtsConnection();
