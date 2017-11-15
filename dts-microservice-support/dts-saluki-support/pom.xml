@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>io.dts</groupId>
-		<artifactId>dts</artifactId>
+		<artifactId>dts-microservice-support</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>dts-saluki-support</artifactId>
@@ -15,7 +15,6 @@
 		<dependency>
 			<groupId>com.quancheng.saluki</groupId>
 			<artifactId>saluki-core</artifactId>
-			<version>1.5.7.RELEASE</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>

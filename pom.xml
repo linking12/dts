@@ -16,8 +16,7 @@
 		<module>dts-rm-rabbit</module>
 		<module>dts-rm-rocketmq</module>
 		<module>dts-resourcemanager</module>
-		<module>dts-saluki-support</module>
-		<module>dts-example</module>
+		<module>dts-microservice-support</module>
 	</modules>
 	<properties>
 		<java_source_version>1.8</java_source_version>
