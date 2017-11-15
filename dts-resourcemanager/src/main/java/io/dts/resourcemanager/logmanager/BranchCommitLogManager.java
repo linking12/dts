@@ -43,15 +43,13 @@ public class BranchCommitLogManager extends DtsLogManagerImpl {
     DataSourceTransactionManager tm = new DataSourceTransactionManager(datasource);
     TransactionTemplate transactionTemplate = new TransactionTemplate(tm);
     final JdbcTemplate template = new JdbcTemplate(datasource);
-
     transactionTemplate.execute(new TransactionCallbackWithoutResult() {
       @Override
       protected void doInTransactionWithoutResult(TransactionStatus status) {
         String deleteSql = String.format("delete from %s where id in (%s) and status = %d",
             txcLogTableName, context.getGlobalXid(), UndoLogMode.COMMON_LOG.getValue());
-        logger.info("delete undo log sql" + deleteSql);
+        logger.info("delete undo log sql:" + deleteSql);
         template.execute(deleteSql);
-
       }
     });
   }
