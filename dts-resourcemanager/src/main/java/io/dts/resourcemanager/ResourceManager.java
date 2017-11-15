@@ -21,9 +21,9 @@ import io.dts.common.exception.DtsException;
  */
 public interface ResourceManager {
 
-  public long register(String dbName) throws DtsException;
+  public long register(String key) throws DtsException;
 
-  public String getRegisterDb();
+  public String getRegisterKey();
 
   public void branchCommit(String xid, long branchId, String key, String udata) throws DtsException;
 
@@ -31,7 +31,7 @@ public interface ResourceManager {
       throws DtsException;
 
   public static ResourceManager getInstance() {
-    return DefaultResourceManager.newResourceManager();
+    return DataSourceResourceManager.newResourceManager();
   }
 
 }

@@ -34,16 +34,16 @@ import io.dts.resourcemanager.struct.ContextStep2;
  * @author liushiming
  * @version BaseResourceManager.java, v 0.0.1 2017年10月13日 下午2:28:51 liushiming
  */
-public class DefaultResourceManager implements ResourceManager {
-  private static final Logger logger = LoggerFactory.getLogger(DefaultResourceManager.class);
+public class DataSourceResourceManager implements ResourceManager {
+  private static final Logger logger = LoggerFactory.getLogger(DataSourceResourceManager.class);
 
-  private static ResourceManager resourceManager = new DefaultResourceManager();
+  private static ResourceManager resourceManager = new DataSourceResourceManager();
 
   private final DtsClientMessageSender resourceMessageSender;
 
   private volatile String dbName;
 
-  private DefaultResourceManager() {
+  private DataSourceResourceManager() {
     DefaultDtsResourcMessageSender messageSender = DefaultDtsResourcMessageSender.getInstance();
     messageSender.registerResourceManager(this);
     this.resourceMessageSender = messageSender;
@@ -55,7 +55,7 @@ public class DefaultResourceManager implements ResourceManager {
   }
 
   @Override
-  public String getRegisterDb() {
+  public String getRegisterKey() {
     return this.dbName;
   }
 

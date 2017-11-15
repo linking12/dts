@@ -85,7 +85,7 @@ public class DefaultDtsResourcMessageSender implements DtsClientMessageSender {
       public void run() {
         try {
           HeartbeatRequestHeader hearbeat = new HeartbeatRequestHeader();
-          hearbeat.setDbName(rm.getRegisterDb());
+          hearbeat.setDbName(rm.getRegisterKey());
           DefaultDtsResourcMessageSender.this.invoke(hearbeat);
         } catch (Throwable e) {
           e.printStackTrace();
