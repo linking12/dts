@@ -15,7 +15,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>io.dts</groupId>
-			<artifactId>dts-client</artifactId>
+			<artifactId>dts-saluki-support</artifactId>
 			<version>${dts.version}</version>
 		</dependency>
 		<dependency>

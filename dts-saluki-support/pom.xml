@@ -20,7 +20,11 @@
 		</dependency>
 		<dependency>
 			<groupId>io.dts</groupId>
-			<artifactId>dts-common</artifactId>
+			<artifactId>dts-datasource</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.dts</groupId>
+			<artifactId>dts-client</artifactId>
 		</dependency>
 	</dependencies>
 </project>
