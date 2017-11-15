@@ -45,8 +45,8 @@
 ```
 * 资源端，针对数据库资源，使用Dts的适配DtsDataSource来使数据库连接池转变为Dts资源
 
-1. 执行script/resource.sql脚本<br/>
-2. 将数据库连接池适配为Dts资源端<br/>
+1. 执行script/resource.sql脚本 
+2. 将数据库连接池适配为Dts资源端 ,如下示例：
 
 ```
   @Bean
