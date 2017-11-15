@@ -30,10 +30,10 @@
 
 ```
 <dependency>
-			<groupId>io.dts</groupId>
-			<artifactId>dts-saluki-support</artifactId>
-			<version>${dts.version}</version>
-		</dependency>
+	<groupId>io.dts</groupId>
+	<artifactId>dts-saluki-support</artifactId>
+	<version>${dts.version}</version>
+</dependency>
 ```
 
 * 在Dts客户端、Dts资源端、Dts服务端的启动参数加上-DZK_CONNECTION=127.0.0.1:2181，zookeeper的连接地址，Dts使用zookeeper来做集群管理
