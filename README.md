@@ -45,6 +45,9 @@
 ```
 * 资源端，针对数据库资源，使用Dts的适配DtsDataSource来使数据库连接池转变为Dts资源
 
+1：执行script/resource.sql脚本<br/>
+2：将数据库连接池适配为Dts资源端<br/>
+
 ```
   @Bean
   @Primary
@@ -60,3 +63,5 @@
 
 * 服务端，针对spring boot直接启动Main，将事务协调器启动起来
 
+1: 执行script/server.sql脚本
+2：启动事务协调器服务端
