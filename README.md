@@ -1,118 +1,62 @@
 # 概述
 
-* saluki是以Grpc作为底层，提供一套高性能、易于使用的服务化治理框架
-* 对Grpc的开发进行扩展，支持java开发服务端，其他语言(php、go、c++)做客户端语言，不会对Grpc原生开发方式产生破坏
+* Dts是一款高性能、高可靠、接入简单的分布式事务中间件,用于解决分布式环境下的事务一致性问题;
+  在单机数据库下很容易维持事务的 ACID特性，但在分布式系统中并不容易，DTS可以保证分布式系统中的分布式事务的 ACID 特性
 
 # 功能
-
-* 服务注册及发现，提供集群环境的服务发现及治理能力
-* 服务路由，基于javascript路由规则配置及host的路由规则配置(<a href="http://dubbo.io/User+Guide-zh.htm#UserGuide-zh-%E8%B7%AF%E7%94%B1%E8%A7%84%E5%88%99">路由规则示例</a>)
-* 熔断及隔离，基于hystrix来进行的熔断、隔离、服务降级
-* 简化开发方式，对于Grpc原生stub方式进行封装，提供了使用interface和java Bean作为服务契约的方式
-* 与spring-boot进行集成，提供了autoconfig的方式
-* ha重试功能，针对幂等服务可以开启ha功能，当前服务实例存在问题，会剔除当前实例，选择另外实例进行负载均衡
-* 可以自由选择三种模式，genric、Stub、proxy，其中泛化在框架集成上，原生Stub模式针对原生已有的Grpc服务、普通代理模式推荐使用
-* 通过在proto文件中配置options，使用hibernate validator进行参数的检查
-
+* 跨消息和数据库的分布式事务 <br/>
+  在某些业务场景中，需要进行多个 DB 操作的同时，还会调用消息系统，DB 操作成功、消息发送失败或者反过来都会造成业务的不完整
+* 跨服务的分布式事务 <br/>
+  业务完成服务化后，资源与客户端调用解耦，同时又要保证多个服务调用间资源的变化保持强一致，否则会造成业务数据的不完整,DTS支持跨服务的事务
+  
 # 详细说明
 
-* saluki-plugin提供的插件可以在grpc插件基础上生成interface及java bean
-* saluki-serializer提供了将protobuf与java bean两者对象互相转换
-* saluki-registry提供了服务注册，可以在此扩展，目前仅支持consul
+* Dts Server：事务协调器。负责分布式事务的推进，管理事务生命周期
+* Dts Client：事务发起者。通过事务协调器，开启、提交、回滚分布式事务
+* Dts Resource：资源，包括数据库、MQ
+
+# 架构方案
+  请查看根目录下的架构图
 
 # Compile
 ```
    mvn install -Dmaven.test.skip=true
    
 ```
-# 关于服务调用Sample
-  详细请查看 <a href="https://github.com/linking12/saluki/tree/master/saluki-example">sample</a>
+# 关于Sample
+  详细请查看 <a href="https://github.com/linking12/dts/tree/master/dts-example">sample</a>
   
 # Quick Start
+* 在Dts客户端、Dts资源端、Dts服务端的启动参数加上-DZK_CONNECTION=127.0.0.1:2181，zookeeper的连接地址，Dts使用zookeeper来做集群管理
 
-* 首先在proto文件工程配置grpc提供的gradle或maven插件生成stub
+* 客户端，在服务调用不同的接口添加@DtsTransaction注解，将两个服务调用纳入整个分布式事务管理
 
-示例：<a href="https://github.com/linking12/saluki/tree/master/saluki-service"> api </a>
-
-```
-<build>
-  <extensions>
-    <extension>
-      <groupId>kr.motd.maven</groupId>
-      <artifactId>os-maven-plugin</artifactId>
-      <version>1.4.1.Final</version>
-    </extension>
-  </extensions>
-  <plugins>
-    <plugin>
-      <groupId>org.xolstice.maven.plugins</groupId>
-      <artifactId>protobuf-maven-plugin</artifactId>
-      <version>0.5.0</version>
-      <configuration>
-        <protocArtifact>com.google.protobuf:protoc:3.0.2:exe:${os.detected.classifier}</protocArtifact>
-        <pluginId>grpc-java</pluginId>
-        <pluginArtifact>io.grpc:protoc-gen-grpc-java:1.2.0:exe:${os.detected.classifier}</pluginArtifact>
-      </configuration>
-      <executions>
-        <execution>
-          <goals>
-            <goal>compile</goal>
-            <goal>compile-custom</goal>
-          </goals>
-        </execution>
-      </executions>
-    </plugin>
-  </plugins>
-</build>
 
 ```
-* 再次添加saluki提供的gradle或maven插件根据protoc文件生成interface及pojo模型
+ @DtsTransaction
+  public HelloReply callService() {
+    HelloRequest request = new HelloRequest();
+    request.setName("liushiming");
+    HelloReply reply = helloService.dtsNormal(request);
+    helloService.dtsException(request);
+    return reply;
+  }
 
 ```
-<dependency>
-	<groupId>com.quancheng.saluki</groupId>
-	<artifactId>saluki-core</artifactId>
-	<version>1.5.7.RELEASE</version>
-	<scope>provided</scope>
-</dependency>
+* 资源端，针对数据库资源，使用Dts的适配DtsDataSource来使数据库连接池转变为Dts资源
 
-<plugin>
-	<groupId>com.quancheng.saluki</groupId>
-	<artifactId>saluki-maven-plugin</artifactId>
-	<version>1.5.7.RELEASE</version>
-	<configuration>
-		<protoPath>src/main/proto</protoPath>
-		<buildPath>target/generated-sources/protobuf/java</buildPath>
-	</configuration>
-	<executions>
-		<execution>
-			<goals>
-				<goal>proto2java</goal>
-			</goals>
-		</execution>
-	</executions>
-</plugin>
+```
+  @Bean
+  @Primary
+  public DataSource dataSource() {
+    DruidDataSource datasource = new DruidDataSource();
+    int startIndex = dbUrl.lastIndexOf("/");
+    String databaseName = dbUrl.substring(startIndex + 1, dbUrl.length());
+    datasource.setConnectionProperties(connectionProperties);
+    return new DtsDataSource(datasource, databaseName);
+  }
 
 ```
 
-添加后在生成Grpc的相关类之后，同时会生成interface及bean
-![interface](./doc/interface.jpeg)
-![bean](./doc/bean.jpeg)
+* 服务端，针对spring boot直接启动Main，将事务协调器启动起来
 
-* 应用上两步生成的artifactId，添加spring-boot-saluki依赖
-
-```
-<dependency>
-	<groupId>com.quancheng.saluki</groupId>
-	<artifactId>spring-boot-starter-saluki</artifactId>
-	<version>1.5.7.RELEASE</version>
-</dependency>
-<dependency>
-	<groupId>com.quancheng.saluki</groupId>
-	<artifactId>spring-boot-starter-saluki-monitor</artifactId>
-	<version>1.5.7.RELEASE</version>
-</dependency>
-```
-
-* 启动spring boot main，并访问localhost:8080/doc,可进行服务测试
-![login](./doc/service.jpeg)
