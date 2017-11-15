@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.List;
 
 import io.dts.common.exception.DtsException;
-import io.dts.datasource.commiter.DataSourceExecutorCommiter;
 
 /**
  * Created by guoyubo on 2017/9/21.
@@ -33,7 +32,7 @@ public abstract class AbstractExecutor {
   private <T> T executeInternal(final StatementModel baseStatementUnit,
       final List<Object> parameterSet, final ExecuteCallback<T> executeCallback) throws Exception {
     try {
-      DataSourceExecutorCommiter commiter = new DataSourceExecutorCommiter(baseStatementUnit, parameterSet);
+      ExecutorHelper commiter = new ExecutorHelper(baseStatementUnit, parameterSet);
       commiter.beforeExecute();
       T result = executeCallback.execute(baseStatementUnit);
       commiter.afterExecute();

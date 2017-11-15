@@ -1,4 +1,4 @@
-package io.dts.datasource.commiter;
+package io.dts.datasource.wrapper.executor;
 
 
 import java.sql.SQLException;
@@ -9,23 +9,22 @@ import org.slf4j.LoggerFactory;
 
 import io.dts.common.context.DtsContext;
 import io.dts.common.exception.DtsException;
-import io.dts.datasource.wrapper.executor.StatementModel;
 import io.dts.parser.DtsVisitorFactory;
 import io.dts.parser.struct.RollbackInfor;
 import io.dts.parser.struct.TxcTable;
 import io.dts.parser.vistor.ITxcVisitor;
 import io.dts.resourcemanager.api.IDtsConnection;
 
-public class DataSourceExecutorCommiter {
+public class ExecutorHelper {
 
-  private static final Logger logger = LoggerFactory.getLogger(DataSourceExecutorCommiter.class);
+  private static final Logger logger = LoggerFactory.getLogger(ExecutorHelper.class);
 
   private ITxcVisitor txcVisitor;
 
   private StatementModel stateModel;
 
 
-  public DataSourceExecutorCommiter(StatementModel stateModel, final List<Object> parameterSet)
+  public ExecutorHelper(StatementModel stateModel, final List<Object> parameterSet)
       throws SQLException {
     this.stateModel = stateModel;
     IDtsConnection txcConnection = stateModel.getStatement().getDtsConnection();
