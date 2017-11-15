@@ -33,7 +33,7 @@ import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.CollectionUtils;
 
-import io.dts.common.common.DtsXID;
+import io.dts.common.context.DtsXID;
 import io.dts.common.exception.DtsException;
 import io.dts.common.protocol.ResultCode;
 import io.dts.parser.struct.RollbackInfor;

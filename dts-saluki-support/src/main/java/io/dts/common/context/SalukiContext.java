@@ -15,7 +15,7 @@ package io.dts.common.context;
 
 import com.quancheng.saluki.core.common.RpcContext;
 
-import io.dts.common.common.DtsContext;
+import io.dts.common.context.DtsContext;
 
 /**
  * @author liushiming

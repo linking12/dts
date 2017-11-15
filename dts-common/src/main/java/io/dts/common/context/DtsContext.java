@@ -11,7 +11,7 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-package io.dts.common.common;
+package io.dts.common.context;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,11 +28,11 @@ public abstract class DtsContext {
   protected static final String TXC_NEXT_SVR_ADDR = "NEXT_SVR_ADDR";
   private static List<DtsContext> contexts;
   static {
-    contexts = load(DtsContext.class.getClassLoader());
+    contexts = load();
   }
 
-  private static List<DtsContext> load(ClassLoader classLoader) {
-    Iterable<DtsContext> candidates = ServiceLoader.load(DtsContext.class, classLoader);
+  private static List<DtsContext> load() {
+    Iterable<DtsContext> candidates = ServiceLoader.load(DtsContext.class);
     List<DtsContext> list = new ArrayList<DtsContext>();
     for (DtsContext current : candidates) {
       list.add(current);
@@ -48,7 +48,7 @@ public abstract class DtsContext {
 
   public static DtsContext getInstance() {
     if (contexts == null || contexts.isEmpty()) {
-      contexts = load(DtsContext.class.getClassLoader());
+      contexts = load();
     }
     return contexts.get(0);
   }

@@ -6,8 +6,8 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import io.dts.common.common.DtsContext;
-import io.dts.common.common.DtsXID;
+import io.dts.common.context.DtsContext;
+import io.dts.common.context.DtsXID;
 import io.dts.datasource.wrapper.DtsPrepareStatementWrapper;
 import io.dts.datasource.wrapper.DtsStatementWrapper;
 import io.dts.parser.struct.TxcRuntimeContext;

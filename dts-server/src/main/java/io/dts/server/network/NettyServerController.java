@@ -30,7 +30,7 @@ import org.springframework.stereotype.Component;
 import com.google.common.collect.Queues;
 
 import io.dts.common.cluster.ServerCluster;
-import io.dts.common.common.DtsXID;
+import io.dts.common.context.DtsXID;
 import io.dts.common.protocol.RequestCode;
 import io.dts.common.util.NetUtil;
 import io.dts.common.util.ThreadFactoryImpl;

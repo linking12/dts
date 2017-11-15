@@ -19,7 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.dts.common.api.DtsServerMessageSender;
-import io.dts.common.common.DtsXID;
+import io.dts.common.context.DtsXID;
 import io.dts.common.exception.DtsException;
 import io.dts.common.protocol.header.BeginMessage;
 import io.dts.common.protocol.header.BranchCommitMessage;

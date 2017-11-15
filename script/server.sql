@@ -7,7 +7,6 @@ CREATE TABLE `dts_branch_error_log` (
   `gmt_created` datetime NOT NULL,
   `gmt_modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `is_notify` tinyint(1) DEFAULT '0',
-  `mid` int(11) DEFAULT NULL,
   PRIMARY KEY (`branch_id`),
   UNIQUE KEY `branch_id` (`branch_id`),
   KEY `tx_id` (`tx_id`)
@@ -21,7 +20,6 @@ CREATE TABLE `dts_branch_log` (
   `state` tinyint(1) NOT NULL,
   `gmt_created` datetime NOT NULL,
   `gmt_modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `mid` int(11) NOT NULL,
   PRIMARY KEY (`branch_id`),
   KEY `tx_id` (`tx_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
@@ -31,6 +29,5 @@ CREATE TABLE `dts_global_log` (
   `state` tinyint(1) NOT NULL,
   `gmt_created` datetime NOT NULL,
   `gmt_modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `mid` int(11) NOT NULL,
   PRIMARY KEY (`tx_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;

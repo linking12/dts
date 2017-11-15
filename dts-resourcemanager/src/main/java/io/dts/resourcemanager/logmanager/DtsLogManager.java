@@ -19,7 +19,7 @@ import java.sql.SQLException;
 
 import org.springframework.jdbc.core.PreparedStatementCallback;
 
-import io.dts.common.common.DtsXID;
+import io.dts.common.context.DtsXID;
 import io.dts.common.util.BlobUtil;
 import io.dts.parser.struct.TxcRuntimeContext;
 import io.dts.resourcemanager.struct.ContextStep2;

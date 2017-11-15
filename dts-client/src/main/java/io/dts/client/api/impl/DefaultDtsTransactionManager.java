@@ -5,9 +5,9 @@ import org.slf4j.LoggerFactory;
 
 import io.dts.client.aop.TransactionDtsInterceptor;
 import io.dts.client.api.DtsTransactionManager;
-import io.dts.common.common.DtsContext;
 import io.dts.common.api.DtsClientMessageSender;
-import io.dts.common.common.DtsXID;
+import io.dts.common.context.DtsContext;
+import io.dts.common.context.DtsXID;
 import io.dts.common.exception.DtsException;
 import io.dts.common.protocol.header.BeginMessage;
 import io.dts.common.protocol.header.BeginResultMessage;

@@ -13,6 +13,8 @@
  */
 package io.dts.server.network.processor;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Lookup;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
@@ -45,6 +47,7 @@ import io.netty.channel.ChannelHandlerContext;
 @Qualifier("dtsMessageProcessor")
 @Scope("prototype")
 public class DtsMessageProcessor implements NettyRequestProcessor {
+  private static final Logger logger = LoggerFactory.getLogger(DtsMessageProcessor.class);
 
   @Lookup
   protected DtsServerMessageHandler createMessageHandler() {
@@ -110,6 +113,7 @@ public class DtsMessageProcessor implements NettyRequestProcessor {
         return response;
       }
     } catch (Throwable e) {
+      logger.error(e.getMessage(), e);
       response.setCode(ResponseCode.SYSTEM_ERROR);
       response.setRemark(e.getMessage());
       return response;

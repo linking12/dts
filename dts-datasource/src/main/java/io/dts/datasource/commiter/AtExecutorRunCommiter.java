@@ -7,7 +7,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.dts.common.common.DtsContext;
+import io.dts.common.context.DtsContext;
 import io.dts.common.exception.DtsException;
 import io.dts.datasource.wrapper.executor.StatementModel;
 import io.dts.parser.DtsVisitorFactory;

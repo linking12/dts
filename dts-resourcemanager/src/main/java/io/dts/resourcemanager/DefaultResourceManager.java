@@ -19,8 +19,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.dts.common.api.DtsClientMessageSender;
-import io.dts.common.common.DtsContext;
-import io.dts.common.common.DtsXID;
+import io.dts.common.context.DtsContext;
+import io.dts.common.context.DtsXID;
 import io.dts.common.exception.DtsException;
 import io.dts.common.protocol.RequestMessage;
 import io.dts.common.protocol.header.RegisterMessage;

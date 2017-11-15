@@ -32,7 +32,7 @@ public class DtsLogDaoImpl implements DtsLogDao {
       @Override
       public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
         PreparedStatement ps = con.prepareStatement(
-            "insert into dts_global_log (state,mid,gmt_created,gmt_modified) values (?,now(),now())",
+            "insert into dts_global_log (state,gmt_created,gmt_modified) values (?,now(),now())",
             Statement.RETURN_GENERATED_KEYS);
         ps.setInt(1, globalLog.getState());
         return ps;
@@ -158,7 +158,7 @@ public class DtsLogDaoImpl implements DtsLogDao {
 
   @Override
   public List<GlobalLog> getGlobalLogs() {
-    return jdbcTemplate.query("select * from dts_global_log where mid=?", new Object[] {},
+    return jdbcTemplate.query("select * from dts_global_log", new Object[] {},
         new RowMapper<GlobalLog>() {
           @Override
           public GlobalLog mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -175,7 +175,7 @@ public class DtsLogDaoImpl implements DtsLogDao {
   @Override
   public void insertBranchErrorLog(final BranchLog branchLog) {
     jdbcTemplate.update(
-        "insert into dts_branch_error_log (branch_id,tx_id,state,client_ip,client_info,gmt_created,gmt_modified,mid) values (?,?,?,?,?,now(),now())",
+        "insert into dts_branch_error_log (branch_id,tx_id,state,client_ip,client_info,gmt_created,gmt_modified) values (?,?,?,?,?,now(),now())",
         new Object[] {branchLog.getBranchId(), branchLog.getTransId(), branchLog.getState(),
             branchLog.getClientIp(), branchLog.getClientInfo()});
   }
