@@ -25,7 +25,6 @@ import java.util.ServiceLoader;
  */
 public abstract class DtsContext {
   protected static final String TXC_XID_KEY = "XID";
-  protected static final String TXC_NEXT_SVR_ADDR = "NEXT_SVR_ADDR";
   private static List<DtsContext> contexts;
   static {
     contexts = load();
