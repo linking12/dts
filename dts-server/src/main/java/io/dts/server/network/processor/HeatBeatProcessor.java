@@ -45,7 +45,7 @@ public class HeatBeatProcessor implements NettyRequestProcessor {
         (HeartbeatRequestHeader) request.decodeCommandCustomHeader(HeartbeatRequestHeader.class);
     ChannelInfo clientChannelInfo = new ChannelInfo(//
         ctx.channel(), //
-        header.getDbName(), //
+        header.getClientOrResourceInfo(), //
         request.getLanguage(), //
         request.getVersion()//
     );

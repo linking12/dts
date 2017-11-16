@@ -110,7 +110,7 @@ public class ChannelRepository {
     for (Map.Entry<Channel, ChannelInfo> entry : channelTable.entrySet()) {
       final Channel channel = entry.getKey();
       final ChannelInfo channelInfo = entry.getValue();
-      if (channelInfo.getDbName().equals(clientInfo)) {
+      if (channelInfo.getClientOrResourceInfo().equals(clientInfo)) {
         return channel;
       }
     }

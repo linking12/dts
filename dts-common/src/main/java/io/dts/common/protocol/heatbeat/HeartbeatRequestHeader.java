@@ -7,14 +7,14 @@ import io.dts.remoting.exception.RemotingCommandException;
 
 public class HeartbeatRequestHeader implements CommandCustomHeader, RequestMessage {
 
-  private String dbName;
+  private String clientOrResourceInfo;
 
-  public String getDbName() {
-    return dbName;
+  public String getClientOrResourceInfo() {
+    return clientOrResourceInfo;
   }
 
-  public void setDbName(String dbName) {
-    this.dbName = dbName;
+  public void setClientOrResourceInfo(String dbName) {
+    this.clientOrResourceInfo = dbName;
   }
 
   @Override
