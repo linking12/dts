@@ -24,6 +24,7 @@ import org.apache.rocketmq.common.message.MessageAccessor;
 import org.apache.rocketmq.common.message.MessageConst;
 import org.apache.rocketmq.remoting.exception.RemotingException;
 
+import io.dts.common.context.DtsContext;
 import io.dts.common.exception.DtsException;
 import io.dts.resourcemanager.ResourceManager;
 
@@ -48,24 +49,28 @@ public class DtsRocketMQProducer extends DefaultMQProducer {
     } catch (Exception e) {
       throw new DtsException(e, "message validate error");
     }
-    SendResult sendResult = null;
-    try {
-      MessageAccessor.putProperty(msg, MessageConst.PROPERTY_TRANSACTION_PREPARED, "true");
-      MessageAccessor.putProperty(msg, MessageConst.PROPERTY_PRODUCER_GROUP, getProducerGroup());
-      sendResult = defaultMQProducerImpl.send(msg);
-    } catch (Exception e) {
-      throw new DtsException(e, "send message Exception");
-    }
-    SendStatus ss = sendResult.getSendStatus();
-    if (ss == SendStatus.SEND_OK) {
-      if (sendResult.getTransactionId() != null) {
-        MessageAccessor.putProperty(msg, "__transactionId__", sendResult.getTransactionId());
+    if (DtsContext.getInstance().inTxcTransaction()) {
+      SendResult sendResult = null;
+      try {
+        MessageAccessor.putProperty(msg, MessageConst.PROPERTY_TRANSACTION_PREPARED, "true");
+        MessageAccessor.putProperty(msg, MessageConst.PROPERTY_PRODUCER_GROUP, getProducerGroup());
+        sendResult = defaultMQProducerImpl.send(msg);
+      } catch (Exception e) {
+        throw new DtsException(e, "send message Exception");
       }
+      SendStatus ss = sendResult.getSendStatus();
+      if (ss == SendStatus.SEND_OK) {
+        if (sendResult.getTransactionId() != null) {
+          MessageAccessor.putProperty(msg, "__transactionId__", sendResult.getTransactionId());
+        }
+      }
+      String sendResultKey = SendResult.encoderSendResultToJson(sendResult);
+      resourceManager.register(sendResultKey);
+      this.setDefaultMQProducerImpl();
+      return sendResult;
+    } else {
+      return this.defaultMQProducerImpl.send(msg);
     }
-    String sendResultKey = SendResult.encoderSendResultToJson(sendResult);
-    resourceManager.register(sendResultKey);
-    this.setDefaultMQProducerImpl();
-    return sendResult;
   }
 
   private void setDefaultMQProducerImpl() {
