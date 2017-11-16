@@ -20,5 +20,9 @@
 			<artifactId>rocketmq-client</artifactId>
 			<version>4.0.0-incubating</version>
 		</dependency>
+		<dependency>
+			<groupId>io.dts</groupId>
+			<artifactId>dts-resourcemanager</artifactId>
+		</dependency>
 	</dependencies>
 </project>

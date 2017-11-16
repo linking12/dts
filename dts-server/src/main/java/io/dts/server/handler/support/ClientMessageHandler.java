@@ -138,7 +138,7 @@ public interface ClientMessageHandler {
           branchCommitMessage.setServerAddr(DtsXID.getSvrAddr());
           branchCommitMessage.setTranId(transId);
           branchCommitMessage.setBranchId(branchId);
-          branchCommitMessage.setDbName(branchLog.getClientInfo());
+          branchCommitMessage.setResourceInfo(branchLog.getClientInfo());
           BranchCommitResultMessage branchCommitResult = null;
           try {
             branchCommitResult = messageSender.invokeSync(clientAddress, clientInfo,
@@ -169,7 +169,7 @@ public interface ClientMessageHandler {
           branchRollbackMessage.setServerAddr(DtsXID.getSvrAddr());
           branchRollbackMessage.setTranId(transId);
           branchRollbackMessage.setBranchId(branchId);
-          branchRollbackMessage.setDbName(branchLog.getClientInfo());
+          branchRollbackMessage.setResourceInfo(branchLog.getClientInfo());
           BranchRollbackResultMessage branchRollbackResult = null;
           try {
             branchRollbackResult = messageSender.invokeSync(clientAddress, clientInfo,

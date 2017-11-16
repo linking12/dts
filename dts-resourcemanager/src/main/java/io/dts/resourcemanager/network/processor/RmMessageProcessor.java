@@ -85,12 +85,11 @@ public class RmMessageProcessor implements NettyRequestProcessor {
     Long branchId = commitMessage.getBranchId();
     Long tranId = commitMessage.getTranId();
     String servAddr = commitMessage.getServerAddr();
-    String dbName = commitMessage.getDbName();
-    String udata = commitMessage.getUdata();
+    String resourceInfo = commitMessage.getResourceInfo();
     resultMessage.setBranchId(branchId);
     resultMessage.setTranId(tranId);
     try {
-      rm.branchCommit(servAddr + ":" + tranId, branchId, dbName, udata);
+      rm.branchCommit(servAddr + ":" + tranId, branchId, resourceInfo);
       resultMessage.setResult(ResultCode.OK.getValue());
     } catch (Exception e) {
       resultMessage.setResult(ResultCode.ERROR.getValue());
@@ -103,12 +102,11 @@ public class RmMessageProcessor implements NettyRequestProcessor {
     Long branchId = rollBackMessage.getBranchId();
     Long tranId = rollBackMessage.getTranId();
     String servAddr = rollBackMessage.getServerAddr();
-    String dbName = rollBackMessage.getDbName();
-    String udata = rollBackMessage.getUdata();
+    String resourceInfo = rollBackMessage.getResourceInfo();
     resultMessage.setBranchId(branchId);
     resultMessage.setTranId(tranId);
     try {
-      rm.branchRollback(servAddr + ":" + tranId, branchId, dbName, udata);
+      rm.branchRollback(servAddr + ":" + tranId, branchId, resourceInfo);
       resultMessage.setResult(ResultCode.OK.getValue());
     } catch (Exception e) {
       resultMessage.setResult(ResultCode.ERROR.getValue());

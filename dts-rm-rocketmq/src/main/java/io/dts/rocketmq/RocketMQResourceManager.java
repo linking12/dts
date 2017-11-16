@@ -11,10 +11,11 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-package io.dts.resourcemanager;
+package io.dts.rocketmq;
 
-import java.sql.SQLException;
-
+import org.apache.rocketmq.client.impl.producer.DefaultMQProducerImpl;
+import org.apache.rocketmq.client.producer.LocalTransactionState;
+import org.apache.rocketmq.client.producer.SendResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,28 +23,28 @@ import io.dts.common.api.DtsClientMessageSender;
 import io.dts.common.context.DtsContext;
 import io.dts.common.context.DtsXID;
 import io.dts.common.exception.DtsException;
-import io.dts.common.protocol.RequestMessage;
 import io.dts.common.protocol.header.RegisterMessage;
 import io.dts.common.protocol.header.RegisterResultMessage;
 import io.dts.remoting.RemoteConstant;
-import io.dts.resourcemanager.logmanager.DtsLogManager;
+import io.dts.resourcemanager.DataSourceResourceManager;
+import io.dts.resourcemanager.ResourceManager;
 import io.dts.resourcemanager.network.DefaultDtsResourcMessageSender;
-import io.dts.resourcemanager.struct.ContextStep2;
 
 /**
  * @author liushiming
- * @version BaseResourceManager.java, v 0.0.1 2017年10月13日 下午2:28:51 liushiming
+ * @version RocketMQResourceManager.java, v 0.0.1 2017年11月16日 上午11:20:16 liushiming
  */
-public class DataSourceResourceManager implements ResourceManager {
+public class RocketMQResourceManager implements ResourceManager {
+
   private static final Logger logger = LoggerFactory.getLogger(DataSourceResourceManager.class);
 
-  private static ResourceManager resourceManager = new DataSourceResourceManager();
+  private static ResourceManager resourceManager = new RocketMQResourceManager();
 
   private final DtsClientMessageSender resourceMessageSender;
 
-  private volatile String dbName;
+  private DefaultMQProducerImpl defaultMQProducerImpl;
 
-  private DataSourceResourceManager() {
+  private RocketMQResourceManager() {
     DefaultDtsResourcMessageSender messageSender = DefaultDtsResourcMessageSender.getInstance();
     messageSender.registerResourceManager(this);
     this.resourceMessageSender = messageSender;
@@ -54,17 +55,24 @@ public class DataSourceResourceManager implements ResourceManager {
     return resourceManager;
   }
 
-  @Override
-  public String getRegisterKey() {
-    return this.dbName;
+
+  public DefaultMQProducerImpl getDefaultMQProducerImpl() {
+    return defaultMQProducerImpl;
+  }
+
+  public void setDefaultMQProducerImpl(DefaultMQProducerImpl defaultMQProducerImpl) {
+    this.defaultMQProducerImpl = defaultMQProducerImpl;
+  }
+
+  public DtsClientMessageSender getResourceMessageSender() {
+    return resourceMessageSender;
   }
 
   @Override
-  public long register(String dbName) throws DtsException {
-    this.dbName = dbName;
+  public long register(String topic) throws DtsException {
     if (DtsContext.getInstance().inTxcTransaction()) {
       RegisterMessage registerMessage = new RegisterMessage();
-      registerMessage.setClientInfo(dbName);
+      registerMessage.setClientInfo(topic);
       registerMessage.setTranId(DtsXID.getTransactionId(DtsContext.getInstance().getCurrentXid()));
       try {
         RegisterResultMessage resultMessage = (RegisterResultMessage) resourceMessageSender
@@ -86,40 +94,32 @@ public class DataSourceResourceManager implements ResourceManager {
   }
 
   @Override
-  public void branchCommit(String xid, long branchId, String resouceInfo) throws DtsException {
+  public String getRegisterKey() {
+    throw new UnsupportedOperationException("unsupport method in rocketmq resourcemanager");
+  }
+
+  @Override
+  public void branchCommit(String xid, long branchId, String resourceInfo) throws DtsException {
+    SendResult sendResult = SendResult.decoderSendResultFromJson(resourceInfo);
+    LocalTransactionState localTransactionState = LocalTransactionState.COMMIT_MESSAGE;
     try {
-      ContextStep2 context = new ContextStep2();
-      context.setXid(xid);
-      context.setBranchId(branchId);
-      context.setDbname(resouceInfo);
-      context.setGlobalXid(DtsXID.getGlobalXID(xid, branchId));
-      DtsLogManager.getInstance().branchCommit(context);
-    } catch (DtsException e) {
-      throw e;
-    } catch (SQLException e) {
-      throw new DtsException(e);
+      defaultMQProducerImpl.endTransaction(sendResult, localTransactionState, null);
+    } catch (Exception e) {
+      logger.warn("local transaction execute " + localTransactionState
+          + ",but end broker transaction failed", e);
     }
   }
 
   @Override
-  public void branchRollback(String xid, long branchId, String resouceInfo) throws DtsException {
-    ContextStep2 context = new ContextStep2();
-    context.setXid(xid);
-    context.setBranchId(branchId);
-    context.setDbname(resouceInfo);
-    context.setGlobalXid(DtsXID.getGlobalXID(xid, branchId));
+  public void branchRollback(String xid, long branchId, String resourceInfo) throws DtsException {
+    SendResult sendResult = SendResult.decoderSendResultFromJson(resourceInfo);
+    LocalTransactionState localTransactionState = LocalTransactionState.ROLLBACK_MESSAGE;
     try {
-      DtsLogManager.getInstance().branchRollback(context);
-    } catch (DtsException e) {
-      throw e;
-    } catch (SQLException e) {
-      throw new DtsException(e);
+      defaultMQProducerImpl.endTransaction(sendResult, localTransactionState, null);
+    } catch (Exception e) {
+      logger.warn("local transaction execute " + localTransactionState
+          + ",but end broker transaction failed", e);
     }
   }
-
-  protected <T> T invoke(RequestMessage msg) throws DtsException {
-    return resourceMessageSender.invoke(msg, RemoteConstant.RPC_INVOKE_TIMEOUT);
-  }
-
 
 }

@@ -38,11 +38,9 @@ public class BranchRollBackMessage implements CommandCustomHeader, RequestMessag
   @CFNotNull
   private long branchId;
 
-  private String appName;
 
-  private String dbName;
+  private String resourceInfo;
 
-  private String udata = null;
 
   public String getServerAddr() {
     return serverAddr;
@@ -68,31 +66,13 @@ public class BranchRollBackMessage implements CommandCustomHeader, RequestMessag
     this.branchId = branchId;
   }
 
-  public String getAppName() {
-    return appName;
+  public String getResourceInfo() {
+    return resourceInfo;
   }
 
-  public void setAppName(String appName) {
-    this.appName = appName;
+  public void setResourceInfo(String dbName) {
+    this.resourceInfo = dbName;
   }
-
-  public String getDbName() {
-    return dbName;
-  }
-
-  public void setDbName(String dbName) {
-    this.dbName = dbName;
-  }
-
-  public String getUdata() {
-    return udata;
-  }
-
-  public void setUdata(String udata) {
-    this.udata = udata;
-  }
-
-
 
   @Override
   public void checkFields() throws RemotingCommandException {

@@ -6,7 +6,6 @@ public class ContextStep2 {
   private String xid;
   private long branchId;
   private String dbname;
-  private String udata;
 
   public long getGlobalXid() {
     return globalXid;
@@ -32,13 +31,6 @@ public class ContextStep2 {
     this.branchId = branchId;
   }
 
-  public String getUdata() {
-    return udata;
-  }
-
-  public void setUdata(String udata) {
-    this.udata = udata;
-  }
 
 
   public String getDbname() {

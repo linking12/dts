@@ -25,13 +25,8 @@ public interface ResourceManager {
 
   public String getRegisterKey();
 
-  public void branchCommit(String xid, long branchId, String key, String udata) throws DtsException;
+  public void branchCommit(String xid, long branchId, String resourceInfo) throws DtsException;
 
-  public void branchRollback(String xid, long branchId, String key, String udata)
-      throws DtsException;
-
-  public static ResourceManager getInstance() {
-    return DataSourceResourceManager.newResourceManager();
-  }
+  public void branchRollback(String xid, long branchId, String resourceInfo) throws DtsException;
 
 }
