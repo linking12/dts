@@ -1,4 +1,4 @@
-package org.dts.springcloud.support;
+package io.dts.springcloud;
 
 /**
  * Hello world!
