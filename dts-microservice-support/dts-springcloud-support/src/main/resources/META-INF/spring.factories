@@ -1,2 +1,3 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-io.dts.springcloud.SpringCloudContextConfig
+io.dts.springcloud.SpringCloudContextConfig,\
+io.dts.springcloud.ContextHystrixAutoConfiguration

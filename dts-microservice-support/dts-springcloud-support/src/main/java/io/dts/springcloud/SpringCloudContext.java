@@ -38,11 +38,22 @@ public class SpringCloudContext extends DtsContext {
     return LOCAL.get();
   }
 
+  public static void removeContext() {
+    LOCAL.remove();
+  }
+
   public SpringCloudContext setAttachment(String key, String value) {
     if (value == null) {
       attachments.remove(key);
     } else {
       attachments.put(key, value);
+    }
+    return this;
+  }
+
+  public SpringCloudContext setAttachment(Map<String, String> value) {
+    if (value != null && value.isEmpty()) {
+      attachments.putAll(value);
     }
     return this;
   }
@@ -60,6 +71,7 @@ public class SpringCloudContext extends DtsContext {
     return attachments;
   }
 
+
   @Override
   public String getCurrentXid() {
     return SpringCloudContext.getContext().getAttachment(TXC_XID_KEY);
@@ -72,7 +84,7 @@ public class SpringCloudContext extends DtsContext {
 
   @Override
   public void unbind() {
-    SpringCloudContext.getContext().removeAttachment(TXC_XID_KEY);
+    SpringCloudContext.removeContext();
   }
 
   @Override
