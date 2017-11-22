@@ -39,13 +39,8 @@
 			</dependency>
 			<dependency>
 				<groupId>com.quancheng.saluki</groupId>
-				<artifactId>spring-boot-starter-saluki</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.quancheng.saluki</groupId>
 				<artifactId>spring-boot-starter-saluki-monitor</artifactId>
-				<version>${project.version}</version>
+				<version>${saluki.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework.boot</groupId>

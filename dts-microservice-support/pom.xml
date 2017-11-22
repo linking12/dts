@@ -10,7 +10,6 @@
 	<artifactId>dts-microservice-support</artifactId>
 	<modules>
 		<module>dts-saluki-support</module>
-		<module>dts-dubbo-support</module>
 		<module>dts-springcloud-support</module>
 	</modules>
 	<packaging>pom</packaging>
