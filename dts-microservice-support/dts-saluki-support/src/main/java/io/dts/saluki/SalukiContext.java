@@ -35,7 +35,7 @@ public class SalukiContext extends DtsContext {
 
   @Override
   public void unbind() {
-    RpcContext.getContext().removeAttachment(TXC_XID_KEY);
+    RpcContext.removeContext();
   }
 
   @Override
