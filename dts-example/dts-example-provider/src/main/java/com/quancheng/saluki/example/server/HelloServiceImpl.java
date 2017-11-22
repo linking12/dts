@@ -7,6 +7,7 @@ import com.quancheng.examples.model.hello.HelloReply;
 import com.quancheng.examples.model.hello.HelloRequest;
 import com.quancheng.examples.service.HelloService;
 import com.quancheng.saluki.boot.SalukiService;
+import com.quancheng.saluki.core.common.RpcContext;
 import com.quancheng.saluki.example.repository.StudentDao;
 import com.quancheng.saluki.example.repository.entity.StudentDo;
 
@@ -19,6 +20,7 @@ public class HelloServiceImpl implements HelloService {
   @Override
   @Transactional
   public HelloReply dtsNormal(HelloRequest hellorequest) {
+    System.out.println(RpcContext.getContext().get("123"));
     StudentDo studentDo = new StudentDo();
     studentDo.setName("liushiming");
     studentDao.save(studentDo);
@@ -29,10 +31,10 @@ public class HelloServiceImpl implements HelloService {
 
   @Override
   public HelloReply dtsException(HelloRequest hellorequest) {
-    throw new RuntimeException("rollback");
-    // HelloReply reply = new HelloReply();
-    // reply.setMessage("none");
-    // return reply;
+    // throw new RuntimeException("rollback");
+    HelloReply reply = new HelloReply();
+    reply.setMessage("none");
+    return reply;
   }
 
 

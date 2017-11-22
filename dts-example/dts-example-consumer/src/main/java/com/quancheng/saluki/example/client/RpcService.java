@@ -19,6 +19,7 @@ import com.quancheng.examples.model.hello.HelloReply;
 import com.quancheng.examples.model.hello.HelloRequest;
 import com.quancheng.examples.service.HelloService;
 import com.quancheng.saluki.boot.SalukiReference;
+import com.quancheng.saluki.core.common.RpcContext;
 
 import io.dts.client.aop.annotation.DtsTransaction;
 
@@ -36,6 +37,7 @@ public class RpcService {
 
   @DtsTransaction
   public HelloReply callService() {
+    RpcContext.getContext().set("123", "123");
     HelloRequest request = new HelloRequest();
     request.setName("liushiming");
     HelloReply reply = helloService.dtsNormal(request);
