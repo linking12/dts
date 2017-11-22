@@ -27,6 +27,8 @@ import feign.RequestInterceptor;
  */
 @Configuration
 public class SpringCloudContextConfig extends WebMvcConfigurerAdapter {
+
+
   @Override
   public void addInterceptors(InterceptorRegistry registry) {
     registry.addInterceptor(new SpringCloudContextInterceptor())//

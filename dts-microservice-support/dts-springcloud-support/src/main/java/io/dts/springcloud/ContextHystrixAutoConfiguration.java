@@ -13,21 +13,24 @@
  */
 package io.dts.springcloud;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 
+import io.dts.client.aop.DtsTransactionScaner;
+
 /**
  * @author liushiming
- * @version SpringCloudHystrixAutoConfiguration.java, v 0.0.1 2017年11月22日 下午6:10:02 liushiming
+ * @version ContextHystrixAutoConfiguration.java, v 0.0.1 2017年11月22日 下午6:27:06 liushiming
  */
 @Configuration
 @ConditionalOnClass(HystrixCommand.class)
-@ConditionalOnProperty(value = "spring.sleuth.hystrix.strategy.enabled", matchIfMissing = true)
+@ConditionalOnBean(DtsTransactionScaner.class)
 public class ContextHystrixAutoConfiguration {
+
   @Bean
   ContextHystrixConcurrencyStrategy contextHystrixConcurrencyStrategy() {
     return new ContextHystrixConcurrencyStrategy();
