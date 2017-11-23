@@ -46,7 +46,7 @@ public class SalukiContext extends DtsContext {
   }
 
   @Override
-  public void bind(String xid) {
+  public synchronized void bind(String xid) {
     LOCAL.get().put(TXC_XID_KEY, xid);
     RpcContext.getContext().setAttachment(TXC_XID_KEY, xid);
   }
