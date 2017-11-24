@@ -42,6 +42,7 @@ public class RpcService {
     request.setName("liushiming");
     HelloReply reply = helloService.dtsNormal(request);
     helloService.dtsException(request);
+    System.out.println(RpcContext.getContext().get("123"));
     return reply;
   }
 
