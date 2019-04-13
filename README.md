@@ -1,1 +1,1 @@
-## NOTICE, Dts Project has been moved to venusteam   [Dts](https://github.com/venusteam/dts).
+## NOTICE, Dts Project has been moved to ke finance   [Dts](https://github.com/ke-finance).
